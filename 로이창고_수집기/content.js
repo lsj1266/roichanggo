@@ -351,17 +351,17 @@
     try {
       var best = null;
       var bestScore = -1;
-      var nodes = document.querySelectorAll('div, span, p, strong, em, font, b, i');
-      var limit = Math.min(nodes.length, 3500);
+      var nodes = document.querySelectorAll('[class*="price" i], [class*="Price"], div, span, p, strong, em, font, b, i');
+      var limit = Math.min(nodes.length, 12000);
       for (var j = 0; j < limit; j++) {
         var el = nodes[j];
         var txt = (el.innerText || '').trim();
-        if (!txt || txt.length > 100) continue;
+        if (!txt || txt.length > 140) continue;
         var compact = txt.replace(/\s*\.\s*/g, '.').replace(/\s+/g, ' ');
         if (!/(?:¥|￥|RMB|CNY)\s*\d/i.test(compact)) continue;
-        if (/88vip|limited time subsidy|coupon|discount\s+of|off\b|before\s+discount|krw|원/i.test(compact)) continue;
+        if (/88vip|limited time subsidy|coupon|discount\s+of|off\b|before\s+discount|krw|원|免费|免运费|运费|物流|优惠前|原价/i.test(compact)) continue;
         var rect = el.getBoundingClientRect();
-        if (!rect || rect.width <= 0 || rect.height <= 0 || rect.top < 0 || rect.top > 950) continue;
+        if (!rect || rect.width <= 0 || rect.height <= 0 || rect.top < 0 || rect.top > 1100) continue;
         var cs = window.getComputedStyle(el);
         if (cs && cs.textDecorationLine && cs.textDecorationLine.indexOf('line-through') !== -1) continue;
         var m = compact.match(/(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i);
@@ -369,7 +369,7 @@
         var val = toNumber(m[1]);
         if (val === null || val <= 0) continue;
         var fs = cs ? parseFloat(cs.fontSize) || 14 : 14;
-        var score = fs + (/flash|sale|promo|현재|할인/i.test(txt) ? 10 : 0) - (txt.length * 0.1);
+        var score = fs + (/flash|sale|promo|현재|할인|券后|到手/i.test(compact) ? 10 : 0) - (compact.length * 0.1);
         if (score > bestScore) {
           bestScore = score;
           best = val;
@@ -377,17 +377,26 @@
       }
       if (best !== null) return best;
 
-      // 최후 수단: 본문 상단 텍스트 줄 단위 스캔
-      var bodyText = (document.body && document.body.innerText || '').slice(0, 4000).split(/\r?\n/);
-      for (var k = 0; k < bodyText.length; k++) {
-        var line = bodyText[k].replace(/\s*\.\s*/g, '.').replace(/\s+/g, ' ').trim();
-        if (!line || line.length > 100) continue;
-        if (/88vip|limited time subsidy|coupon|discount\s+of|off\b|before\s+discount|krw|원/i.test(line)) continue;
-        var lm = line.match(/(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i);
-        if (lm) {
-          var lv = toNumber(lm[1]);
-          if (lv !== null && lv > 0) return lv;
-        }
+      // 본문 상단 텍스트 통합 스캔 (줄바꿈으로 ¥와 숫자가 나뉜 경우 포함)
+      var flatBody = (document.body && document.body.innerText || '')
+        .slice(0, 12000)
+        .replace(/\s*\.\s*/g, '.')
+        .replace(/\s+/g, ' ');
+      var re = /(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/gi;
+      var bm;
+      while ((bm = re.exec(flatBody)) !== null) {
+        var ctx = flatBody.slice(Math.max(0, bm.index - 24), bm.index + bm[0].length + 20);
+        if (/88vip|before\s+discount|krw|원|免费|免运费|运费|物流|优惠前|原价|省\d/i.test(ctx)) continue;
+        var bv = toNumber(bm[1]);
+        if (bv !== null && bv > 0) return bv;
+      }
+
+      // 타오바오/티몰 내부 JSON 데이터("priceText":"49.9") fallback
+      var html = document.documentElement ? document.documentElement.innerHTML : '';
+      var jm = html.match(/"priceText"\s*:\s*"([0-9]+(?:\.[0-9]{1,2})?)"/);
+      if (jm) {
+        var jv = toNumber(jm[1]);
+        if (jv !== null && jv > 0) return jv;
       }
     } catch (_) {}
 
