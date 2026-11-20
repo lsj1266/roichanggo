@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "로이창고 상품 수집기",
+  "version": "2.0.0",
+  "description": "타오바오·티몰·1688·라쿠텐의 상품 상세 페이지와 검색 목록에서 상품을 한 번에 담아 로이창고(웹앱)로 보냅니다.",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_title": "로이창고 수집함",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://item.taobao.com/*",
+        "https://detail.tmall.com/*",
+        "https://detail.1688.com/*",
+        "https://item.rakuten.co.jp/*",
+        "https://s.taobao.com/*",
+        "https://s.1688.com/*",
+        "https://search.rakuten.co.jp/*",
+        "https://www.rakuten.co.jp/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ]
+}
