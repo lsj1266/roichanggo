@@ -1996,8 +1996,8 @@ function geminiCheckKeys(keys){
 
 /* ---------- 상세이미지(최대 10장) 속 중국어·영문 → 한국어 ---------- */
 var IMG_TR_PROMPT = [
-  "이미지는 중국 구매대행 상품의 상세 설명 이미지입니다.",
-  "이미지 안에 보이는 중국어·영어 글자만 읽고 한국어로 간결하게 정리해 주세요.",
+  "이미지는 중국·일본 구매대행 상품의 상세 설명 이미지입니다.",
+  "이미지 안에 보이는 중국어·영어·일본어 글자만 읽고 한국어로 간결하게 정리해 주세요.",
   "규칙:",
   "1) 이미지에 실제로 보이는 내용만 쓰고, 보이지 않는 내용은 추측해서 만들지 마세요.",
   "2) 상품 설명·스펙·재질·치수표·사이즈·주의사항·세탁·배송 안내를 빠뜨리지 마세요.",
@@ -2841,7 +2841,7 @@ function imageTrPanelHTML(p){
       '<span class="friendly" style="margin-left:auto">' + (keys ? "키 " + keys + "개 사용 중" : "⚙ 설정에서 Gemini API 키를 넣으면 켜집니다") + '</span>' +
     '</div>';
   if(!list.length){
-    return head + '<div class="friendly" style="margin-top:6px">사진 속 중국어 상품설명·스펙·치수표·주의사항을 읽어 한국어로 정리하고, 상세페이지에서 각 사진 바로 아래에 넣습니다. ' +
+    return head + '<div class="friendly" style="margin-top:6px">사진 속 중국어·일본어 상품설명·스펙·치수표·주의사항을 읽어 한국어로 정리하고, 상세페이지에서 각 사진 바로 아래에 넣습니다. ' +
       (keys ? "위 [🖼️ 상세이미지 10장 글자 번역]을 누르면 10장까지 차례로 번역합니다." : "" ) + '</div>';
   }
   var rows = list.map(function(t){
@@ -2901,7 +2901,7 @@ function imagesHTML(p){
         '<button class="btn sm danger" data-act="clearImages">모두 지우기</button>' +
       '</div>' +
       imageTrPanelHTML(p) +
-      '<div class="friendly" style="margin-top:6px">상세페이지에는 이 사진이 <b>10장까지</b> 순서대로 들어갑니다(스마트스토어는 대표 1장 + 추가 9장 노출). 사진 속 중국어 글자는 위 [🖼️ 상세이미지 10장 글자 번역]을 누르면 앱 안에서 바로 한국어로 읽어 사진 아래에 넣어 줍니다.</div>' +
+      '<div class="friendly" style="margin-top:6px">상세페이지에는 이 사진이 <b>10장까지</b> 순서대로 들어갑니다(스마트스토어는 대표 1장 + 추가 9장 노출). 사진 속 중국어·일본어 글자는 위 [🖼️ 상세이미지 10장 글자 번역]을 누르면 앱 안에서 바로 한국어로 읽어 사진 아래에 넣어 줍니다.</div>' +
     '</div>' +
   '</div>';
 }
@@ -4907,7 +4907,7 @@ function openSettings(){
     '</div>' +
 
     '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">Gemini API 키 — 사진 속 글자 번역 (선택)</h4>' +
-    '<div class="notice" style="display:block">키를 넣으면 <b>상세이미지 10장 속 중국어 글자</b>를 한국어로 읽어 사진 아래에 넣고, <b>상품명·옵션명</b>도 더 자연스럽게 다듬습니다. 한도에 걸린 키가 있으면 <b>다음 키로 자동 전환</b>합니다.</div>' +
+    '<div class="notice" style="display:block">키를 넣으면 <b>상세이미지 10장 속 중국어·일본어 글자</b>를 한국어로 읽어 사진 아래에 넣고, <b>상품명·옵션명</b>도 더 자연스럽게 다듬습니다. 한도에 걸린 키가 있으면 <b>다음 키로 자동 전환</b>합니다.</div>' +
     '<label class="field" style="margin-top:8px">Gemini API 키 (줄바꿈으로 여러 개 입력)' +
       '<textarea id="setGeminiKeys" rows="4" spellcheck="false" autocomplete="off" placeholder="AIza... 한 줄에 키 하나 (여러 개면 줄바꿈으로)" style="font-family:ui-monospace,Consolas,monospace;font-size:11.5px;letter-spacing:.02em">' + esc(str(s.geminiKeys)) + '</textarea></label>' +
     '<div class="friendly" style="margin-top:4px">키는 내 컴퓨터 브라우저에만 저장되며 외부로 유출되지 않습니다. 비워두면 기존 무료 번역(구글/사전)으로 동작합니다.</div>' +
