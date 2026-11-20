@@ -356,14 +356,15 @@
       for (var j = 0; j < limit; j++) {
         var el = nodes[j];
         var txt = (el.innerText || '').trim();
-        if (!txt || txt.length > 80) continue;
-        if (!/(?:¥|￥|RMB|CNY)\s*\d/i.test(txt)) continue;
-        if (/88vip|subsidy|coupon|save\s|discount\s+of|off\b|before\s+discount|krw|원/i.test(txt)) continue;
+        if (!txt || txt.length > 100) continue;
+        var compact = txt.replace(/\s*\.\s*/g, '.').replace(/\s+/g, ' ');
+        if (!/(?:¥|￥|RMB|CNY)\s*\d/i.test(compact)) continue;
+        if (/88vip|limited time subsidy|coupon|discount\s+of|off\b|before\s+discount|krw|원/i.test(compact)) continue;
         var rect = el.getBoundingClientRect();
         if (!rect || rect.width <= 0 || rect.height <= 0 || rect.top < 0 || rect.top > 950) continue;
         var cs = window.getComputedStyle(el);
         if (cs && cs.textDecorationLine && cs.textDecorationLine.indexOf('line-through') !== -1) continue;
-        var m = txt.match(/(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i);
+        var m = compact.match(/(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i);
         if (!m) continue;
         var val = toNumber(m[1]);
         if (val === null || val <= 0) continue;
