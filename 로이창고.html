@@ -454,7 +454,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   <div class="brand">
     <div class="logo">🛒</div>
     <div>
-      <h1>로이창고 <span class="ver">v2.1</span></h1>
+      <h1>로이창고 <span class="ver">v2.2</span></h1>
       <div class="sub">로이 전용 구매대행 상품 가공·업로드 작업실 · 중국/일본 소싱 → 스마트스토어·쿠팡·G마켓</div>
     </div>
   </div>
@@ -465,7 +465,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   </div>
   <div class="topactions">
     <button class="btn" data-act="importAny" title="로이창고 수집기에서 내려받은 JSON 또는 CSV 파일">⬆ JSON/CSV 불러오기</button>
-    <button class="btn warn" data-act="autoClean" title="중국어·영어 이름을 한국어로 번역하고, 쓰면 안 되는 단어 · 옵션 10개 · 배송비 · 판매가까지 한 번에 정리">✨ 원클릭 번역·자동정리</button>
+    <button class="btn warn" data-act="autoClean" title="중국어·영어 이름을 한국어로 번역하고, 쓰면 안 되는 단어 · 옵션 2~11개 · 배송비 · 판매가까지 한 번에 정리">✨ 원클릭 번역·자동정리</button>
     <button class="btn primary" data-act="exportSmartstore" title="스마트스토어 대량등록 양식(CSV)으로 내보내기">⬇ 스마트스토어 내보내기</button>
     <button class="btn ghost" data-act="openSettings" title="환율 · 마진 · 해운 요율 · API 키 (고급 설정)">⚙ 설정</button>
   </div>
@@ -494,7 +494,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
         <div class="num">2</div>
         <div class="sc">
           <div class="st">한 번에 번역·정리하기</div>
-          <div class="sd">중국어·영어 이름을 한국어로 번역하고, 쓰면 안 되는 단어·옵션 10개·배송비·판매가를 자동으로 맞춥니다.</div>
+          <div class="sd">중국어·영어 이름을 한국어로 번역하고, 쓰면 안 되는 단어·옵션 2~11개·배송비·판매가를 자동으로 맞춥니다.</div>
           <button class="btn step-btn warn" data-act="autoClean">✨ 원클릭 번역·자동정리</button>
         </div>
         <span class="sdot" data-statedot="2"></span>
@@ -922,6 +922,7 @@ function normProduct(raw){
   p.imageUrl = normalizeImgUrl(p.imageUrl);
   p.images = uniqUrls(p.images || p.detailImages || [], 10);
   p.thumbCutout = !!p.thumbCutout;
+  p.detailNotice = (["top","bottom","shoes","none"].indexOf(str(p.detailNotice)) >= 0) ? str(p.detailNotice) : "auto";
   p.imageNote = str(p.imageNote);
   p.updatedAt = num(p.updatedAt, Date.now());
   return p;
@@ -1331,7 +1332,7 @@ function searchUrlFor(key, keyword){
   return item.url + q;
 }
 
-/* 금칙어 치환 + 상품명 50자 + 옵션명 25자/10개 정리 (값을 바꾼 항목 수를 돌려줌) */
+/* 금칙어 치환 + 상품명 50자 + 옵션명 25자/11개 정리 (값을 바꾼 항목 수를 돌려줌) */
 function cleanAllFields(p, alsoOptions){
   var changed = 0;
   var nm = cleanName(p.name);
@@ -1358,7 +1359,7 @@ function cleanAllFields(p, alsoOptions){
     p.options = (p.options||[]).map(function(o){
       o.name = truncChars(applyAllBanned(o.name), 25);
       return o;
-    }).slice(0, 10);
+    }).slice(0, 11);
     if(beforeN !== p.options.length) changed++;
   }
   return changed;
@@ -1956,11 +1957,17 @@ function translateAll(texts, onProgress){
   });
 }
 
-/* 번역 결과를 이름/옵션에 넣기 */
-function applyTranslated(kind, target, idx, text){
+/* 번역 결과를 이름/옵션/속성에 넣기 */
+function applyTranslated(kind, target, idx, text, key){
   var v = collapse(str(text)).trim();
   if(!v) return false;
   if(kind === "name"){ target.name = v; return true; }
+  if(kind === "attr"){
+    if(key === "tag"){ if(!target.tags || idx === null || idx === undefined) return false; target.tags[idx] = v; return true; }
+    if(str(key).indexOf("attrs.") === 0){ target.attrs[key.slice(6)] = v; return true; }
+    target[key] = v;
+    return true;
+  }
   var o = (target.options || [])[idx];
   if(!o) return false;
   o.name = v;
@@ -2044,6 +2051,7 @@ function translateProduct(p, onlyOptions){
   (p.options || []).forEach(function(o, i){
     if(needsTranslation(o.name)) jobs.push({ p:p, kind:"option", i:i, src:str(o.name) });
   });
+  if(!onlyOptions) attrTranslateJobs(p).forEach(function(j){ jobs.push(j); });
   if(!jobs.length){
     toast(onlyOptions ? "옵션 이름에 번역할 외국어가 없습니다" : "이미 한글로 되어 있습니다", "");
     return Promise.resolve();
@@ -2060,7 +2068,7 @@ function translateProduct(p, onlyOptions){
     jobs.forEach(function(j){
       var r = mergePieces(j.src, map);
       if(!r){ fail++; return; }
-      if(applyTranslated(j.kind, j.p, j.i, r.text)) n++;
+      if(applyTranslated(j.kind, j.p, j.i, r.text, j.key)) n++;
     });
     if(n) cleanAllFields(p, true);
     touch(p); setBusy(false); hideProgress();
@@ -2199,7 +2207,7 @@ function renderEditor(){
     '</div>' +
   '</div>' +
   '<div class="grid">' + cardName(p, lang) + cardPrice(p, c) + cardOptions(p) +
-    cardImages(p) + cardAttrs(p) + cardTags(p) + cardChecklist(p) + '</div>' +
+    cardImages(p) + cardDetailNotice(p) + cardAttrs(p) + cardTags(p) + cardChecklist(p) + '</div>' +
   '<div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap">' +
     '<button class="btn" data-act="exportOne">이 상품만 CSV로</button>' +
     '<button class="btn primary" data-act="exportSmartstore">스마트스토어 내보내기</button>' +
@@ -2379,13 +2387,13 @@ function cardPrice(p, c){
 /* ---------- 3) 옵션 ---------- */
 function cardOptions(p){
   return '<section class="card span2">' +
-    '<div class="card-head"><div class="ico">🔢</div><h3>옵션 정리 (최대 10개)</h3>' +
-      '<span class="hint">옵션 이름 25자 이내 · 판매는 10개까지만</span>' +
+    '<div class="card-head"><div class="ico">🔢</div><h3>옵션 정리 (2~11개)</h3>' +
+      '<span class="hint">옵션 이름 25자 이내 · 판매는 11개까지</span>' +
       '<div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">' +
         '<button class="btn sm" data-act="translateOptions" title="이 상품 옵션 이름의 중국어·영어를 한국어로 번역합니다">🌐 옵션 번역</button>' +
         '<button class="btn sm" data-act="addOption">＋ 옵션 추가</button>' +
-        '<button class="btn sm warn" data-act="trimOptions" title="첫 번째(1번)와 12번째 이후를 지우고 10개만 남깁니다">1번·12번 이후 지우기</button>' +
-        '<button class="btn sm" data-act="keepTop10" title="위에서부터 10개만 남깁니다">위에서 10개만</button>' +
+        '<button class="btn sm warn" data-act="trimOptions" title="첫 번째(1번) 옵션을 빼고 최대 11개만 남깁니다">1번 빼고 11개만</button>' +
+        '<button class="btn sm" data-act="keepTop11" title="위에서부터 11개만 남깁니다">위에서 11개만</button>' +
         '<button class="btn sm" data-act="resetOptionNames" title="수집했을 때의 원래 옵션 이름으로 되돌립니다">옵션 이름 되돌리기</button>' +
       '</div>' +
     '</div>' +
@@ -2460,9 +2468,52 @@ function imagesHTML(p){
         '<button class="btn sm" data-act="addImage">추가</button>' +
         '<button class="btn sm danger" data-act="clearImages">모두 지우기</button>' +
       '</div>' +
-      '<div class="friendly" style="margin-top:6px">최대 10장까지만 저장됩니다. 스마트스토어는 대표 1장 + 추가 9장까지 노출되니, 10번째 사진은 보관용으로 두세요.</div>' +
+      '<div class="friendly" style="margin-top:6px">상세페이지에는 이 사진이 <b>10장까지</b> 순서대로 들어갑니다(스마트스토어는 대표 1장 + 추가 9장 노출). 사진 속 중국어 문구 번역·누끼가 필요하면 [번역·누끼 요청 파일]로 10장까지 함께 보내 주세요.</div>' +
     '</div>' +
   '</div>';
+}
+
+
+/* ---------- 상세페이지 공지 ---------- */
+function noticePreviewHTML(p){
+  var mode = noticeModeOf(p);
+  var type = noticeTypeFor(p);
+  if(mode === "none"){
+    return '<div style="padding:16px;text-align:center;color:#8590ab;font-size:12.5px">공지를 넣지 않습니다 — 상세 사진만 들어갑니다.</div>';
+  }
+  if(type === "none"){
+    return '<div style="padding:16px;text-align:center;color:#8590ab;font-size:12.5px">일반 상품으로 판단해 공지를 넣지 않습니다.<br>옷·신발이면 위에서 유형을 직접 골라 주세요.</div>';
+  }
+  return buildSizeNoticeHtml(type);
+}
+function noticeStatusText(p){
+  var mode = noticeModeOf(p);
+  if(mode === "none") return "공지 넣지 않음";
+  if(mode === "auto"){
+    var info = noticeDetectInfo(p);
+    if(info.type === "none") return "자동 판별 · 일반 상품 → 공지 없음";
+    return "자동 판별 · " + NOTICE_LABEL[info.type] + (info.hit ? " (“" + info.hit + "”)" : "");
+  }
+  return "직접 선택 · " + NOTICE_LABEL[mode];
+}
+function cardDetailNotice(p){
+  return '<section class="card span2" id="noticeCard">' +
+    '<div class="card-head"><div class="ico">📐</div><h3>상세 공지 자동 삽입 (옷 실측 · 신발 사이즈)</h3>' +
+      '<span class="hint" id="noticeStatus">' + esc(noticeStatusText(p)) + '</span></div>' +
+    '<div class="g2">' +
+      '<label class="field">상세 공지' +
+        '<select data-field="detailNotice" id="noticeSelect">' +
+          NOTICE_TYPES.map(function(t){
+            return '<option value="' + t.v + '"' + (noticeModeOf(p) === t.v ? " selected" : "") + '>' + esc(t.label) + '</option>';
+          }).join("") +
+        '</select></label>' +
+      '<div class="friendly" style="align-self:end">기본값 <b>자동 판별</b> — 아무것도 고르지 않아도 옷이면 실측 공지, 신발이면 남녀 사이즈표가 상세페이지 맨 위에 들어갑니다.</div>' +
+    '</div>' +
+    '<div class="tiny muted" style="margin-top:10px;font-weight:700">미리보기 — 스마트스토어 상세페이지에 이대로 들어갑니다</div>' +
+    '<div id="noticePrev" style="margin-top:6px;border:1px dashed #dfe5f2;border-radius:12px;padding:10px;background:#fbfcff;max-height:420px;overflow:auto">' +
+      noticePreviewHTML(p) + '</div>' +
+    '<div class="friendly" style="margin-top:6px">공지 뒤에 상세 사진 10장이 순서대로 이어집니다. 사진 속 중국어 글자는 앱에서 번역하지 않습니다 — [번역·누끼 요청 파일]로 10장까지 보내 주세요.</div>' +
+  '</section>';
 }
 
 /* ---------- 5) 속성 ---------- */
@@ -2531,7 +2582,7 @@ function stepState(){
   var ps = state.products;
   var has = ps.length > 0;
   var clean = has && ps.every(function(p){
-    return productRisk(p).length === 0 && (p.options||[]).length <= 10 && calc(p).price > 0;
+    return productRisk(p).length === 0 && (p.options||[]).length <= OPT_MAX && calc(p).price > 0;
   });
   var imgOk = has && ps.some(function(p){ return !!p.imageUrl && (p.images||[]).length > 0; });
   return { 1: has, 2: clean, 3: imgOk, 4: false };
@@ -2548,9 +2599,9 @@ function renderSteps(){
 
 function optionRowsHTML(p){
   if(!p.options.length) return '<div style="padding:14px;text-align:center;color:#8590ab;font-size:12px">옵션이 없습니다 · ＋ 옵션 추가를 누르세요 (없어도 등록은 됩니다)</div>';
-  var over = p.options.length > 10;
+  var over = p.options.length > OPT_MAX;
   return p.options.map(function(o,i){
-    var out = over && i >= 10;
+    var out = over && i >= OPT_MAX;
     var len = charCount(o.name);
     var cls = len > 25 ? "bad" : (len >= 22 ? "warn" : "");
     return '<div class="orow' + (out?" out":"") + '" data-orow="' + i + '">' +
@@ -2567,12 +2618,12 @@ function optionRowsHTML(p){
 }
 
 function sellableOptions(p){
-  return p.options.length > 11 ? p.options.slice(1,11) : p.options;
+  return p.options.length > OPT_MAX ? p.options.slice(1, 1 + OPT_MAX) : p.options;
 }
 
 function optionSummaryHTML(p){
   var n = (p.options||[]).length;
-  var sell = (p.options||[]).slice(0,10);
+  var sell = (p.options||[]).slice(0, OPT_MAX);
   var stock = sell.reduce(function(a,o){ return a + num(o.stock,0); }, 0);
   var longN = (p.options||[]).filter(function(o){ return charCount(o.name) > 25; }).length;
   var basis = basisInfo(p);
@@ -2580,7 +2631,8 @@ function optionSummaryHTML(p){
     '<span>판매할 옵션 <b>' + sell.length + '</b>개</span>' +
     '<span>옵션 재고 <b>' + nf(stock) + '</b></span>' +
     (longN ? '<span style="color:#d9444b;font-weight:700">이름 25자 초과 ' + longN + '개</span>' : '<span style="color:#0f9d76;font-weight:700">옵션 이름 길이 정상</span>') +
-    (n > 10 ? '<span style="color:#d98200;font-weight:700">' + (n - 10) + '개는 판매에서 빠집니다</span>' : '') +
+    (n <= 1 ? '<span style="color:#d98200;font-weight:700">' + (n === 0 ? "옵션 없음 · 2개 이상 권장" : "옵션 1개 · 2개 이상 권장") + '</span>' : '') +
+    (n > OPT_MAX ? '<span style="color:#d98200;font-weight:700">' + (n - OPT_MAX) + '개는 판매에서 빠집니다</span>' : '') +
     '<span>배송비 기준 <b>' + esc(basis.fromOption ? basis.label : "대표 무게") + '</b>' + (basis.kg>0 ? " · " + basis.kg + "kg" : "") + '</span>';
 }
 
@@ -2661,7 +2713,7 @@ function renderChecklist(){
   var len = charCount(p.name);
   var hits = productRisk(p);
   var optN = (p.options||[]).length;
-  var sell = (p.options||[]).slice(0,10);
+  var sell = (p.options||[]).slice(0, OPT_MAX);
   var optStock = sell.reduce(function(a,o){ return a + num(o.stock,0); }, 0);
   var imgN = (p.images||[]).length;
   var basis = c.basis;
@@ -2695,7 +2747,7 @@ function renderChecklist(){
     {t:"판매가", d: c.price>0 ? won(c.price) : "아직 미정", s: c.price>0? "ok":"bad"},
     {t:"남는 돈", d: won(c.net) + " (" + c.realMargin.toFixed(1) + "%)", s: c.net>0? "ok":"bad"},
     {t:"배송비 기준 무게", d: basis.kg>0 ? basis.label + " · " + basis.kg + "kg" : "무게를 넣어 주세요", s: basis.kg>0?"ok":"warn"},
-    {t:"옵션", d: optN===0 ? "옵션 없음(단일 상품)" : (optN<=10 ? sell.length + "개로 등록" : "10개 초과 " + optN + "개"), s: optN<=10? "ok":"warn"},
+    {t:"옵션", d: optN===0 ? "옵션 없음(단일 상품) · 2개 이상 권장" : (optN===1 ? "1개 · 2개 이상 권장" : (optN<=OPT_MAX ? sell.length + "개로 등록" : "11개 초과 " + optN + "개")), s: (optN>=2 && optN<=OPT_MAX) ? "ok":"warn"},
     {t:"옵션 재고", d: optN? nf(optStock)+"개" : "—", s: (optN===0 || optStock>0)? "ok":"warn"},
     {t:"대표 사진", d: p.imageUrl ? (p.thumbCutout ? "있음 · 누끼 완료" : "있음 · 누끼 전") : "없음", s: p.imageUrl? (p.thumbCutout?"ok":"warn") : "bad"},
     {t:"상세 사진", d: imgN + "/10장", s: imgN>=3? "ok" : (imgN>0?"warn":"bad")},
@@ -2792,6 +2844,10 @@ function refreshDerived(){
 
   renderBannedPanel();
   renderPreview();
+  var noticeSt = document.getElementById("noticeStatus");
+  if(noticeSt) noticeSt.textContent = noticeStatusText(p);
+  var noticePv = document.getElementById("noticePrev");
+  if(noticePv) noticePv.innerHTML = noticePreviewHTML(p);
   renderChecklist();
   renderStats();
   renderList();
@@ -2988,6 +3044,16 @@ function bindGlobal(){
       touch(pc); renderEditor(); save();
       return;
     }
+    if(field === "detailNotice"){
+      var pn = current(); if(!pn) return;
+      pn.detailNotice = t.value;
+      touch(pn); save();
+      var nst = document.getElementById("noticeStatus");
+      if(nst) nst.textContent = noticeStatusText(pn);
+      var npr = document.getElementById("noticePrev");
+      if(npr) npr.innerHTML = noticePreviewHTML(pn);
+      return;
+    }
     if(e.target.id === "anyFile" || e.target.id === "csvFile" || e.target.id === "jsonFile"){
       importAnyFile(e.target.files[0]); e.target.value = ""; return;
     }
@@ -3102,7 +3168,7 @@ function handleAction(act, el, ev){
     }
     case "addOption": {
       if(!p) return;
-      if((p.options||[]).length >= 10){ toast("옵션은 10개까지입니다. 하나를 지우고 추가해 주세요", "bad"); return; }
+      if((p.options||[]).length >= OPT_MAX){ toast("옵션은 11개까지입니다. 하나를 지우고 추가해 주세요", "bad"); return; }
       p.options.push({ name: "", extra: 0, stock: 0, weightKg: 0 });
       touch(p); renderEditor(); save();
       break;
@@ -3110,27 +3176,27 @@ function handleAction(act, el, ev){
     case "trimOptions": {
       if(!p) return;
       var before = (p.options||[]).length;
-      if(before <= 10){ toast("이미 10개 이하입니다 (지금 " + before + "개) — 지울 것이 없습니다"); return; }
-      var next = p.options.slice(1, 11);
+      if(before <= OPT_MAX){ toast("이미 11개 이하입니다 (지금 " + before + "개) — 지울 것이 없습니다"); return; }
+      var next = p.options.slice(1, 1 + OPT_MAX);
       p.options = next;
       touch(p); renderEditor(); save();
-      toast("1번과 12번 이후를 지우고 " + next.length + "개만 남겼습니다", "ok");
+      toast("1번을 빼고 " + next.length + "개만 남겼습니다", "ok");
       break;
     }
-    case "keepTop10": {
+    case "keepTop11": {
       if(!p) return;
       var n0 = (p.options||[]).length;
-      if(n0 <= 10){ toast("이미 10개 이하입니다 (지금 " + n0 + "개)"); return; }
-      p.options = p.options.slice(0, 10);
+      if(n0 <= OPT_MAX){ toast("이미 11개 이하입니다 (지금 " + n0 + "개)"); return; }
+      p.options = p.options.slice(0, OPT_MAX);
       touch(p); renderEditor(); save();
-      toast("위에서 10개만 남기고 " + (n0 - 10) + "개를 지웠습니다", "ok");
+      toast("위에서 11개만 남기고 " + (n0 - OPT_MAX) + "개를 지웠습니다", "ok");
       break;
     }
     case "resetOptionNames": {
       if(!p) return;
       var orig = (p.rawOptions || []).slice();
       if(!(p.options||[]).length && orig.length){
-        p.options = orig.slice(0, 10).map(function(nm){
+        p.options = orig.slice(0, OPT_MAX).map(function(nm){
           return { name: nm, extra: 0, stock: 0, weightKg: parseWeightFromText(nm) };
         });
       } else {
@@ -3241,7 +3307,7 @@ function cleanField(key){
 /* ---------- 원클릭 번역·자동정리 ----------
    ① 이름·옵션의 중국어/영어를 한국어로 번역 (구글 → 실패하면 사전)
    ② 쓰면 안 되는 단어·문구·중복·50자 정리
-   ③ 옵션 10개·무게·배송비·판매가·자연노출 점수까지 한 번에 */
+   ③ 옵션 2~11개·무게·배송비·판매가·자연노출 점수까지 한 번에 */
 function autoClean(){
   if(TRANS_BUSY){ toast("이미 번역·정리하는 중입니다 — 끝날 때까지 기다려 주세요"); return; }
   var p = current();
@@ -3262,6 +3328,7 @@ function autoClean(){
     (x.options || []).forEach(function(o, i){
       if(needsTranslation(o.name)) jobs.push({ p:x, kind:"option", i:i, src:str(o.name) });
     });
+    attrTranslateJobs(x).forEach(function(j){ jobs.push(j); });   // 소재·모델명·브랜드·카테고리·태그
   });
 
   if(!jobs.length){
@@ -3280,7 +3347,7 @@ function autoClean(){
     jobs.forEach(function(j){
       var r = mergePieces(j.src, map);
       if(!r){ stat.fail++; return; }
-      if(!applyTranslated(j.kind, j.p, j.i, r.text)){ stat.fail++; return; }
+      if(!applyTranslated(j.kind, j.p, j.i, r.text, j.key)){ stat.fail++; return; }
       stat.ok++;
       if(r.engine === "dict") stat.dict++; else if(r.engine === "google") stat.google++;
     });
@@ -3305,11 +3372,17 @@ function finishAutoClean(targets, stat){
   var missWeight = 0;
   targets.forEach(function(x){
     cleanAllFields(x, true);
+    var org = normalizeOrigin(x.attrs.origin);
+    if(org) x.attrs.origin = org;
+    x.tags = (x.tags||[]).map(function(t){ return str(t).trim(); })
+      .filter(Boolean)
+      .filter(function(t, i, a){ return a.indexOf(t) === i; })
+      .slice(0, 10);
 
     x.options = (x.options||[]).filter(function(o){
       return str(o.name).trim() !== "" || num(o.extra,0) > 0 || num(o.stock,0) > 0;
     });
-    if(x.options.length > 10) x.options = x.options.slice(0, 10);
+    if(x.options.length > OPT_MAX) x.options = x.options.slice(0, OPT_MAX);
     x.options.forEach(function(o){ if(!num(o.weightKg,0)) o.weightKg = parseWeightFromText(o.name); });
 
     var b = basisInfo(x);
@@ -3486,8 +3559,8 @@ function seoScore(p){
 
   var optN = (p.options||[]).length;
   var longOpt = (p.options||[]).filter(function(o){ return charCount(o.name) > 25; }).length;
-  var optPts = optN <= 10 ? (longOpt ? 6 : 10) : 4;
-  items.push({ t:"옵션 10개 이내 · 이름 25자", pts:optPts, max:10, d: optN + "개" + (longOpt ? " · 긴 이름 " + longOpt : "") });
+  var optPts = optN <= OPT_MAX ? (longOpt ? 6 : 10) : 4;
+  items.push({ t:"옵션 2~11개 · 이름 25자", pts:optPts, max:10, d: optN + "개" + (longOpt ? " · 긴 이름 " + longOpt : "") });
 
   var total = 0;
   items.forEach(function(it){ total += it.pts; });
@@ -3660,17 +3733,204 @@ function downloadTemplate(){
   toast("스마트스토어 빈 양식(제목 줄만)을 내려받았습니다", "ok");
 }
 
+/* =========================================================
+   9-0. 상세페이지 자동 공지 — 옷 실측(윗옷·바지) · 신발 남녀 사이즈
+   ---------------------------------------------------------
+   · 상품명·원본명·카테고리·옵션명을 보고 종류를 자동으로 고릅니다.
+   · 상품별 [상세 공지 자동 삽입]에서 직접 고르거나 [넣지 않음]으로 뺄 수 있습니다.
+   · 스마트스토어·쿠팡·G마켓 내보내기의 [상세설명] 맨 위에 그대로 들어갑니다.
+   ========================================================= */
+var OPT_MIN = 2, OPT_MAX = 11;
+
+var NOTICE_TYPES = [
+  { v:"auto",   label:"자동 판별 (기본 — 아무것도 안 골라도 들어갑니다)" },
+  { v:"top",    label:"의류-윗옷 실측 공지" },
+  { v:"bottom", label:"의류-바지 실측 공지" },
+  { v:"shoes",  label:"신발-남녀 사이즈표" },
+  { v:"none",   label:"넣지 않음 (사진만)" }
+];
+var NOTICE_LABEL = { top:"의류-윗옷 실측", bottom:"의류-바지 실측", shoes:"신발-남녀 사이즈", none:"공지 없음" };
+
+/* 상품 종류를 알아보는 단어 — 신발 → 바지 → 윗옷 순서로 봅니다(패딩바지처럼 겹치면 바지) */
+var NOTICE_WORDS = {
+  shoes: ["신발","운동화","스니커즈","구두","부츠","샌들","슬리퍼","로퍼","워커","크록스","하이힐","플랫슈즈",
+          "sneakers","sneaker","shoes","shoe","boots","boot","sandals","sandal","slippers","slipper","loafers","loafer","heels","footwear"],
+  bottom: ["바지","팬츠","청바지","슬랙스","조거","레깅스","반바지","숏팬츠","핫팬츠","스커트","치마","트레이닝바지",
+           "pants","jeans","jean","slacks","jogger","leggings","shorts","skirt","trousers"],
+  top: ["맨투맨","후드","티셔츠","자켓","재킷","코트","패딩","점퍼","셔츠","니트","가디건","카디건","조끼","블라우스","아우터","스웨트","집업","야상","무스탕",
+        "sweatshirt","hoodie","t-shirt","tshirt","tee","jacket","coat","padding","jumper","shirt","knit","cardigan","vest","blouse","sweater","outerwear","zip-up","zipup"]
+};
+
+function noticeHasWord(hay, w){
+  var word = str(w).toLowerCase();
+  if(!word) return false;
+  if(/^[a-z0-9 .\-]+$/.test(word)){
+    var re = new RegExp("(^|[^a-z])" + word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "([^a-z]|$)");
+    return re.test(hay);
+  }
+  return hay.indexOf(word) >= 0;
+}
+function noticeDetectInfo(p){
+  if(!p) return { type:"none", hit:"" };
+  var hay = [
+    str(p.name), str(p.origTitle), str(p.category),
+    (p.rawOptions || []).join(" "),
+    (p.options || []).map(function(o){ return str(o && o.name); }).join(" ")
+  ].join(" ").toLowerCase();
+  var order = ["shoes","bottom","top"];
+  for(var i = 0; i < order.length; i++){
+    var list = NOTICE_WORDS[order[i]];
+    for(var k = 0; k < list.length; k++){
+      if(noticeHasWord(hay, list[k])) return { type:order[i], hit:list[k] };
+    }
+  }
+  return { type:"none", hit:"" };
+}
+function detectCategoryNotice(p){ return noticeDetectInfo(p).type; }
+function noticeModeOf(p){
+  var m = str(p && p.detailNotice);
+  return (m === "top" || m === "bottom" || m === "shoes" || m === "none") ? m : "auto";
+}
+function noticeTypeFor(p){
+  var m = noticeModeOf(p);
+  return m === "auto" ? detectCategoryNotice(p) : m;
+}
+
+/* 상세페이지 안에서도 깨지지 않게 — 전부 인라인 스타일(반응형: 폭 100%, 표 고정) */
+var NST = {
+  box:'max-width:760px;margin:0 auto 18px;font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;color:#1b2138;line-height:1.65;word-break:keep-all',
+  card:'border:1px solid #e4e8f2;border-radius:14px;padding:18px 16px;background:#ffffff',
+  h:'font-size:16px;font-weight:800;letter-spacing:-.01em',
+  p:'margin:6px 0 0;font-size:13px;color:#4b5573',
+  sub:'margin:14px 0 0;font-size:13px;font-weight:700',
+  ul:'margin:6px 0 0;padding-left:18px;font-size:13px;color:#4b5573',
+  warn:'margin-top:14px;padding:10px 12px;border-radius:10px;background:#fff4e0;color:#8a5300;font-size:12.5px;line-height:1.6',
+  note:'margin-top:8px;padding:10px 12px;border-radius:10px;background:#f6f7fb;color:#4b5573;font-size:12.5px;line-height:1.6',
+  table:'width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px;table-layout:fixed',
+  th:'padding:7px 4px;border:1px solid #e4e8f2;background:#f6f7fb;font-weight:700;text-align:center',
+  td:'padding:7px 4px;border:1px solid #e4e8f2;text-align:center'
+};
+
+function noticeShell(title, intro, body){
+  return '<div style="' + NST.box + '"><div style="' + NST.card + '">' +
+    '<div style="' + NST.h + '">' + title + '</div>' +
+    '<div style="' + NST.p + '">' + intro + '</div>' + body + '</div></div>';
+}
+function noticeMethodHTML(title, rows){
+  return '<div style="' + NST.sub + '">' + title + '</div><ul style="' + NST.ul + '">' +
+    rows.map(function(r){
+      return '<li><b style="color:#1b2138">' + r[0] + '</b> — ' + r[1] + '</li>';
+    }).join("") + '</ul>';
+}
+function noticeOverseasHTML(extra){
+  return '<div style="' + NST.note + '"><b style="color:#1b2138">해외직구·구매대행 안내</b><br>' +
+    '· 해외에서 들여오는 상품이라 교환·반품을 하실 때 왕복 배송비가 발생합니다.<br>' +
+    '· 세탁·착용·택 제거 후에는 교환·반품이 어렵습니다. 받으신 날 바로 사이즈를 확인해 주세요.<br>' +
+    (extra ? '· ' + extra + '<br>' : '') +
+    '· 색상은 화면 설정과 촬영 조명에 따라 실제와 조금 다를 수 있습니다.</div>';
+}
+function noticeShoeTableHTML(title, rows){
+  return '<div style="' + NST.sub + '">' + title + '</div>' +
+    '<table style="' + NST.table + '"><thead><tr>' +
+      '<th style="' + NST.th + '">발길이 (mm)</th><th style="' + NST.th + '">EU 사이즈</th>' +
+    '</tr></thead><tbody>' +
+    rows.map(function(r){
+      return '<tr><td style="' + NST.td + '">' + r[0] + '</td><td style="' + NST.td + '">' + r[1] + '</td></tr>';
+    }).join("") +
+    '</tbody></table>';
+}
+
+function buildSizeNoticeHtml(type){
+  if(type === "top"){
+    return noticeShell("📏 윗옷 실측 사이즈 안내",
+      "해외 구매대행 상품은 같은 표기 사이즈라도 실제 치수가 조금씩 다릅니다. 아래 방법으로 평소 입는 옷과 비교해 주세요.",
+      noticeMethodHTML("재는 방법 (모두 단면 기준)", [
+        ["어깨너비", "양쪽 어깨 솔기 끝에서 끝까지"],
+        ["가슴단면", "겨드랑이 아래 1~2cm 지점, 앞판만"],
+        ["소매길이", "어깨 솔기에서 소매 끝까지"],
+        ["총장", "뒷목 중앙(또는 어깨선)에서 밑단까지"]
+      ]) +
+      '<div style="' + NST.warn + '"><b>실측 오차 1~3cm</b> — 재는 위치와 원단의 신축성에 따라 1~3cm 차이가 날 수 있습니다. 여유 있게 입으시려면 한 치수 위를 권합니다.</div>' +
+      noticeOverseasHTML("사이즈는 상품 상세 사진의 실측표와 함께 확인해 주세요.")
+    );
+  }
+  if(type === "bottom"){
+    return noticeShell("📏 바지 실측 사이즈 안내",
+      "해외 구매대행 상품은 같은 표기 사이즈라도 실제 치수가 조금씩 다릅니다. 아래 방법으로 평소 입는 바지와 비교해 주세요.",
+      noticeMethodHTML("재는 방법 (모두 단면 기준)", [
+        ["허리단면", "허리를 잠근 상태에서 허리 끝과 끝"],
+        ["엉덩이단면", "엉덩이가 가장 넓은 곳"],
+        ["허벅지단면", "밑위 아래 2~3cm 지점, 다리 한 쪽 폭"],
+        ["밑위", "허리선에서 밑솔기까지"],
+        ["밑단", "바지 끝 단면"],
+        ["총장", "허리선에서 밑단까지"]
+      ]) +
+      '<div style="' + NST.warn + '"><b>실측 오차 1~3cm</b> — 재는 위치와 원단의 신축성에 따라 1~3cm 차이가 날 수 있습니다. 허리·엉덩이는 여유 있게 재 주세요.</div>' +
+      noticeOverseasHTML("와이드·일자 핏은 같은 사이즈라도 실루엣에 따라 여유가 다르니 상세 사진을 함께 확인해 주세요.")
+    );
+  }
+  if(type === "shoes"){
+    var fem  = [[225,35],[230,36],[235,37],[240,38],[245,39],[250,40],[255,41]];
+    var male = [[250,40],[255,41],[260,42],[265,43],[270,44],[275,45],["280~285",46]];
+    return noticeShell("👟 신발 사이즈 안내 (여성·남성)",
+      "같은 발길이라도 브랜드·제품 종류에 따라 맞는 사이즈가 다릅니다. 아래 표에서 내 발길이를 확인해 주세요.",
+      noticeShoeTableHTML("여성 · 225~255mm / EU 35~41", fem) +
+      noticeShoeTableHTML("남성 · 250~285mm / EU 40~46", male) +
+      '<div style="' + NST.warn + '"><b>발볼이 넓거나 발등이 높으면 한 치수 위(5mm)</b>를 권합니다. 운동화·스니커즈는 여유 있게, 구두는 정사이즈로 고르세요.</div>' +
+      noticeOverseasHTML("사이즈 표기는 브랜드·제조사마다 5mm 안팎 차이가 날 수 있습니다.")
+    );
+  }
+  return "";
+}
+
+/* 상세페이지 HTML — 공지(있으면) + 상세 사진 10장 */
+function buildDetailHtml(p){
+  if(!p) return "";
+  var imgs = (p.images || []).slice(0, 10).map(function(u){
+    return '<p><img src="' + esc(u) + '" style="max-width:100%;"></p>';
+  }).join("");
+  var type = noticeTypeFor(p);
+  var notice = (type && type !== "none") ? buildSizeNoticeHtml(type) : "";
+  return notice + imgs;
+}
+
+/* 원산지 표기(中国·China 등)를 앱 표준값으로 */
+function normalizeOrigin(v){
+  var t = str(v).trim();
+  if(!t) return "";
+  if(t === "중국" || t === "일본" || t === "한국" || t === "기타") return t;
+  if(/中国|中國|china|chn|^cn$/i.test(t)) return "중국";
+  if(/日本|japan|jpn|^jp$/i.test(t)) return "일본";
+  if(/韩国|韓國|korea|kor|^kr$/i.test(t)) return "한국";
+  return "기타";
+}
+
+/* 속성(소재·모델명·브랜드·인증정보·카테고리·태그)의 중국어·영어도 함께 번역
+   — 영문 모델명은 상품 코드일 수 있어 한자·가나가 있을 때만 바꿉니다 */
+function attrTranslateJobs(p){
+  var jobs = [];
+  function add(key, idx, val, allowEnglish){
+    var v = str(val).trim();
+    if(!v || !needsTranslation(v)) return;
+    if(!allowEnglish && !isCJK(v) && !RE_KANA.test(v)) return;
+    jobs.push({ p:p, kind:"attr", key:key, i:idx, src:v });
+  }
+  add("attrs.material", null, p.attrs && p.attrs.material, true);
+  add("attrs.model", null, p.attrs && p.attrs.model, false);
+  add("attrs.brand", null, p.attrs && p.attrs.brand, false);
+  add("attrs.cert", null, p.attrs && p.attrs.cert, true);
+  add("category", null, p.category, true);
+  (p.tags || []).forEach(function(t, i){ add("tag", i, t, true); });
+  return jobs;
+}
+
 /* ---------- 마켓 업로드용 ---------- */
 function ssName(p){
   return truncChars(str(p.name).replace(/[*?"<>]/g, ""), 100);
 }
-function detailHtml(p){
-  return (p.images||[]).slice(0,10).map(function(u){
-    return '<p><img src="' + esc(u) + '" style="max-width:100%;"></p>';
-  }).join("");
-}
+function detailHtml(p){ return buildDetailHtml(p); }
 function optionBrief(p){
-  return (p.options||[]).filter(function(o){ return str(o.name).trim(); }).slice(0,10).map(function(o){
+  return (p.options||[]).filter(function(o){ return str(o.name).trim(); }).slice(0, OPT_MAX).map(function(o){
     var extra = num(o.extra,0);
     return str(o.name).trim() + (extra ? " (+" + nf(extra) + "원)" : "") + " / 재고 " + nf(num(o.stock,0));
   }).join(" | ");
@@ -3734,7 +3994,7 @@ function gmarketRow(p){
 function optionHeader(){ return ["판매자상품코드","상품명","옵션명","옵션값","옵션가","재고수량"]; }
 function optionRows(p){
   var rows = [];
-  (p.options||[]).slice(0,10).forEach(function(o, idx){
+  (p.options||[]).slice(0, OPT_MAX).forEach(function(o, idx){
     if(!str(o.name).trim() && !num(o.extra,0) && !num(o.stock,0)) return;
     rows.push([p.id, ssName(p), "옵션", str(o.name).trim() || ("옵션 " + (idx+1)), num(o.extra,0), num(o.stock,0)]);
   });
@@ -3864,7 +4124,7 @@ function parseOptions(txt){
     var parts = chunk.split(">");
     if(!parts[0] || !parts[0].trim()) return null;
     return { name: parts[0].trim(), extra: num(parts[1],0), stock: num(parts[2],0), weightKg: 0 };
-  }).filter(Boolean).slice(0, 10);
+  }).filter(Boolean).slice(0, OPT_MAX);
 }
 
 /* 수집기 JSON 1건 → 로이창고 상품 */
@@ -4274,6 +4534,17 @@ var RoiChanggoCore = {
   coupangRow: coupangRow,
   gmarketHeader: gmarketHeader,
   gmarketRow: gmarketRow,
+  detectCategoryNotice: detectCategoryNotice,
+  noticeDetectInfo: noticeDetectInfo,
+  noticeModeOf: noticeModeOf,
+  noticeTypeFor: noticeTypeFor,
+  buildSizeNoticeHtml: buildSizeNoticeHtml,
+  buildDetailHtml: buildDetailHtml,
+  detailHtml: detailHtml,
+  normalizeOrigin: normalizeOrigin,
+  attrTranslateJobs: attrTranslateJobs,
+  OPT_MIN: OPT_MIN,
+  OPT_MAX: OPT_MAX,
   smartstoreCsv: function(){ return buildTableCsv(smartstoreHeader(), state.products.map(smartstoreRow)); },
   coupangCsv: function(){ return buildTableCsv(coupangHeader(), state.products.map(coupangRow)); },
   gmarketCsv: function(){ return buildTableCsv(gmarketHeader(), state.products.map(gmarketRow)); },
