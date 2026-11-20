@@ -350,6 +350,8 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   background:#1b2138;color:#fff;border-radius:11px;padding:9px 15px;font-size:12.5px;font-weight:600;
   box-shadow:0 12px 30px -12px rgba(0,0,0,.6);animation:pop .18s ease-out;
 }
+.toast.busy{background:#a33c0a}
+.btn[disabled],.btn:disabled{opacity:.72;cursor:progress;transform:none}
 .toast.ok{background:#0f9d76}
 .toast.bad{background:#c93a40}
 @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -452,7 +454,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   <div class="brand">
     <div class="logo">🛒</div>
     <div>
-      <h1>로이창고 <span class="ver">v2</span></h1>
+      <h1>로이창고 <span class="ver">v2.1</span></h1>
       <div class="sub">로이 전용 구매대행 상품 가공·업로드 작업실 · 중국/일본 소싱 → 스마트스토어·쿠팡·G마켓</div>
     </div>
   </div>
@@ -463,7 +465,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   </div>
   <div class="topactions">
     <button class="btn" data-act="importAny" title="로이창고 수집기에서 내려받은 JSON 또는 CSV 파일">⬆ JSON/CSV 불러오기</button>
-    <button class="btn warn" data-act="autoClean" title="쓰면 안 되는 단어 · 옵션 10개 · 배송비 · 판매가를 한 번에 정리">✨ 원클릭 자동정리</button>
+    <button class="btn warn" data-act="autoClean" title="중국어·영어 이름을 한국어로 번역하고, 쓰면 안 되는 단어 · 옵션 10개 · 배송비 · 판매가까지 한 번에 정리">✨ 원클릭 번역·자동정리</button>
     <button class="btn primary" data-act="exportSmartstore" title="스마트스토어 대량등록 양식(CSV)으로 내보내기">⬇ 스마트스토어 내보내기</button>
     <button class="btn ghost" data-act="openSettings" title="환율 · 마진 · 해운 요율 · API 키 (고급 설정)">⚙ 설정</button>
   </div>
@@ -491,9 +493,9 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
       <div class="step" data-step="2">
         <div class="num">2</div>
         <div class="sc">
-          <div class="st">한 번에 정리하기</div>
-          <div class="sd">쓰면 안 되는 단어, 옵션 10개, 배송비, 판매가를 자동으로 맞춥니다.</div>
-          <button class="btn step-btn warn" data-act="autoClean">✨ 원클릭 자동정리</button>
+          <div class="st">한 번에 번역·정리하기</div>
+          <div class="sd">중국어·영어 이름을 한국어로 번역하고, 쓰면 안 되는 단어·옵션 10개·배송비·판매가를 자동으로 맞춥니다.</div>
+          <button class="btn step-btn warn" data-act="autoClean">✨ 원클릭 번역·자동정리</button>
         </div>
         <span class="sdot" data-statedot="2"></span>
       </div>
@@ -501,7 +503,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
         <div class="num">3</div>
         <div class="sc">
           <div class="st">사진 확인하기</div>
-          <div class="sd">대표 1장 + 상세 10장 확인. 누끼·번역은 요청 파일로 부탁합니다.</div>
+          <div class="sd">대표 1장 + 상세 10장 확인. 이름 번역은 2번 단추에서 바로 되고, 누끼는 요청 파일로 부탁합니다.</div>
           <button class="btn step-btn" data-act="goImages">🖼️ 사진 확인하기</button>
         </div>
         <span class="sdot" data-statedot="3"></span>
@@ -692,8 +694,10 @@ var DEFAULT_SETTINGS = {
   // 스마트스토어 업로드 기본값
   importer: "", asInfo: "", asPhone: "",
   originCodeCN: "", originCodeJP: "", catCode: "",
-  // 선택 사항: 외부 이미지(누끼) · 번역 API 키
-  apiCutout: "", apiTranslate: ""
+  // 선택 사항: 외부 이미지(누끼) API 키
+  apiCutout: "", apiTranslate: "",
+  // 이름 번역 방식: auto = 구글 번역(무료) + 사전 / dict = 번역 없이 사전 치환만
+  translateMode: "auto"
 };
 
 // 수집기 source 코드/한글 라벨 → 로이창고 표준 표기
@@ -1370,6 +1374,706 @@ function highlightBanned(text){
 }
 
 /* =========================================================
+   4-3. 자동 한글 번역 — 구글 번역(무료 주소) → 안 되면 내장 사전
+   ---------------------------------------------------------
+   · 파일을 그냥 열어도(file://) 동작합니다. API 키가 필요 없습니다.
+   · 한글이 이미 들어 있는 이름은 한글을 건드리지 않고
+     한자·가나 덩어리만 번역합니다(직접 고친 이름 보호).
+   · 인터넷이 막히면 내장 사전으로 핵심 단어만이라도 한글로 바꿉니다.
+   ========================================================= */
+var TRANS_KEY = "roi_trans_v1";
+var TRANS_EP = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ko&dt=t&q=";
+var TRANS_BUSY = false;
+var TRANS_STATE = { down:false, fails:0 };
+
+var RE_HAN  = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
+var RE_KANA = /[\u3040-\u30ff]/;
+var RE_HANGUL = /[\uac00-\ud7a3\u1100-\u11ff]/;
+var RE_CJK_RUN = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]+/g;
+
+/* 번역 전에 지우는 브랜드·상호 표기 (고유명사는 번역하면 오히려 어색해지고, 지재권 위험도 큼) */
+var BRAND_STRIP_EXTRA = [
+  "jeanswest","真维斯","恒源祥","南极人","花花公子","波司登","雅鹿","太平鸟","森马","七匹狼",
+  "海澜之家","特步","安踏","李宁","鸿星尔克","贵人鸟","回力","美特斯邦威","名创优品",
+  "九阳","苏泊尔","格兰仕","老板电器","方太","tcl","创维","康佳","荣事达","奥克斯","志高","长虹",
+  "骆驼","探路者","凯乐石","牧高笛","迪卡侬","decathlon","狼爪","jack wolfskin","无印良品",
+  "淘宝","天猫","1688","拼多多","抖音","京东","aliexpress","amazon"
+];
+var BRAND_STRIP = null;
+function brandStripList(){
+  if(BRAND_STRIP) return BRAND_STRIP;
+  var seen = {}, out = [];
+  BRAND_WORDS.concat(BRAND_STRIP_EXTRA).forEach(function(b){
+    var k = String(b || "").trim();
+    if(!k || seen[k.toLowerCase()]) return;
+    seen[k.toLowerCase()] = 1;
+    out.push(k);
+  });
+  out.sort(function(a,b){ return b.length - a.length; });
+  BRAND_STRIP = out;
+  return BRAND_STRIP;
+}
+
+/* 내장 사전 — 인터넷이 없어도 핵심 단어는 한국어로 (중문 · 영문 · 일문) */
+var TRANS_DICT = {
+  /* ---- 생활가전 ---- */
+  "石墨烯":"그래핀","取暖器":"히터","电暖器":"전기히터","暖风机":"팬히터","加热器":"히터",
+  "小太阳":"미니 히터","电热毯":"전기요","电热垫":"전기매트","暖手宝":"손난로","热水袋":"찜질팩",
+  "油汀":"오일히터","加湿器":"가습기","除湿机":"제습기","空气净化器":"공기청정기","净化器":"공기청정기",
+  "风扇":"선풍기","电风扇":"선풍기","空调":"에어컨","冷风机":"냉풍기","循环扇":"서큘레이터",
+  "电饭煲":"전기밥솥","电饭锅":"전기밥솥","电水壶":"전기포트","热水壶":"전기포트","烧水壶":"전기포트",
+  "咖啡机":"커피머신","榨汁机":"착즙기","破壁机":"믹서기","豆浆机":"두유제조기","搅拌机":"믹서기",
+  "空气炸锅":"에어프라이어","烤箱":"오븐","微波炉":"전자레인지","电磁炉":"인덕션","电陶炉":"전기레인지",
+  "吹风机":"드라이기","卷发棒":"고데기","直发器":"고데기","挂烫机":"스팀다리미","熨斗":"다리미",
+  "剃须刀":"면도기","理发器":"이발기","电动牙刷":"전동칫솔","吸尘器":"청소기","无线吸尘器":"무선청소기",
+  "扫地机器人":"로봇청소기","洗衣机":"세탁기","烘干机":"건조기","晾衣架":"빨래건조대","缝纫机":"재봉틀",
+  /* ---- 주방 · 수납 · 생활 ---- */
+  "保温杯":"보온병","水杯":"컵","茶杯":"찻잔","马克杯":"머그컵","随手杯":"텀블러","水壶":"물병",
+  "饭盒":"도시락통","保鲜盒":"밀폐용기","收纳盒":"수납함","收纳箱":"수납박스","收纳袋":"수납파우치",
+  "置物架":"선반","书架":"책장","鞋架":"신발장","衣架":"옷걸이","挂钩":"걸이","垃圾桶":"쓰레기통",
+  "纸巾盒":"티슈케이스","肥皂盒":"비누케이스","牙刷架":"칫솔걸이","毛巾架":"수건걸이","浴巾":"목욕타월",
+  "毛巾":"수건","拖把":"걸레밀대","抹布":"행주","刷子":"브러시","海绵":"스펀지","洗碗布":"수세미",
+  "窗帘":"커튼","门帘":"도어커튼","遮光":"암막","床单":"시트","被套":"이불커버","枕套":"베개커버",
+  "枕头":"베개","被子":"이불","床垫":"매트리스","沙发套":"소파커버","地毯":"러그","地垫":"매트",
+  "桌布":"테이블보","椅垫":"방석","坐垫":"쿠션","抱枕":"쿠션","收纳凳":"수납스툴",
+  /* ---- 조명 · 디지털 ---- */
+  "台灯":"스탠드조명","壁灯":"벽조명","吊灯":"펜던트조명","灯带":"LED바","灯串":"전구줄",
+  "夜灯":"무드등","小夜灯":"무드등","投影灯":"무드등","照明":"조명","灯泡":"전구","射灯":"스포트라이트",
+  "插座":"콘센트","插排":"멀티탭","排插":"멀티탭","充电器":"충전기","数据线":"케이블","充电线":"케이블",
+  "耳机":"이어폰","蓝牙耳机":"블루투스이어폰","音箱":"스피커","音响":"스피커","键盘":"키보드",
+  "鼠标":"마우스","鼠标垫":"마우스패드","手机壳":"휴대폰케이스","钢化膜":"강화유리필름","支架":"거치대",
+  "自拍杆":"셀카봉","充电宝":"보조배터리","移动电源":"보조배터리","摄像头":"카메라","监控":"CCTV",
+  "行车记录仪":"블랙박스","显微镜":"현미경","放大镜":"확대경","望远镜":"망원경","打印机":"프린터",
+  "投影仪":"프로젝터","显示器":"모니터","遥控器":"리모컨","转接头":"젠더","转换器":"변환기",
+  /* ---- 스포츠 · 레저 ---- */
+  "羽毛球拍":"배드민턴라켓","羽毛球":"배드민턴","网球拍":"테니스라켓","网球":"테니스",
+  "拉线机":"스트링머신","穿线机":"스트링머신","乒乓球拍":"탁구라켓","乒乓球":"탁구",
+  "篮球":"농구공","足球":"축구공","排球":"배구공","瑜伽垫":"요가매트","哑铃":"덤벨","跳绳":"줄넘기",
+  "护膝":"무릎보호대","护腕":"손목보호대","护腰":"허리보호대","露营":"캠핑","帐篷":"텐트",
+  "钓鱼竿":"낚싯대","登山杖":"등산스틱","自行车":"자전거","滑板":"스케이트보드","头盔":"헬멧",
+  "拉力器":"저항밴드","健身":"헬스","运动":"운동",
+  /* ---- 의류 ---- */
+  "羽绒服":"패딩","棉服":"패딩","大衣":"코트","风衣":"트렌치코트","夹克":"자켓","外套":"아우터",
+  "马甲":"조끼","卫衣":"맨투맨","连帽卫衣":"후드티","毛衣":"니트","针织衫":"니트","开衫":"가디건",
+  "衬衫":"셔츠","T恤":"티셔츠","打底衫":"이너티","连衣裙":"원피스","半身裙":"스커트","裙子":"스커트",
+  "裤子":"바지","牛仔裤":"청바지","牛仔":"데님","休闲裤":"캐주얼팬츠","运动裤":"트레이닝팬츠",
+  "阔腿裤":"와이드팬츠","短裤":"반바지","套装":"세트","睡衣":"잠옷","家居服":"홈웨어",
+  "内衣":"속옷","文胸":"브라","袜子":"양말","帽子":"모자","围巾":"목도리","手套":"장갑",
+  "腰带":"벨트","皮带":"벨트","背包":"백팩","双肩包":"백팩","单肩包":"숄더백","手提包":"토트백",
+  "钱包":"지갑","行李箱":"캐리어","运动鞋":"운동화","跑步鞋":"러닝화","靴子":"부츠","拖鞋":"슬리퍼",
+  "凉鞋":"샌들","高跟鞋":"하이힐","棒球帽":"야구모자","针织帽":"비니","披肩":"숄",
+  /* ---- 소재 ---- */
+  "纯棉":"순면","棉质":"면","棉":"코튼","涤纶":"폴리에스터","聚酯纤维":"폴리에스터","羊毛":"울",
+  "羊绒":"캐시미어","真皮":"천연가죽","皮革":"가죽","人造革":"인조가죽","尼龙":"나일론","丝绸":"실크",
+  "雪纺":"시폰","蕾丝":"레이스","麻":"린넨","棉麻":"코튼린넨","法兰绒":"플란넬","摇粒绒":"후리스",
+  "珊瑚绒":"극세사","不锈钢":"스테인리스","铝合金":"알루미늄","塑料":"플라스틱","硅胶":"실리콘",
+  "玻璃":"유리","陶瓷":"세라믹","竹":"대나무","实木":"원목","木质":"원목","碳纤维":"카본",
+  "亚克力":"아크릴","树脂":"레진","橡胶":"고무","乳胶":"라텍스","牛津布":"옥스퍼드",
+  /* ---- 색상 ---- */
+  "白色":"흰색","黑色":"검정","红色":"빨강","蓝色":"파랑","绿色":"초록","黄色":"노랑","灰色":"회색",
+  "粉色":"분홍","紫色":"보라","米色":"베이지","卡其色":"카키","咖啡色":"커피색","棕色":"갈색",
+  "深蓝":"남색","浅蓝":"연파랑","藏青":"네이비","银色":"실버","金色":"골드","玫瑰金":"로즈골드",
+  "透明":"투명","酒红":"와인","橘色":"주황","橙色":"주황","杏色":"살구색","奶茶色":"밀크티",
+  "深灰":"짙은회색","浅灰":"연회색","黑色系":"검정계열","白色系":"흰색계열",
+  /* ---- 수량 · 단위 · 규격 ---- */
+  "公斤":"kg","千克":"kg","厘米":"cm","毫米":"mm","英寸":"인치","寸":"인치","克":"g",
+  "个装":"개입","件套":"종세트","件":"개","只":"개","片":"장","包":"팩","盒":"박스","瓶":"병",
+  "对":"켤레","双":"켤레","支":"자루","套":"세트","均码":"프리사이즈","尺寸":"사이즈",
+  "小号":"S","中号":"M","大号":"L","加大号":"XL","特大号":"2XL",
+  /* ---- 수식어 ---- */
+  "新款":"신상","加厚":"도톰한","加绒":"기모","薄款":"얇은","宽松":"루즈핏","修身":"슬림핏",
+  "高腰":"하이웨이스트","直筒":"스트레이트","大码":"빅사이즈","加大":"빅사이즈",
+  "男女同款":"남녀공용","情侣":"커플","女款":"여성용","男款":"남성용","女士":"여성용","男士":"남성용",
+  "儿童":"키즈","宝宝":"아기","学生":"학생용","成人":"성인용","家用":"가정용","车载":"차량용",
+  "户外":"야외용","室内":"실내용","办公室":"사무실용","宿舍":"기숙사용","便携":"휴대용",
+  "折叠":"접이식","可折叠":"접이식","多功能":"다기능","迷你":"미니","小型":"소형","中型":"중형",
+  "大型":"대형","大容量":"대용량","超大":"초대형","超薄":"초슬림","轻便":"경량","轻量":"경량",
+  "防水":"방수","防滑":"미끄럼방지","防尘":"먼지방지","防风":"방풍","保暖":"보온","透气":"통기성",
+  "速热":"급속발열","快速":"고속","节能":"절전","省电":"절전","静音":"저소음","无线":"무선",
+  "有线":"유선","电动":"전동","手动":"수동","自动":"자동","智能":"스마트","数字":"디지털",
+  "数码":"디지털","高清":"고화질","超清":"초고화질","工业":"산업용","商用":"업소용",
+  "升级":"업그레이드","加长":"길이연장","可调节":"조절식","可拆洗":"분리세탁","双面":"양면",
+  "加宽":"와이드","通用":"호환","专用":"전용","套装组合":"세트","多色":"멀티컬러","纯色":"단색",
+  "花色":"무늬","卡通":"캐릭터","简约":"심플","韩版":"한국스타일","日系":"일본스타일",
+  "复古":"레트로","高质感":"고급스러운","高颜值":"고급스러운","网红":"인기","爆款":"인기",
+  /* ---- 주방 · 생활 보강 ---- */
+  "刨丝器":"채칼","切菜器":"채칼","切菜":"채소 손질","用具":"용품","厨具":"주방용품",
+  "锅铲":"뒤집개","汤勺":"국자","漏勺":"건지개","不粘锅":"코팅팬","菜刀":"식칼","砧板":"도마",
+  "筷子":"젓가락","勺子":"스푼","护眼灯":"아이케어 조명","学习灯":"학습등","降噪":"노이즈캔슬링",
+  "续航":"배터리","碳素纤维":"카본","碳素":"카본","超轻":"초경량","耐用":"내구성","隔热":"단열",
+  "免打孔":"타공 없이","安装":"설치","冬季":"겨울","秋季":"가을","夏季":"여름","春季":"봄",
+  "秋冬":"가을겨울","早春":"초봄","running":"러닝","walking":"워킹","hiking":"등산",
+  /* ---- 지워야 할 판촉 문구 ---- */
+  "包邮":"","正品":"","特价":"","免运费":"","赠品":"","现货":"","预售":"","批发":"",
+  "品牌":"","一件代发":"","厂家直销":"","限时":"","秒杀":"","新品":"","爆款推荐":"",
+  /* ---- English ---- */
+  "heater":"히터","heating":"난방","warmer":"온열기","humidifier":"가습기","dehumidifier":"제습기",
+  "purifier":"공기청정기","fan":"선풍기","blanket":"담요","electric blanket":"전기요",
+  "curtain":"커튼","cushion":"쿠션","pillow":"베개","mat":"매트","rug":"러그","carpet":"러그",
+  "towel":"수건","storage":"수납","box":"박스","bag":"가방","backpack":"백팩","shoes":"신발",
+  "sneakers":"스니커즈","socks":"양말","jeans":"청바지","pants":"바지","trousers":"바지",
+  "shirt":"셔츠","t-shirt":"티셔츠","tee":"티셔츠","hoodie":"후드티","sweater":"스웨터",
+  "knit":"니트","jacket":"자켓","coat":"코트","padding":"패딩","down jacket":"패딩",
+  "dress":"원피스","skirt":"스커트","vest":"조끼","gloves":"장갑","hat":"모자","cap":"모자",
+  "scarf":"목도리","belt":"벨트","wallet":"지갑","luggage":"캐리어","slippers":"슬리퍼",
+  "boots":"부츠","sandal":"샌들","cotton":"코튼","wool":"울","cashmere":"캐시미어","leather":"가죽",
+  "denim":"데님","polyester":"폴리에스터","nylon":"나일론","silk":"실크","linen":"린넨",
+  "stainless steel":"스테인리스","steel":"스틸","aluminum":"알루미늄","plastic":"플라스틱",
+  "silicone":"실리콘","glass":"유리","ceramic":"세라믹","wooden":"원목",
+  "wireless":"무선","wired":"유선","bluetooth":"블루투스","portable":"휴대용","foldable":"접이식",
+  "folding":"접이식","waterproof":"방수","non-slip":"미끄럼방지","anti-slip":"미끄럼방지",
+  "windproof":"방풍","thermal":"보온","breathable":"통기성","multifunctional":"다기능",
+  "multi-purpose":"다기능","large":"대형","small":"소형","mini":"미니","capacity":"용량",
+  "adjustable":"조절식","rechargeable":"충전식","usb":"USB","led":"LED","lamp":"램프",
+  "light":"조명","kitchen":"주방","bathroom":"욕실","bedroom":"침실","office":"사무실",
+  "outdoor":"야외","indoor":"실내","home":"가정용","car":"차량용","travel":"여행용",
+  "set":"세트","pack":"팩","pcs":"개","piece":"개","size":"사이즈","color":"색상",
+  "black":"검정","white":"흰색","red":"빨강","blue":"파랑","green":"초록","gray":"회색",
+  "grey":"회색","pink":"분홍","beige":"베이지","brown":"갈색","navy":"네이비","yellow":"노랑",
+  "purple":"보라","silver":"실버","gold":"골드","khaki":"카키","kids":"키즈","women":"여성용",
+  "men":"남성용","unisex":"남녀공용","free size":"프리사이즈","new":"신상",
+  /* ---- 日本語 ---- */
+  "掃除機":"청소기","収納":"수납","折りたたみ":"접이식","大きい":"대형","小さい":"소형",
+  "軽量":"경량","保温":"보온","ステンレス":"스테인리스","セット":"세트","日本製":"일본제",
+  "加湿":"가습","暖房":"난방","冷房":"냉방","扇風機":"선풍기","炊飯器":"전기밥솥",
+  "電気ケトル":"전기포트","ドライヤー":"드라이기","掃除":"청소","台所":"주방","洗面":"세면",
+  "枕":"베개","毛布":"담요","座布団":"방석","靴下":"양말","帽子":"모자","手袋":"장갑",
+  "財布":"지갑","傘":"우산","時計":"시계","眼鏡":"안경","水筒":"물병","弁当":"도시락",
+  "新品":"신상","送料無料":"","正規品":"",
+  "ブラック":"검정","ホワイト":"흰색","グレー":"회색","ブラウン":"갈색","ベージュ":"베이지",
+  "ブルー":"파랑","グリーン":"초록","ピンク":"분홍","レッド":"빨강","ネイビー":"네이비",
+  "シルバー":"실버","ゴールド":"골드","ヒーター":"히터","エアコン":"에어컨","ストーブ":"히터",
+  "ファン":"선풍기","バッグ":"가방","シューズ":"신발","タオル":"수건","ボックス":"박스",
+  "ケース":"케이스","カバー":"커버","ライト":"조명","チェア":"의자","テーブル":"테이블",
+  "マット":"매트","カーテン":"커튼","クッション":"쿠션","ウール":"울","コットン":"코튼","レザー":"가죽"
+};
+
+/* 기계 번역이 어색하게 옮기는 표현 다듬기 */
+var TRANS_FIX = [
+  ["선풍기 히터","팬히터"],
+  ["작은 태양","미니 히터"],
+  ["에너지 절약형","절전형"],
+  ["에너지 절약","절전"],
+  ["가정용 에너지","가정용"],
+  ["빠른 난방","급속 난방"],
+  ["남녀 공용","남녀공용"],
+  ["무료 배송",""],
+  ["무료배송",""],
+  ["최저 가격",""],
+  ["고품질","고급"],
+  ["대용량 저장","대용량 수납"],
+  ["접는","접이식"],
+  ["다기능성","다기능"],
+  ["핸드폰","휴대폰"],
+  ["스마트 폰","휴대폰"],
+  ["사이즈 조절","사이즈조절"],
+  ["다운 재킷","패딩"],
+  ["다운재킷","패딩"],
+  ["두꺼운","도톰한"],
+  ["두꺼워지다","도톰한"],
+  ["두껍게","도톰한"],
+  ["새로운","신상"],
+  ["고품질의","고급"],
+  ["남성용의","남성용"],
+  ["여성용의","여성용"],
+  ["무료 배송비",""],
+  ["특별 제안",""],
+  ["특별 할인",""],
+  ["특별 가격",""],
+  ["정품 가죽","가죽"]
+];
+
+var TRANS_DICT_SORTED = null;
+function dictPairs(){
+  if(TRANS_DICT_SORTED) return TRANS_DICT_SORTED;
+  var out = [];
+  Object.keys(TRANS_DICT).forEach(function(k){
+    var kk = String(k || "").trim();
+    if(kk.length < 2) return;
+    out.push([kk, str(TRANS_DICT[k])]);
+  });
+  out.sort(function(a,b){ return b[0].length - a[0].length; });
+  TRANS_DICT_SORTED = out;
+  return out;
+}
+
+/* 브라우저가 번역 주소를 부를 수 있는지 (테스트용으로 끌 수도 있음) */
+function canFetch(){ return typeof fetch === "function"; }
+
+/* 전각 문자·기호 정리 — 【】, #, ＊, 반복 공백 등 */
+function tidyForeign(text){
+  var t = str(text);
+  t = t.replace(/[\uff01-\uff5e]/g, function(ch){ return String.fromCharCode(ch.charCodeAt(0) - 0xfee0); });
+  t = t.replace(/\u3000/g, " ");
+  t = t.replace(/[【】\[\]{}<>《》「」『』""''`~^|\\\/]/g, " ");
+  t = t.replace(/[#*※★☆○●△▲▶▷◆◇·•]/g, " ");
+  t = t.replace(/\s{2,}/g, " ");
+  return t.trim();
+}
+
+/* 브랜드 표기 지우기 (영문은 단어 단위로만) */
+function stripBrands(text){
+  var t = str(text);
+  var removed = 0;
+  brandStripList().forEach(function(b){
+    if(!b) return;
+    if(/^[a-z0-9 .&'-]+$/i.test(b)){
+      var re = new RegExp("(^|[^A-Za-z0-9])" + escRe(b) + "([^A-Za-z0-9]|$)", "gi");
+      t = t.replace(re, function(m, a, z){ removed++; return a + " " + z; });
+    }else if(t.indexOf(b) >= 0){
+      removed += t.split(b).length - 1;
+      t = t.split(b).join(" ");
+    }
+  });
+  return { text: t.replace(/\s{2,}/g, " ").trim(), n: removed };
+}
+
+/* 번역기에 보낼 문장 만들기 — 브랜드·기호 제거 */
+function prepareTextForApi(text){
+  var r = stripBrands(tidyForeign(text));
+  return r.text.replace(/\s{2,}/g, " ").trim();
+}
+
+/* 번역 결과 다듬기 — 남은 한자·가나·기호 제거, 어색한 표현 교체 */
+function polishKo(s){
+  var t = str(s);
+  t = t.replace(/[\uff01-\uff5e]/g, function(ch){ return String.fromCharCode(ch.charCodeAt(0) - 0xfee0); });
+  t = t.replace(/[\u3000]/g, " ");
+  t = t.replace(/[【】\[\]{}<>《》「」『』""''`]/g, " ");
+  TRANS_FIX.forEach(function(p){
+    var re = new RegExp(escRe(p[0]), "gi");
+    t = t.replace(re, p[1]);
+  });
+  t = t.replace(/[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\u3040-\u30ff]+/g, " ");
+  // 문장으로 끝나는 꼬리(…됩니다. / …입니다.)와 쉼표는 상품명에 필요 없음
+  t = t.replace(/\s*(입니다|습니다|됩니다|합니다)([.!。]?)\s*$/g, " ");
+  t = t.replace(/[.。]/g, " ");
+  t = t.replace(/[,，、;；]/g, " ");
+  t = t.replace(/\s{2,}/g, " ");
+  // 같은 단어가 연달아 나오면 하나만 (예: 절전 절전)
+  var words = t.split(" ");
+  var keep = [];
+  words.forEach(function(w, i){
+    if(i && w && w === words[i-1]) return;
+    keep.push(w);
+  });
+  t = keep.join(" ");
+  t = t.replace(/^[\s,·\/\-:;]+/, "").replace(/[\s,·\/\-:;]+$/, "");
+  return t.trim();
+}
+
+/* 내장 사전만으로 번역 (인터넷 없음 · 요청 실패) */
+function dictTranslate(text){
+  var t = prepareTextForApi(text);
+  if(!t) return "";
+  dictPairs().forEach(function(p){
+    var k = p[0], v = p[1];
+    if(/^[a-z0-9 .&'-]+$/i.test(k)){
+      var re = new RegExp("(^|[^A-Za-z0-9])" + escRe(k) + "([^A-Za-z0-9]|$)", "gi");
+      t = t.replace(re, function(m, a, z){ return a + " " + v + " " + z; });
+    }else if(t.indexOf(k) >= 0){
+      t = t.split(k).join(" " + v + " ");
+    }
+  });
+  return polishKo(t);
+}
+
+/* ---------- 번역 캐시 (같은 이름을 두 번 번역하지 않음) ---------- */
+var TRANS_CACHE = null;
+function transCacheOk(){
+  try{ return typeof localStorage !== "undefined" && !!localStorage; }catch(e){ return false; }
+}
+function transCache(){
+  if(TRANS_CACHE) return TRANS_CACHE;
+  TRANS_CACHE = {};
+  if(!transCacheOk()) return TRANS_CACHE;
+  try{
+    var raw = localStorage.getItem(TRANS_KEY);
+    var obj = raw ? JSON.parse(raw) : null;
+    if(obj && typeof obj === "object") TRANS_CACHE = obj;
+  }catch(e){ TRANS_CACHE = {}; }
+  return TRANS_CACHE;
+}
+var transCacheTimer = null;
+function transCacheSave(now){
+  if(!transCacheOk()) return;
+  function put(){
+    try{
+      var keys = Object.keys(TRANS_CACHE);
+      if(keys.length > 4000){
+        var keep = {};
+        keys.slice(keys.length - 3000).forEach(function(k){ keep[k] = TRANS_CACHE[k]; });
+        TRANS_CACHE = keep;
+      }
+      localStorage.setItem(TRANS_KEY, JSON.stringify(TRANS_CACHE));
+    }catch(e){}
+  }
+  if(now){ clearTimeout(transCacheTimer); put(); return; }
+  clearTimeout(transCacheTimer);
+  transCacheTimer = setTimeout(put, 800);
+}
+function transCacheSet(text, ko){
+  var t = str(text);
+  if(!t || !str(ko).trim()) return;
+  transCache()[t] = str(ko).trim();
+  transCacheSave(false);
+}
+function clearTransCache(){
+  TRANS_CACHE = {};
+  try{ if(transCacheOk()) localStorage.removeItem(TRANS_KEY); }catch(e){}
+}
+
+/* ---------- 번역이 필요한 글인지 ---------- */
+function needsTranslation(text){
+  var t = str(text);
+  if(!t.trim()) return false;
+  if(RE_HAN.test(t) || RE_KANA.test(t)) return true;
+  if(!RE_HANGUL.test(t) && (t.match(/[A-Za-z]/g) || []).length >= 3) return true;
+  return false;
+}
+
+/* 번역할 조각 — 한글이 섞여 있으면 한자·가나 덩어리만 */
+function transPieces(text){
+  var t = str(text);
+  if(!t.trim()) return [];
+  if(!RE_HANGUL.test(t)) return [t];
+  var m = t.match(RE_CJK_RUN) || [];
+  var out = [];
+  m.forEach(function(x){ if(out.indexOf(x) < 0) out.push(x); });
+  return out;
+}
+
+/* ---------- 구글 번역 호출 ---------- */
+function delay(ms){
+  return new Promise(function(res){ setTimeout(res, ms); });
+}
+function fetchOnce(url, ms){
+  var opt = {};
+  try{
+    if(typeof AbortController === "function"){
+      var ac = new AbortController();
+      opt.signal = ac.signal;
+      setTimeout(function(){ try{ ac.abort(); }catch(e){} }, ms || 9000);
+    }
+  }catch(e){}
+  return fetch(url, opt).then(function(r){
+    if(!r || !r.ok){
+      var e = new Error("HTTP " + (r ? r.status : "?"));
+      e.status = r ? r.status : 0;
+      throw e;
+    }
+    return r.text();
+  }).then(function(txt){
+    try{ return JSON.parse(txt); }
+    catch(e){
+      // 잠시 몰릴 때 오는 안내 페이지 → 조금 기다렸다 다시
+      var err = new Error("JSON 아님");
+      err.status = 429;
+      throw err;
+    }
+  });
+}
+/* 몰림(429)·일시 오류는 두 번까지 다시 시도 */
+function httpJson(url, ms){
+  if(!canFetch()) return Promise.reject(new Error("fetch 없음"));
+  var attempt = 0;
+  function run(){
+    attempt++;
+    return fetchOnce(url, ms).catch(function(err){
+      var code = err && err.status;
+      var retryable = (!code || code === 429 || code >= 500 || code === 0);
+      if(attempt >= 3 || !retryable) throw err;
+      return delay(attempt === 1 ? 600 : 1600).then(run);
+    });
+  }
+  return run();
+}
+
+/* 여러 줄을 한 번에 번역 — 줄 수가 안 맞으면 null */
+function googleMany(lines){
+  if(!lines || !lines.length) return Promise.resolve(null);
+  var url = TRANS_EP + encodeURIComponent(lines.join("\n"));
+  return httpJson(url, 9000).then(function(j){
+    var segs = (j && j[0]) || [];
+    var txt = segs.map(function(s){ return str(s && s[0]); }).join("");
+    if(!str(txt).trim()) return null;
+    var arr = txt.split("\n").map(function(s){ return s.trim(); });
+    while(arr.length && arr[arr.length - 1] === "") arr.pop();
+    // 줄이 밀렸으면(앞이 비어 있음) 믿지 않고 한 줄씩 다시 번역
+    if(str(lines[0]).trim() && arr.length && arr[0] === "") return null;
+    if(arr.length !== lines.length) return null;
+    return arr;
+  });
+}
+
+/* 한 덩어리 번역 — 실패하면 내장 사전 */
+function translateToKo(text){
+  var src = str(text).trim();
+  if(!src) return Promise.resolve({ ok:false, text:"", engine:"none" });
+  var mode = str(state.settings.translateMode);
+  if(!needsTranslation(src)) return Promise.resolve({ ok:true, text:src, engine:"skip" });
+  var cached = transCache()[src];
+  if(str(cached).trim()) return Promise.resolve({ ok:true, text:str(cached), engine:"cache" });
+  if(mode === "dict" || !canFetch()) return Promise.resolve(dictResult(src));
+  var api = prepareTextForApi(src);
+  if(!api) return Promise.resolve(dictResult(src));
+  return googleMany([api]).then(function(arr){
+    var ko = arr && arr[0] ? polishKo(arr[0]) : "";
+    if(!str(ko).trim()){
+      TRANS_STATE.fails++;
+      if(TRANS_STATE.fails >= 3) TRANS_STATE.down = true;
+      return dictResult(src);
+    }
+    transCacheSet(src, ko);
+    return { ok:true, text:ko, engine:"google" };
+  }).catch(function(){
+    TRANS_STATE.fails++;
+    if(TRANS_STATE.fails >= 3) TRANS_STATE.down = true;
+    return dictResult(src);
+  });
+}
+function dictResult(src){
+  var ko = polishKo(dictTranslate(src));
+  if(!ko) ko = polishKo(dictTranslate(prepareTextForApi(src)));
+  return ko ? { ok:true, text:ko, engine:"dict" } : { ok:false, text:"", engine:"dict" };
+}
+
+/* 여러 글을 한 번에 번역 — 캐시 → 묶음 요청 → 실패분은 사전 */
+function translateAll(texts, onProgress){
+  return new Promise(function(resolve){
+    var list = [], seen = {};
+    (texts || []).forEach(function(t){
+      var s = str(t).trim();
+      if(!s || seen[s] || !needsTranslation(s)) return;
+      seen[s] = 1;
+      list.push(s);
+    });
+    var out = {};
+    if(!list.length) return resolve(out);
+
+    var pending = [];
+    list.forEach(function(s){
+      var cached = transCache()[s];
+      if(str(cached).trim()) out[s] = { ok:true, text:str(cached), engine:"cache" };
+      else pending.push(s);
+    });
+    if(!pending.length) return resolve(out);
+
+    var mode = str(state.settings.translateMode);
+    if(mode === "dict" || !canFetch() || TRANS_STATE.down){
+      pending.forEach(function(s){ out[s] = dictResult(s); });
+      return resolve(out);
+    }
+
+    /* 번역기에 보낼 문장으로 묶기 (같은 문장은 한 번만) */
+    var work = [], byApi = {};
+    pending.forEach(function(s){
+      var api = prepareTextForApi(s);
+      if(!api){ out[s] = dictResult(s); return; }
+      if(!byApi[api]){ byApi[api] = { api:api, srcs:[] }; work.push(byApi[api]); }
+      byApi[api].srcs.push(s);
+    });
+    if(!work.length) return resolve(out);
+
+    var batches = [], cur = [], curLen = 0;
+    work.forEach(function(w){
+      var l = w.api.length + 1;
+      if(cur.length && (cur.length >= 12 || curLen + l > 1200)){ batches.push(cur); cur = []; curLen = 0; }
+      cur.push(w); curLen += l;
+    });
+    if(cur.length) batches.push(cur);
+
+    var done = 0;
+    function tick(){ done++; if(onProgress) onProgress(done, work.length); }
+    function put(w, ko, engine){
+      var v = polishKo(ko);
+      if(!str(v).trim()){ v = polishKo(dictTranslate(w.api)); engine = "dict"; }
+      if(!str(v).trim()){ w.srcs.forEach(function(s){ out[s] = { ok:false, text:"", engine:"dict" }; }); tick(); return; }
+      w.srcs.forEach(function(s){
+        out[s] = { ok:true, text:v, engine:engine };
+        transCacheSet(s, v);
+      });
+      tick();
+    }
+    function oneOff(w){
+      return googleMany([w.api]).then(function(arr){
+        var ko = arr && arr[0] ? arr[0] : "";
+        if(str(ko).trim()) put(w, ko, "google");
+        else put(w, dictTranslate(w.api), "dict");
+      }).catch(function(){
+        TRANS_STATE.down = true;
+        put(w, dictTranslate(w.api), "dict");
+      });
+    }
+
+    var idx = 0, active = 0, finished = false, failStreak = 0;
+    function runBatch(batch){
+      if(TRANS_STATE.down){
+        batch.forEach(function(w){ put(w, dictTranslate(w.api), "dict"); });
+        return Promise.resolve();
+      }
+      return googleMany(batch.map(function(w){ return w.api; })).then(function(arr){
+        if(arr && arr.length === batch.length){
+          failStreak = 0;
+          batch.forEach(function(w, i){ put(w, arr[i], "google"); });
+          return;
+        }
+        // 줄 수가 안 맞으면 한 줄씩 다시 (정확도 우선)
+        var chain = Promise.resolve();
+        batch.forEach(function(w){ chain = chain.then(function(){ return oneOff(w); }); });
+        return chain;
+      }).catch(function(){
+        failStreak++;
+        // 첫 실패는 잠깐 쉬었다가 그 묶음만 한 번 더, 그래도 안 되면 남은 것은 사전으로
+        if(failStreak < 2){
+          return delay(1500).then(function(){
+            return googleMany(batch.map(function(w){ return w.api; })).then(function(arr2){
+              if(arr2 && arr2.length === batch.length){
+                batch.forEach(function(w, i){ put(w, arr2[i], "google"); });
+                return;
+              }
+              TRANS_STATE.down = true;
+              batch.forEach(function(w){ put(w, dictTranslate(w.api), "dict"); });
+            }, function(){
+              TRANS_STATE.down = true;
+              batch.forEach(function(w){ put(w, dictTranslate(w.api), "dict"); });
+            });
+          });
+        }
+        TRANS_STATE.down = true;
+        batch.forEach(function(w){ put(w, dictTranslate(w.api), "dict"); });
+      });
+    }
+    function pump(){
+      while(active < 2 && idx < batches.length){
+        var b = batches[idx++];
+        active++;
+        runBatch(b).then(function(){ active--; pump(); });
+      }
+      if(!finished && active === 0 && idx >= batches.length){ finished = true; resolve(out); }
+    }
+    pump();
+  });
+}
+
+/* 번역 결과를 이름/옵션에 넣기 */
+function applyTranslated(kind, target, idx, text){
+  var v = collapse(str(text)).trim();
+  if(!v) return false;
+  if(kind === "name"){ target.name = v; return true; }
+  var o = (target.options || [])[idx];
+  if(!o) return false;
+  o.name = v;
+  return true;
+}
+/* 짧은 수식어가 "~다" 같은 동사형으로 번역되면(예: 加厚 → 두꺼워지다) 내장 사전을 씀 */
+function fixPieceKo(piece, ko){
+  var t = str(ko).trim();
+  if(!t) return t;
+  if(RE_HAN.test(piece) && piece.length <= 4 && /(다|지다)$/.test(t)){
+    var d = polishKo(dictTranslate(piece));
+    if(str(d).trim()) return d;
+  }
+  return t;
+}
+function mergePieces(src, map){
+  var vals = transPieces(src).map(function(p){ return map[p] || null; });
+  if(!RE_HANGUL.test(src)){
+    var one = vals[0];
+    if(!one || !one.ok || !str(one.text).trim()) return null;
+    return { text:one.text, engine:one.engine };
+  }
+  var any = false, engine = "";
+  var pieces = transPieces(src);
+  var joined = str(src).replace(RE_CJK_RUN, function(m){
+    var i = pieces.indexOf(m);
+    var r = i >= 0 ? vals[i] : null;
+    if(r && r.ok && str(r.text).trim()){ any = true; engine = r.engine; return fixPieceKo(m, r.text); }
+    return " ";
+  });
+  if(!any) return null;
+  return { text:joined, engine:engine };
+}
+
+/* ---------- 진행 표시 ---------- */
+function showProgress(text){
+  if(!hasDOM()) return;
+  var wrap = document.getElementById("toasts");
+  if(!wrap) return;
+  var el = document.getElementById("transProgress");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "transProgress";
+    el.className = "toast busy";
+    wrap.appendChild(el);
+  }
+  el.textContent = text;
+}
+function hideProgress(){
+  if(!hasDOM()) return;
+  var el = document.getElementById("transProgress");
+  if(el) el.remove();
+}
+function setBusy(on, label){
+  TRANS_BUSY = !!on;
+  if(!hasDOM()) return;
+  var btns = document.querySelectorAll('[data-act="autoClean"],[data-act="translateNow"],[data-act="translateOptions"]');
+  Array.prototype.forEach.call(btns, function(b){
+    if(on){
+      if(!b.getAttribute("data-label")) b.setAttribute("data-label", b.innerHTML);
+      b.disabled = true;
+      b.textContent = label || "번역·정리 중...";
+    }else{
+      b.disabled = false;
+      var lb = b.getAttribute("data-label");
+      if(lb) b.innerHTML = lb;
+      b.removeAttribute("data-label");
+    }
+  });
+}
+
+/* ---------- 한 상품만 번역 (이름·옵션) ---------- */
+function translateProduct(p, onlyOptions){
+  if(!p){ toast("상품을 먼저 골라 주세요", "bad"); return Promise.resolve(); }
+  if(TRANS_BUSY){ toast("이미 번역하는 중입니다 — 잠시만 기다려 주세요"); return Promise.resolve(); }
+  var jobs = [];
+  if(!onlyOptions){
+    var nmSrc = str(p.name).trim() ? str(p.name) : str(p.origTitle);
+    if(needsTranslation(nmSrc)) jobs.push({ p:p, kind:"name", src:nmSrc });
+  }
+  (p.options || []).forEach(function(o, i){
+    if(needsTranslation(o.name)) jobs.push({ p:p, kind:"option", i:i, src:str(o.name) });
+  });
+  if(!jobs.length){
+    toast(onlyOptions ? "옵션 이름에 번역할 외국어가 없습니다" : "이미 한글로 되어 있습니다", "");
+    return Promise.resolve();
+  }
+  var texts = [];
+  jobs.forEach(function(j){ transPieces(j.src).forEach(function(t){ texts.push(t); }); });
+  TRANS_STATE.down = false; TRANS_STATE.fails = 0;
+  setBusy(true, "번역 중...");
+  showProgress("🌐 번역하는 중...");
+  return translateAll(texts, function(done, total){
+    showProgress("🌐 번역하는 중... " + done + "/" + total);
+  }).then(function(map){
+    var n = 0, fail = 0;
+    jobs.forEach(function(j){
+      var r = mergePieces(j.src, map);
+      if(!r){ fail++; return; }
+      if(applyTranslated(j.kind, j.p, j.i, r.text)) n++;
+    });
+    if(n) cleanAllFields(p, true);
+    touch(p); setBusy(false); hideProgress();
+    renderEditor(); renderList(); save();
+    if(n) toast("🌐 " + n + "곳을 한국어로 번역했습니다", "ok");
+    if(fail) toast("번역하지 못한 곳이 " + fail + "군데 있습니다 — 인터넷 연결을 확인해 주세요", "bad");
+  }).catch(function(){
+    setBusy(false); hideProgress();
+    toast("번역을 마치지 못했습니다 — 인터넷 연결을 확인해 주세요", "bad");
+  });
+}
+
+/* =========================================================
    5. 렌더 — 상단 통계
    ========================================================= */
 function renderStats(){
@@ -1523,8 +2227,9 @@ function cardName(p, lang){
         (p.url ? '<div class="tiny" style="margin-top:4px"><a href="' + esc(p.url) + '" target="_blank" rel="noreferrer noopener" style="color:#a33c0a;font-weight:700">원본 페이지 열기 ↗</a></div>' : '') +
         '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">' +
           '<button class="btn tiny" data-act="copyOrig">원본 이름 복사</button>' +
+          '<button class="btn tiny primary" data-act="translateNow" title="원본 이름과 옵션을 구글 번역으로 한국어로 바꿉니다 (인터넷이 없으면 내장 사전)">🌐 한국어로 번역</button>' +
           '<button class="btn tiny" data-act="fromOrig">원본을 상품명으로</button>' +
-          '<button class="btn tiny" data-act="requestTranslate" title="로이에게 번역을 부탁하는 JSON 파일을 만듭니다">번역 요청 파일</button>' +
+          '<button class="btn tiny" data-act="requestTranslate" title="로이에게 번역을 부탁하는 JSON 파일을 만듭니다 (앱에서 바로 번역되므로 보통 필요 없음)">번역 요청 파일</button>' +
         '</div>' +
       '</div>' +
 
@@ -1677,6 +2382,7 @@ function cardOptions(p){
     '<div class="card-head"><div class="ico">🔢</div><h3>옵션 정리 (최대 10개)</h3>' +
       '<span class="hint">옵션 이름 25자 이내 · 판매는 10개까지만</span>' +
       '<div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">' +
+        '<button class="btn sm" data-act="translateOptions" title="이 상품 옵션 이름의 중국어·영어를 한국어로 번역합니다">🌐 옵션 번역</button>' +
         '<button class="btn sm" data-act="addOption">＋ 옵션 추가</button>' +
         '<button class="btn sm warn" data-act="trimOptions" title="첫 번째(1번)와 12번째 이후를 지우고 10개만 남깁니다">1번·12번 이후 지우기</button>' +
         '<button class="btn sm" data-act="keepTop10" title="위에서부터 10개만 남깁니다">위에서 10개만</button>' +
@@ -1813,7 +2519,7 @@ function cardChecklist(p){
   return '<section class="card span2">' +
     '<div class="card-head"><div class="ico">✅</div><h3>네이버 스마트스토어 기준 점검</h3>' +
       '<span class="hint" id="checkHint"></span>' +
-      '<button class="btn tiny primary" data-act="autoClean" style="margin-left:auto">✨ 원클릭 자동정리</button>' +
+      '<button class="btn tiny primary" data-act="autoClean" style="margin-left:auto">✨ 원클릭 번역·자동정리</button>' +
     '</div>' +
     seoBarHTML(p) +
     '<div class="check-grid" id="checkList"></div>' +
@@ -2386,6 +3092,8 @@ function handleAction(act, el, ev){
     case "downloadTemplate": downloadTemplate(); break;
     case "openSettings": openSettings(); break;
     case "autoClean": autoClean(); break;
+    case "translateNow": translateProduct(p, false); break;
+    case "translateOptions": translateProduct(p, true); break;
     case "applySuggest": {
       if(!p) return;
       p.priceAuto = true;
@@ -2530,14 +3238,70 @@ function cleanField(key){
   toast(fieldLabel(key) + "을(를) 정리했습니다", "ok");
 }
 
-/* ---------- 원클릭 자동정리 ---------- */
+/* ---------- 원클릭 번역·자동정리 ----------
+   ① 이름·옵션의 중국어/영어를 한국어로 번역 (구글 → 실패하면 사전)
+   ② 쓰면 안 되는 단어·문구·중복·50자 정리
+   ③ 옵션 10개·무게·배송비·판매가·자연노출 점수까지 한 번에 */
 function autoClean(){
+  if(TRANS_BUSY){ toast("이미 번역·정리하는 중입니다 — 끝날 때까지 기다려 주세요"); return; }
   var p = current();
   var targets = selectionHas()
     ? state.products.filter(function(x){ return selection[x.id]; })
     : (p ? [p] : state.products.slice());
-  if(!targets.length){ toast("먼저 [JSON/CSV 불러오기]로 상품을 넣어 주세요", "bad"); return; }
+  if(!targets.length){ toast("먼저 [JSON/CSV 불러오기]로 상품을 넣어 주세요", "bad"); return Promise.resolve(0); }
 
+  // 이름이 비어 있고 원본이 중국어면 원본을 이름으로 삼아 번역
+  targets.forEach(function(x){
+    if(!str(x.name).trim() && str(x.origTitle).trim() && needsTranslation(x.origTitle)) x.name = str(x.origTitle);
+  });
+
+  var jobs = [];
+  targets.forEach(function(x){
+    var nmSrc = str(x.name).trim();
+    if(needsTranslation(nmSrc)) jobs.push({ p:x, kind:"name", src:nmSrc });
+    (x.options || []).forEach(function(o, i){
+      if(needsTranslation(o.name)) jobs.push({ p:x, kind:"option", i:i, src:str(o.name) });
+    });
+  });
+
+  if(!jobs.length){
+    return Promise.resolve(finishAutoClean(targets, null));
+  }
+
+  var texts = [];
+  jobs.forEach(function(j){ transPieces(j.src).forEach(function(t){ if(texts.indexOf(t) < 0) texts.push(t); }); });
+
+  TRANS_STATE.down = false; TRANS_STATE.fails = 0;
+  setBusy(true, "번역·정리 중...");
+  showProgress("🌐 중국어·영어 이름을 한국어로 번역하는 중...");
+
+  return translateAll(texts).then(function(map){
+    var stat = { ok:0, fail:0, dict:0, google:0, brands:0 };
+    jobs.forEach(function(j){
+      var r = mergePieces(j.src, map);
+      if(!r){ stat.fail++; return; }
+      if(!applyTranslated(j.kind, j.p, j.i, r.text)){ stat.fail++; return; }
+      stat.ok++;
+      if(r.engine === "dict") stat.dict++; else if(r.engine === "google") stat.google++;
+    });
+    setBusy(false);
+    hideProgress();
+    finishAutoClean(targets, stat);
+    if(TRANS_STATE.down && stat.dict){
+      setTimeout(function(){
+        toast("구글 번역이 잠시 막혀 내장 사전으로 바꿨습니다 — 조금 뒤 한 번 더 누르면 더 자연스러운 이름이 됩니다", "");
+      }, 1800);
+    }
+  }).catch(function(err){
+    setBusy(false);
+    hideProgress();
+    toast("번역 단계에서 문제가 생겼습니다 — 번역 없이 정리만 합니다", "bad");
+    return finishAutoClean(targets, null);
+  });
+}
+
+/* 번역 뒤 공통 정리 (금칙어 · 옵션 · 무게 · 판매가 · 점수) */
+function finishAutoClean(targets, stat){
   var missWeight = 0;
   targets.forEach(function(x){
     cleanAllFields(x, true);
@@ -2568,28 +3332,38 @@ function autoClean(){
   var kcN = targets.filter(function(x){ return kcRisk(x).length > 0; }).length;
   var negN = targets.filter(function(x){ return marginWarn(x); }).length;
   renderAll(); saveNow();
-  toast("✨ " + targets.length + "개 상품을 한 번에 정리했습니다", "ok");
+
+  var msg = "✨ " + targets.length + "개 상품을 한 번에 정리했습니다";
+  if(stat && stat.ok) msg += " · 번역 " + stat.ok + "곳" + (stat.dict && !stat.google ? "(사전)" : "");
+  toast(msg, "ok");
+  if(stat && stat.fail){
+    setTimeout(function(){
+      toast("번역하지 못한 이름·옵션이 " + stat.fail + "곳 있습니다 — 인터넷 연결을 확인하고 한 번 더 눌러 주세요", "bad");
+    }, 320);
+  }
   if(brandN){
     setTimeout(function(){
       toast("브랜드·금칙어 위험이 남은 상품 " + brandN + "개 — [위험 상품 일괄 제외]를 눌러 빼 두세요", "bad");
-    }, 320);
+    }, 620);
   }
   if(missWeight){
     setTimeout(function(){
       toast("무게를 몰라 배송비를 계산하지 못한 상품이 " + missWeight + "개 있습니다 — 무게(kg)를 넣고 [3번 옵션 기준 자동 계산]을 눌러 주세요", "bad");
-    }, 600);
+    }, 900);
   }
   if(kcN){
     setTimeout(function(){
       toast("KC 인증 확인이 필요한 상품 " + kcN + "개 — 인증번호가 없으면 등록하지 말고 [위험 상품 일괄 제외]를 눌러 주세요", "bad");
-    }, 900);
+    }, 1180);
   }
   if(negN){
     setTimeout(function(){
       toast("역마진(팔수록 손해) 상품 " + negN + "개 — 판매가나 배송비를 다시 확인하세요", "bad");
-    }, 1200);
+    }, 1460);
   }
+  return targets;
 }
+
 
 /* ---------- 옵션 3번 기준 배송비·판매가 ---------- */
 function calcOption3(){
@@ -3378,11 +4152,19 @@ function openSettings(){
       txtField("기본 카테고리 코드", "setCatCode", s.catCode, "상품마다 다르면 비워 두세요") +
     '</div>' +
 
-    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">외부 API 키 (선택)</h4>' +
+    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">이름 번역</h4>' +
+    '<label class="field">번역 방식' +
+      '<select id="setTranslateMode">' +
+        '<option value="auto"' + (s.translateMode === "dict" ? "" : " selected") + '>자동 번역 — 구글 번역, 안 되면 내장 사전 (권장)</option>' +
+        '<option value="dict"' + (s.translateMode === "dict" ? " selected" : "") + '>번역 없이 내장 사전 치환만 (외부 전송 없음)</option>' +
+      '</select></label>' +
+    '<div class="notice" style="margin-top:8px">번역을 켜면 상품명·옵션명이 구글 번역(translate.googleapis.com)으로 전송됩니다. 상품 이름만 전송되고, 사입가·사진·연락처 같은 다른 정보는 전송되지 않습니다. 보내기 싫으면 위에서 <b>사전 치환만</b>을 고르세요. 번역 결과는 이 브라우저에 저장해 두고 다시 쓰지 않습니다.</div>' +
+    '<div style="margin-top:8px"><button class="btn tiny" id="clearTrans">번역 기억 지우기 (다시 번역)</button></div>' +
+
+    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">누끼(배경 제거) API 키 (선택)</h4>' +
     '<div class="notice">넣지 않아도 됩니다. 키가 없으면 [번역·누끼 요청 파일]로 로이에게 부탁하면 됩니다. 키는 이 브라우저에만 저장되고, [누끼 API로 처리]를 누를 때만 해당 서비스로 사진 주소가 전송됩니다.</div>' +
     '<div class="g2" style="margin-top:8px">' +
       txtField("누끼(배경 제거) API 키", "setApiCutout", s.apiCutout, "비워 두셔도 됩니다") +
-      txtField("번역 API 키", "setApiTranslate", s.apiTranslate, "비워 두셔도 됩니다") +
     '</div>' +
 
     '<div class="foot">' +
@@ -3410,9 +4192,11 @@ function openSettings(){
     state.settings.originCodeJP = str(v("setOriginJP"));
     state.settings.catCode = str(v("setCatCode"));
     state.settings.apiCutout = str(v("setApiCutout"));
-    state.settings.apiTranslate = str(v("setApiTranslate"));
+    state.settings.translateMode = str(v("setTranslateMode")) === "dict" ? "dict" : "auto";
   }
 
+  var ct = document.getElementById("clearTrans");
+  if(ct) ct.onclick = function(){ clearTransCache(); toast("번역 기억을 지웠습니다 — 다음 번역은 새로 합니다", "ok"); };
   document.getElementById("saveSettings").onclick = function(){
     collect();
     closeModal(); renderAll(); saveNow();
@@ -3505,7 +4289,16 @@ var RoiChanggoCore = {
   nameKey: nameKey,
   exportMarket: exportMarket,
   handleAction: handleAction,
-  renderEditor: renderEditor
+  renderEditor: renderEditor,
+  // 번역 (바깥에서 점검할 때도 쓸 수 있게)
+  translateToKo: translateToKo,
+  translateAll: translateAll,
+  dictTranslate: dictTranslate,
+  needsTranslation: needsTranslation,
+  transPieces: transPieces,
+  mergePieces: mergePieces,
+  polishKo: polishKo,
+  clearTransCache: clearTransCache
 };
 try{
   if(typeof globalThis !== "undefined") globalThis.RoiChanggoCore = RoiChanggoCore;

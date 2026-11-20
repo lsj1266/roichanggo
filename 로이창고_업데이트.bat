@@ -6,7 +6,8 @@ title 로이창고 업데이터
 rem ============================================================
 rem  로이창고 원클릭 업데이터 (Git 설치 불필요)
 rem  더블클릭하면 GitHub에서 최신판을 받아
-rem  %USERPROFILE%\Downloads\로이창고 폴더를 갱신합니다.
+rem  %USERPROFILE%\Downloads\로이창고 폴더를 갱신하고,
+rem  바탕화면에 '로이창고' 아이콘을 만들고, 앱을 바로 엽니다.
 rem ============================================================
 
 set "ZIPURL=https://github.com/lsj1266/roichanggo/archive/refs/heads/main.zip"
@@ -31,12 +32,12 @@ if exist "%WORK%" rmdir /s /q "%WORK%" >nul 2>&1
 mkdir "%WORK%" >nul 2>&1
 if not exist "%DEST%" mkdir "%DEST%" >nul 2>&1
 
-echo [1/3] 최신판 내려받는 중...
+echo [1/4] 최신판 내려받는 중...
 %PS% "$ProgressPreference='SilentlyContinue'; $ErrorActionPreference='Stop'; try{[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12}catch{}; Invoke-WebRequest -Uri '%ZIPURL%' -OutFile '%WORK%\main.zip' -UseBasicParsing"
 if errorlevel 1 goto FAIL
 if not exist "%WORK%\main.zip" goto FAIL
 
-echo [2/3] 압축 푸는 중...
+echo [2/4] 압축 푸는 중...
 %PS% "$ErrorActionPreference='Stop'; try{ Expand-Archive -Path '%WORK%\main.zip' -DestinationPath '%WORK%\x' -Force } catch { New-Item -ItemType Directory -Force -Path '%WORK%\x' | Out-Null; tar -xf '%WORK%\main.zip' -C '%WORK%\x' }"
 if errorlevel 1 goto FAIL
 
@@ -45,11 +46,20 @@ for /d %%D in ("%WORK%\x\*") do set "SRC=%%D"
 if not defined SRC goto FAIL
 if not exist "%SRC%\로이창고.html" goto FAIL
 
-echo [3/3] 파일 갱신 중...
+echo [3/4] 파일 갱신 중...
 %PS% "$ErrorActionPreference='Stop'; $s='%SRC%'; $d='%DEST%'; Copy-Item -Path (Join-Path $s '로이창고.html') -Destination (Join-Path $d '로이창고.html') -Force; $ext = Join-Path $d '로이창고_수집기'; New-Item -ItemType Directory -Force -Path $ext | Out-Null; Copy-Item -Path (Join-Path $s '로이창고_수집기\*') -Destination $ext -Recurse -Force; if (Test-Path (Join-Path $s 'README.md')) { Copy-Item -Path (Join-Path $s 'README.md') -Destination $d -Force }; if (Test-Path (Join-Path $s '로이창고_업데이트.bat')) { Copy-Item -Path (Join-Path $s '로이창고_업데이트.bat') -Destination $d -Force }"
 if errorlevel 1 goto FAIL
 if not exist "%DEST%\로이창고.html" goto FAIL
 if not exist "%DEST%\로이창고_수집기\manifest.json" goto FAIL
+
+echo [4/4] 바탕화면 아이콘 만들기...
+rem 한글 파일명은 코드값으로 만들어 인코딩 문제를 피합니다 (로이창고 = B85C C774 CC3D ACE0)
+%PS% "$ErrorActionPreference='SilentlyContinue'; $ro=[string][char]0xB85C+[string][char]0xC774+[string][char]0xCC3D+[string][char]0xACE0; $dest='%DEST%'; $html=Join-Path $dest ($ro+'.html'); if(-not (Test-Path $html)){ exit 2 }; $reg=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -Name Desktop -ErrorAction SilentlyContinue).Desktop; $desk=[Environment]::ExpandEnvironmentVariables([string]$reg); if(-not $desk -or -not (Test-Path $desk)){ $desk=[Environment]::GetFolderPath('Desktop') }; if(-not $desk -or -not (Test-Path $desk)){ $desk=Join-Path $env:USERPROFILE 'Desktop' }; if(-not (Test-Path $desk)){ New-Item -ItemType Directory -Force -Path $desk | Out-Null }; $ws=New-Object -ComObject WScript.Shell; $lnk=Join-Path $desk ($ro+'.lnk'); $sc=$ws.CreateShortcut($lnk); $sc.TargetPath=$html; $sc.WorkingDirectory=$dest; $sc.Description=$ro; $chrome=Join-Path $env:ProgramFiles 'Google\Chrome\Application\chrome.exe'; $edge=Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'; if(Test-Path $chrome){ $sc.IconLocation=($chrome+',0') } elseif(Test-Path $edge){ $sc.IconLocation=($edge+',0') }; $sc.Save(); if(Test-Path $lnk){ exit 0 } else { exit 1 }"
+if errorlevel 1 (
+  echo   바탕화면 아이콘은 만들지 못했습니다 ^(앱은 정상 설치되었습니다^)
+) else (
+  echo   바탕화면에 [로이창고] 아이콘을 만들었습니다.
+)
 
 rmdir /s /q "%WORK%" >nul 2>&1
 
@@ -71,9 +81,14 @@ echo.
 echo   * 예전 폴더에서 불러와 있던 확장은, 그 항목을 [삭제]하고
 echo     위 폴더로 새로 [로드]해야 이번 업데이트가 적용됩니다.
 echo.
-echo   * 앱 실행: 위 폴더의 로이창고.html 더블클릭
+echo   * 다음부터는 바탕화면의 [로이창고] 아이콘을 누르면 바로 열립니다.
 echo.
-pause
+
+echo   로이창고를 엽니다...
+start "" "%DEST%\로이창고.html"
+
+echo   창을 닫으셔도 됩니다.
+timeout /t 6 >nul
 exit /b 0
 
 :FAIL
