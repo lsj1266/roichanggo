@@ -3560,7 +3560,7 @@ function seoScore(p){
   var optN = (p.options||[]).length;
   var longOpt = (p.options||[]).filter(function(o){ return charCount(o.name) > 25; }).length;
   var optPts = optN <= OPT_MAX ? (longOpt ? 6 : 10) : 4;
-  items.push({ t:"옵션 2~11개 · 이름 25자", pts:optPts, max:10, d: optN + "개" + (longOpt ? " · 긴 이름 " + longOpt : "") });
+  items.push({ t:"옵션 11개 이내 · 이름 25자", pts:optPts, max:10, d: optN + "개" + (longOpt ? " · 긴 이름 " + longOpt : "") });
 
   var total = 0;
   items.forEach(function(it){ total += it.pts; });
