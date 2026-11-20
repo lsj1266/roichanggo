@@ -282,13 +282,13 @@
   var SELECTORS = {
     taobao: {
       title: ['h1[class*="mainTitle"]', '[class*="ItemHeader"] h1', '[class*="mainTitle"]', '.tb-main-title', '#J_Title h3', 'h1'],
-      price: ['[class*="Price--priceText"]', '[class*="priceText"]', '[class*="Price"] [class*="text"]', '.tm-price', '#J_PromoPrice .tb-rmb-num', '#J_StrPrice .tb-rmb-num', '[class*="price"] em'],
+      price: ['[class*="Price--priceText"]', '[class*="Price--normalText"]', '[class*="Price--"]', '[class*="priceText"]', '[class*="Price"] [class*="text"]', '.tm-price', '#J_PromoPrice .tb-rmb-num', '#J_StrPrice .tb-rmb-num', '[class*="price"] em'],
       image: ['#J_ImgBooth', '[class*="PicGallery"] img', '[class*="mainPic"] img', 'img[class*="mainImg"]'],
       options: ['[class*="SkuContent"] [class*="valueItem"]', '[class*="skuItem"] [class*="valueItem"]', '.tb-sku .tb-prop li a span', '#J_isku .tb-prop li a span']
     },
     tmall: {
       title: ['h1[class*="mainTitle"]', '[class*="ItemHeader"] h1', '[class*="mainTitle"]', '.tb-main-title', '#J_Title h1', 'h1'],
-      price: ['[class*="Price--priceText"]', '[class*="priceText"]', '.tm-price', '#J_StrPrice .tm-price', '[class*="price"] em'],
+      price: ['[class*="Price--priceText"]', '[class*="Price--normalText"]', '[class*="Price--"]', '[class*="priceText"]', '.tm-price', '#J_StrPrice .tm-price', '[class*="price"] em'],
       image: ['#J_ImgBooth', '[class*="PicGallery"] img', '[class*="mainPic"] img', 'img[class*="mainImg"]'],
       options: ['[class*="SkuContent"] [class*="valueItem"]', '[class*="skuItem"] [class*="valueItem"]', '.tb-sku .tb-prop li a span', '#J_isku .tb-prop li a span']
     },
@@ -337,15 +337,47 @@
     var els = allEls(SELECTORS[SITE].price);
     for (var i = 0; i < els.length; i++) {
       var n = toNumber(textOf(els[i]));
-      if (n !== null) return n;
+      if (n !== null && n > 0) return n;
     }
     var ld = readJsonLd();
-    if (ld.price !== null) return ld.price;
+    if (ld.price !== null && ld.price > 0) return ld.price;
     var mn = toNumber(metaContent([
       'meta[property="og:price:amount"]', 'meta[property="product:price:amount"]',
       'meta[itemprop="price"]', 'meta[name="price"]', 'meta[name="lowPrice"]'
     ]));
-    return mn;
+    if (mn !== null && mn > 0) return mn;
+
+    // 영문/글로벌 UI 및 분할 span(¥ + 정수 + 소수) 대응 fallback
+    try {
+      var best = null;
+      var bestScore = -1;
+      var nodes = document.querySelectorAll('div, span, p, strong, em');
+      var limit = Math.min(nodes.length, 2500);
+      for (var j = 0; j < limit; j++) {
+        var el = nodes[j];
+        var txt = (el.innerText || '').trim();
+        if (!txt || txt.length > 80) continue;
+        if (!/(?:¥|￥|RMB|CNY)\s*\d/i.test(txt)) continue;
+        if (/88vip|subsidy|coupon|save\s|discount\s+of|off\b|before\s+discount|krw|원/i.test(txt)) continue;
+        var rect = el.getBoundingClientRect();
+        if (!rect || rect.width <= 0 || rect.height <= 0 || rect.top < 0 || rect.top > 950) continue;
+        var cs = window.getComputedStyle(el);
+        if (cs && cs.textDecorationLine && cs.textDecorationLine.indexOf('line-through') !== -1) continue;
+        var m = txt.match(/(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i);
+        if (!m) continue;
+        var val = toNumber(m[1]);
+        if (val === null || val <= 0) continue;
+        var fs = cs ? parseFloat(cs.fontSize) || 14 : 14;
+        var score = fs + (/flash|sale|promo|현재|할인/i.test(txt) ? 10 : 0) - (txt.length * 0.1);
+        if (score > bestScore) {
+          bestScore = score;
+          best = val;
+        }
+      }
+      if (best !== null) return best;
+    } catch (_) {}
+
+    return null;
   }
 
   function extractImage() {
