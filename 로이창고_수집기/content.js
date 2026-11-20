@@ -351,8 +351,8 @@
     try {
       var best = null;
       var bestScore = -1;
-      var nodes = document.querySelectorAll('div, span, p, strong, em');
-      var limit = Math.min(nodes.length, 2500);
+      var nodes = document.querySelectorAll('div, span, p, strong, em, font, b, i');
+      var limit = Math.min(nodes.length, 3500);
       for (var j = 0; j < limit; j++) {
         var el = nodes[j];
         var txt = (el.innerText || '').trim();
@@ -376,6 +376,19 @@
         }
       }
       if (best !== null) return best;
+
+      // 최후 수단: 본문 상단 텍스트 줄 단위 스캔
+      var bodyText = (document.body && document.body.innerText || '').slice(0, 4000).split(/\r?\n/);
+      for (var k = 0; k < bodyText.length; k++) {
+        var line = bodyText[k].replace(/\s*\.\s*/g, '.').replace(/\s+/g, ' ').trim();
+        if (!line || line.length > 100) continue;
+        if (/88vip|limited time subsidy|coupon|discount\s+of|off\b|before\s+discount|krw|원/i.test(line)) continue;
+        var lm = line.match(/(?:¥|￥|RMB|CNY)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i);
+        if (lm) {
+          var lv = toNumber(lm[1]);
+          if (lv !== null && lv > 0) return lv;
+        }
+      }
     } catch (_) {}
 
     return null;
@@ -548,7 +561,7 @@
   }
 
   function cardPrice(card) {
-    var t = textOf(card);
+    var t = textOf(card).replace(/\s*\.\s*/g, '.');
     var m = t.match(/[¥￥]\s*(\d[\d,]*(?:\.\d+)?)/) || t.match(/(\d[\d,]*(?:\.\d+)?)\s*円/) || t.match(/[¥￥]?\s*(\d[\d,]*(?:\.\d+)?)/);
     return m ? toNumber(m[1]) : null;
   }
