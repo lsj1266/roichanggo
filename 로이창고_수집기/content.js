@@ -398,6 +398,34 @@
         var jv = toNumber(jm[1]);
         if (jv !== null && jv > 0) return jv;
       }
+
+      // 최후 수단: ¥ 아이콘이 CSS/SVG로 분리된 경우 — 상단 우측(상품 정보 영역)의 가장 큰 빨강/주황 숫자
+      var bigBest = null;
+      var bigScore = -1;
+      var numNodes = document.querySelectorAll('span, div, strong, em, b');
+      var nLim = Math.min(numNodes.length, 8000);
+      for (var p = 0; p < nLim; p++) {
+        var ne = numNodes[p];
+        var nt = (ne.innerText || '').replace(/\s+/g, '').trim();
+        if (!/^\d{1,5}(?:\.\d{1,2})?$/.test(nt)) continue;
+        var nr = ne.getBoundingClientRect();
+        if (!nr || nr.width <= 0 || nr.height <= 0 || nr.top < 80 || nr.top > 750 || nr.left < 250) continue;
+        var ncs = window.getComputedStyle(ne);
+        if (!ncs) continue;
+        if (ncs.textDecorationLine && ncs.textDecorationLine.indexOf('line-through') !== -1) continue;
+        var nfs = parseFloat(ncs.fontSize) || 0;
+        if (nfs < 20) continue;
+        var nv = toNumber(nt);
+        if (nv === null || nv <= 0) continue;
+        var color = ncs.color || '';
+        var isWarm = /rgb\(\s*(?:2[0-5]\d|1[89]\d)\s*,\s*(?:[0-9]{1,2}|1[0-4]\d)\s*,/.test(color);
+        var sc = nfs + (isWarm ? 20 : 0);
+        if (sc > bigScore) {
+          bigScore = sc;
+          bigBest = nv;
+        }
+      }
+      if (bigBest !== null) return bigBest;
     } catch (_) {}
 
     return null;

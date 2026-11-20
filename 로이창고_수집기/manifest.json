@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "로이창고 상품 수집기",
-  "version": "2.0.0",
+  "version": "2.0.4",
   "description": "타오바오·티몰·1688·라쿠텐의 상품 상세 페이지와 검색 목록에서 상품을 한 번에 담아 로이창고(웹앱)로 보냅니다.",
   "permissions": [
     "activeTab",
