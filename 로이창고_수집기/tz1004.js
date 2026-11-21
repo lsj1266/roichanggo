@@ -54,17 +54,33 @@
     return true;
   }
 
-  function checkBox(id, on) {
-    var el = document.getElementById(id);
+  /* 이름+값으로 찾고, 없으면 id로 한 번 더 (사이트가 id를 바꿔도 동작) */
+  function findInput(name, value) {
+    var f = form();
+    if (!f) return null;
+    var list = f.querySelectorAll('input[name="' + name + '"]');
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i].value) === String(value)) return list[i];
+    }
+    return null;
+  }
+  function findById(id) {
+    var f = form();
+    var el = f ? f.querySelector('#' + id) : null;
+    return el || document.getElementById(id);
+  }
+  function toggle(el, on) {
     if (!el) return false;
     if (el.checked === !!on) return true;
     el.checked = !!on;
     el.dispatchEvent(new Event('change', { bubbles: true }));
     return true;
   }
-
-  function radio(id) {
-    var el = document.getElementById(id);
+  function checkBox(name, value, on) {
+    return toggle(findInput(name, value) || findById(name + '_' + value), on);
+  }
+  function radio(name, value) {
+    var el = findInput(name, value) || findById(name + '_' + value);
     if (!el) return false;
     el.checked = true;
     el.dispatchEvent(new Event('change', { bubbles: true }));
@@ -133,14 +149,14 @@
     setByName('CONS_ADDR_DET', r.addrDet);
     if (r.addrEn) setByName('CONS_ADDR_EN', r.addrEn);
     if (r.addrDetEn) setByName('CONS_ADDR_DET_EN', r.addrDetEn);
-    if (String(data.ctmsDvs) === '2') radio('CTMS_DVS_CD_2'); else radio('CTMS_DVS_CD_1');
+    if (String(data.ctmsDvs) === '2') radio('CTMS_DVS_CD', '2'); else radio('CTMS_DVS_CD', '1');
 
     // 관부가세
     if (String(data.dutyPay) === '1') {
-      radio('DUTY_PAYMENT_CD_1');
+      radio('DUTY_PAYMENT_CD', '1');
       setByName('DUTY_MOB_NO', String(data.dutyPhone || '').replace(/[^0-9]/g, ''));
     } else {
-      radio('DUTY_PAYMENT_CD_2');
+      radio('DUTY_PAYMENT_CD', '2');
     }
 
     // 요청사항 / 셀러
@@ -183,16 +199,16 @@
     // 부가서비스
     var svc = data.services || [];
     svc.forEach(function (code) {
-      if (!checkBox('CHARGE_DET_CD_' + code, true)) miss.push('부가서비스 ' + code);
-      var q = document.getElementById('CHARGE_DET_QTY_' + code);
+      if (!checkBox('CHARGE_DET_CD', code, true)) miss.push('부가서비스 ' + code);
+      var q = findById('CHARGE_DET_QTY_' + code);
       if (q) { q.disabled = false; if (!q.value) q.value = '1'; }
     });
     if (String(data.care).toUpperCase() === 'Y') {
-      checkBox('CHARGE_DET_CD_65', true);
-      checkBox('INSURANCE_AGREE_YN', true);
+      checkBox('CHARGE_DET_CD', '65', true);
+      toggle(findInput('INSURANCE_AGREE_YN', 'Y') || findById('INSURANCE_AGREE_YN'), true);
     }
     // 결제 방식
-    if (String(data.autoPay) === '1') radio('SVC_DVS_CD_1'); else radio('SVC_DVS_CD_2');
+    if (String(data.autoPay) === '1') radio('SVC_DVS_CD', '1'); else radio('SVC_DVS_CD', '2');
 
     if (badSeq.length) miss.push('통관품목 번호를 찾지 못함: ' + badSeq.join(', '));
 
