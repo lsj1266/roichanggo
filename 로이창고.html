@@ -632,8 +632,8 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 <div class="toasts" id="toasts"></div>
 <input type="file" id="anyFile" accept=".json,.csv,application/json,text/csv" hidden>
 <input type="file" id="tzItemFile" accept=".xls,.csv,.html,.txt,text/html,text/csv" hidden>
-<input type="file" id="domesticFile" accept=".json,.csv,application/json,text/csv" hidden>
-<input type="file" id="taxFile" accept=".json,.csv,application/json,text/csv" hidden>
+<input type="file" id="domesticFile" accept=".json,.csv,.xlsx,.xls,application/json,text/csv" hidden>
+<input type="file" id="taxFile" accept=".csv,.xlsx,.xls,.json,text/csv" hidden>
 
 <script>
 (function(){
@@ -6477,7 +6477,7 @@ function renderDomesticView(){
       '</div></div>' +
       '<div class="acts">' +
         '<button class="btn sm" data-act="domesticAdd">＋ 직접 추가</button>' +
-        '<button class="btn sm primary" data-act="domesticImport">⬆ 상품 불러오기 (CSV/JSON)</button>' +
+        '<button class="btn sm primary" data-act="domesticImport">⬆ 상품 불러오기 (CSV·엑셀·JSON)</button>' +
       '</div></div>';
 
   html += '<section class="card"><div class="card-head"><div class="ico">🏷️</div><h3>도매 상품과 계산</h3>' +
@@ -6485,7 +6485,7 @@ function renderDomesticView(){
   if(!list.length){
     html += '<div class="empty" style="border:0;background:transparent"><div class="big">🏠</div>' +
       '<div style="font-weight:700;color:#4b5573">아직 국내 위탁 상품이 없습니다</div>' +
-      '<div class="tiny">온채널·오너클랜·도매매에서 내려받은 CSV/엑셀을 [상품 불러오기]로 넣거나, 수집기 확장으로 상품 페이지에서 담아 오세요.</div></div>';
+      '<div class="tiny">온채널·오너클랜·도매매에서 내려받은 <b>CSV·엑셀(.xlsx/.xls)</b>을 [상품 불러오기]로 넣거나, 수집기 확장으로 상품 페이지에서 담아 오세요.</div></div>';
   }else{
     html += '<div class="vtable dom"><div class="vhead">' +
       '<div>공급사</div><div>상품명</div><div>도매가</div><div>국내택배</div><div>수수료%</div>' +
@@ -6644,55 +6644,46 @@ function domesticFromCollected(e){
     updatedAt: Date.now()
   });
 }
-function domesticImportText(text, filename){
-  var s = String(text || "").replace(/^\uFEFF/, "").trim();
-  if(!s) return 0;
-  var list = [];
-  var isJson = /\.json$/i.test(str(filename)) || /^[\[{]/.test(s);
-  if(isJson){
-    try{
-      var data = JSON.parse(s);
-      var arr = Array.isArray(data) ? data : (data.products || data.items || data.data || []);
-      list = arr.map(domesticFromCollected).filter(function(d){ return d && (d.name || d.cost); });
-    }catch(e){ toast("JSON을 읽지 못했습니다", "bad"); return 0; }
-  }else{
-    var rows = parseCsv(s);
-    if(rows.length < 2){ toast("CSV에 상품이 없습니다", "bad"); return 0; }
-    var head = rows[0].map(normKey);
-    function col(){
-      for(var a = 0; a < arguments.length; a++){
-        var idx = head.indexOf(normKey(arguments[a]));
-        if(idx >= 0) return idx;
-      }
-      return -1;
+function domesticRowsToItems(rows){
+  if(!rows || rows.length < 2) return [];
+  var head = rows[0].map(normKey);
+  function col(){
+    for(var a = 0; a < arguments.length; a++){
+      var idx = head.indexOf(normKey(arguments[a]));
+      if(idx >= 0) return idx;
     }
-    var ic = {
-      name: col("상품명","상품명노출","name","productname","품명"),
-      code: col("상품코드","공급사코드","자체상품코드","code","상품번호"),
-      cost: col("도매가","공급가","공급가격","매입가","원가","도매금액","도매가격","price"),
-      ship: col("배송비","택배비","국내배송비","shippingfee"),
-      stock: col("재고","재고수량","stock","quantity"),
-      supplier: col("공급사","사이트","마켓","supplier"),
-      url: col("상품url","상품주소","url","link"),
-      img: col("이미지","이미지url","썸네일","image","imageurl"),
-      memo: col("메모","비고","memo")
-    };
-    if(ic.name < 0){ toast("상품명 열을 찾지 못했습니다 (상품명/품명/name)", "bad"); return 0; }
-    rows.slice(1).forEach(function(r){
-      function g(k){ return ic[k] >= 0 ? str(r[ic[k]]).trim() : ""; }
-      var nm = g("name");
-      if(!nm) return;
-      list.push(normDomestic({
-        id: uid(), supplier: g("supplier") || "온채널", name: nm, code: g("code"),
-        cost: num(String(g("cost")).replace(/[^\d.\-]/g, ""), 0),
-        ship: num(String(g("ship")).replace(/[^\d.\-]/g, ""), 0),
-        stock: num(String(g("stock")).replace(/[^\d.\-]/g, ""), 0),
-        url: g("url"), img: g("img"), memo: g("memo"),
-        updatedAt: Date.now()
-      }));
-    });
+    return -1;
   }
-  if(!list.length){ toast("불러올 상품이 없습니다 — 열 이름을 확인해 주세요", "bad"); return 0; }
+  var ic = {
+    name: col("상품명","상품명노출","name","productname","품명","상품"),
+    code: col("상품코드","공급사코드","자체상품코드","code","상품번호","품번"),
+    cost: col("도매가","공급가","공급가격","매입가","원가","도매금액","도매가격","price","도매"),
+    ship: col("배송비","택배비","국내배송비","shippingfee"),
+    stock: col("재고","재고수량","stock","quantity"),
+    supplier: col("공급사","사이트","마켓","supplier","공급업체"),
+    url: col("상품url","상품주소","url","link"),
+    img: col("이미지","이미지url","썸네일","image","imageurl","대표이미지"),
+    memo: col("메모","비고","memo")
+  };
+  if(ic.name < 0) return null;
+  var list = [];
+  rows.slice(1).forEach(function(r){
+    function g(k){ return ic[k] >= 0 ? str(r[ic[k]]).trim() : ""; }
+    var nm = g("name");
+    if(!nm) return;
+    list.push(normDomestic({
+      id: uid(), supplier: g("supplier") || "온채널", name: nm, code: g("code"),
+      cost: num(String(g("cost")).replace(/[^\d.\-]/g, ""), 0),
+      ship: num(String(g("ship")).replace(/[^\d.\-]/g, ""), 0),
+      stock: num(String(g("stock")).replace(/[^\d.\-]/g, ""), 0),
+      url: g("url"), img: g("img"), memo: g("memo"),
+      updatedAt: Date.now()
+    }));
+  });
+  return list;
+}
+function domesticMerge(list){
+  if(!list || !list.length){ toast("불러올 상품이 없습니다 — 열 이름을 확인해 주세요", "bad"); return 0; }
   var added = 0;
   list.forEach(function(d){
     var hit = null;
@@ -6712,6 +6703,205 @@ function domesticImportText(text, filename){
   renderDomesticView();
   toast("국내 위탁 상품 " + list.length + "건을 불러왔습니다 (새 상품 " + added + "건)", "ok");
   return list.length;
+}
+function domesticImportRows(rows, sourceName){
+  var list = domesticRowsToItems(rows);
+  if(list === null){
+    toast("상품명 열을 찾지 못했습니다 — 첫 줄에 상품명(또는 품명) 열이 있어야 합니다", "bad");
+    return 0;
+  }
+  if(!list.length){ toast("상품이 없습니다 — " + (sourceName || "파일") + "의 열 이름을 확인해 주세요", "bad"); return 0; }
+  return domesticMerge(list);
+}
+function domesticImportText(text, filename){
+  var s = String(text || "").replace(/^\uFEFF/, "").trim();
+  if(!s) return 0;
+  var isJson = /\.json$/i.test(str(filename)) || /^[\[{]/.test(s);
+  if(isJson){
+    try{
+      var data = JSON.parse(s);
+      var arr = Array.isArray(data) ? data : (data.products || data.items || data.data || []);
+      return domesticMerge(arr.map(domesticFromCollected).filter(function(d){ return d && (d.name || d.cost); }));
+    }catch(e){ toast("JSON을 읽지 못했습니다", "bad"); return 0; }
+  }
+  if(/<table|<tr[\s>]/i.test(s)) return domesticImportRows(htmlTableRows(s), str(filename));
+  return domesticImportRows(parseCsv(s), str(filename));
+}
+
+/* ---------- 엑셀(.xlsx) · 표(.xls/HTML) · CSV 읽기 ---------- */
+function utf8DecodeBytes(bytes){
+  try{ return new TextDecoder("utf-8").decode(bytes); }catch(e){}
+  var out = "";
+  for(var i = 0; i < bytes.length; i++){
+    var c = bytes[i];
+    if(c < 0x80) out += String.fromCharCode(c);
+    else if(c < 0xE0 && i + 1 < bytes.length){ out += String.fromCharCode(((c & 31) << 6) | (bytes[++i] & 63)); }
+    else if(c < 0xF0 && i + 2 < bytes.length){ out += String.fromCharCode(((c & 15) << 12) | ((bytes[++i] & 63) << 6) | (bytes[++i] & 63)); }
+    else if(i + 3 < bytes.length){
+      var cp = ((c & 7) << 18) | ((bytes[++i] & 63) << 12) | ((bytes[++i] & 63) << 6) | (bytes[++i] & 63);
+      cp -= 0x10000;
+      out += String.fromCharCode(0xD800 + (cp >> 10), 0xDC00 + (cp & 1023));
+    }
+  }
+  return out;
+}
+function unxml(t){
+  return String(t).replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'").replace(/&#(\d+);/g, function(m, n){ return String.fromCharCode(parseInt(n, 10)); })
+    .replace(/&amp;/g, "&");
+}
+function zipEntries(bytes){
+  var dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  var eocd = -1;
+  for(var i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); i--){
+    if(bytes[i] === 0x50 && bytes[i+1] === 0x4b && bytes[i+2] === 0x05 && bytes[i+3] === 0x06){ eocd = i; break; }
+  }
+  if(eocd < 0) return null;
+  var count = dv.getUint16(eocd + 10, true);
+  var p = dv.getUint32(eocd + 16, true);
+  var out = {};
+  for(var k = 0; k < count; k++){
+    if(p + 46 > bytes.length || dv.getUint32(p, true) !== 0x02014b50) break;
+    var method = dv.getUint16(p + 10, true);
+    var compSize = dv.getUint32(p + 20, true);
+    var nameLen = dv.getUint16(p + 28, true);
+    var extraLen = dv.getUint16(p + 30, true);
+    var cmtLen = dv.getUint16(p + 32, true);
+    var lho = dv.getUint32(p + 42, true);
+    var name = utf8DecodeBytes(bytes.subarray(p + 46, p + 46 + nameLen));
+    if(lho + 30 <= bytes.length){
+      var lNameLen = dv.getUint16(lho + 26, true);
+      var lExtraLen = dv.getUint16(lho + 28, true);
+      var start = lho + 30 + lNameLen + lExtraLen;
+      out[name] = { method: method, data: bytes.subarray(start, start + compSize) };
+    }
+    p += 46 + nameLen + extraLen + cmtLen;
+  }
+  return out;
+}
+function inflateRaw(bytes){
+  if(typeof DecompressionStream !== "function" || typeof ReadableStream !== "function"){
+    return Promise.reject(new Error("inflate-unavailable"));
+  }
+  try{
+    var ds = new DecompressionStream("deflate-raw");
+    var rs = new ReadableStream({
+      start: function(c){ c.enqueue(bytes); c.close(); }
+    });
+    var reader = rs.pipeThrough(ds).getReader();
+    var chunks = [], total = 0;
+    function pump(){
+      return reader.read().then(function(r){
+        if(r.done){
+          var out = new Uint8Array(total), off = 0;
+          for(var i = 0; i < chunks.length; i++){ out.set(chunks[i], off); off += chunks[i].length; }
+          return out;
+        }
+        chunks.push(r.value);
+        total += r.value.length;
+        return pump();
+      });
+    }
+    return pump();
+  }catch(e){ return Promise.reject(e); }
+}
+function zipRead(z, name){
+  var e = z[name];
+  if(!e) return Promise.resolve(null);
+  if(e.method === 0) return Promise.resolve(e.data);
+  return inflateRaw(e.data);
+}
+function xmlSharedStrings(xml){
+  var out = [], re = /<si[^>]*>([\s\S]*?)<\/si>/g, m;
+  while((m = re.exec(xml))){
+    var s = "", tr = /<t[^>]*>([\s\S]*?)<\/t>/g, tm;
+    while((tm = tr.exec(m[1]))) s += unxml(tm[1]);
+    out.push(s);
+  }
+  return out;
+}
+function xlColIndex(letters){
+  var n = 0;
+  for(var i = 0; i < letters.length; i++) n = n * 26 + (letters.charCodeAt(i) - 64);
+  return Math.max(0, n - 1);
+}
+function xmlSheetRows(xml, shared){
+  var rows = [], rowRe = /<row[^>]*>([\s\S]*?)<\/row>/g, rm;
+  while((rm = rowRe.exec(xml))){
+    var cells = [];
+    var cRe = /<c([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g, cm;
+    while((cm = cRe.exec(rm[1]))){
+      var attrs = cm[1] || "", inner = cm[2] || "";
+      var refM = attrs.match(/r="([A-Z]+)(\d+)"/);
+      var tM = attrs.match(/t="([^"]+)"/);
+      var ci = refM ? xlColIndex(refM[1]) : cells.length;
+      var t = tM ? tM[1] : "";
+      var v = "";
+      if(t === "inlineStr"){ v = collectText(inner); }
+      else{
+        var vm = inner.match(/<v[^>]*>([\s\S]*?)<\/v>/);
+        if(vm){
+          if(t === "s") v = shared[parseInt(vm[1], 10)] || "";
+          else v = unxml(vm[1]);
+        }
+      }
+      cells[ci] = v;
+    }
+    var row = [];
+    for(var i = 0; i < cells.length; i++) row.push(cells[i] === undefined ? "" : cells[i]);
+    if(row.length) rows.push(row);
+  }
+  function collectText(chunk){
+    var s = "", re = /<t[^>]*>([\s\S]*?)<\/t>/g, m;
+    while((m = re.exec(chunk))) s += unxml(m[1]);
+    return s;
+  }
+  return rows;
+}
+function xlsxToRows(bytes){
+  var z = zipEntries(bytes);
+  if(!z) return Promise.reject(new Error("not-zip"));
+  var names = Object.keys(z);
+  var sheetName = "";
+  names.forEach(function(n){ if(!sheetName && /^xl\/worksheets\/sheet\d+\.xml$/.test(n)) sheetName = n; });
+  if(!sheetName) return Promise.reject(new Error("no-sheet"));
+  return Promise.all([zipRead(z, "xl/sharedStrings.xml"), zipRead(z, sheetName)]).then(function(parts){
+    var shared = parts[0] ? xmlSharedStrings(utf8DecodeBytes(parts[0])) : [];
+    return xmlSheetRows(utf8DecodeBytes(parts[1]), shared);
+  });
+}
+function htmlTableRows(text){
+  var rows = [], trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/gi, trm;
+  while((trm = trRe.exec(text))){
+    var cells = [], tdRe = /<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi, tdm;
+    while((tdm = tdRe.exec(trm[1]))){
+      cells.push(unxml(String(tdm[1]).replace(/<[^>]*>/g, " ")).replace(/\s+/g, " ").trim());
+    }
+    if(cells.some(function(c){ return String(c).trim() !== ""; })) rows.push(cells);
+  }
+  return rows;
+}
+/* 파일 하나를 표(rows)로 읽기 — .xlsx(압축) / .xls(HTML표) / .csv 모두 */
+function readTableFile(file){
+  return new Promise(function(resolve, reject){
+    var name = String((file && file.name) || "").toLowerCase();
+    if(/\.xlsx$/.test(name)){
+      var fr = new FileReader();
+      fr.onload = function(){ xlsxToRows(new Uint8Array(fr.result)).then(resolve, reject); };
+      fr.onerror = function(){ reject(new Error("read")); };
+      fr.readAsArrayBuffer(file);
+      return;
+    }
+    var rd = new FileReader();
+    rd.onload = function(){
+      var text = String(rd.result || "");
+      if(/[\u0000-\u0008]/.test(text)){ reject(new Error("old-xls")); return; }
+      if(/<table|<tr[\s>]/i.test(text)) resolve(htmlTableRows(text));
+      else resolve(parseCsv(text.replace(/^\uFEFF/, "")));
+    };
+    rd.onerror = function(){ reject(new Error("read")); };
+    rd.readAsText(file, "utf-8");
+  });
 }
 
 /* =========================================================
@@ -6785,8 +6975,8 @@ function renderTaxView(){
   '</section>';
 
   html += '<section class="card"><div class="card-head"><div class="ico">📄</div><h3>주문별 장부</h3>' +
-    '<span class="hint">CSV로 불러오면 주문관리 엑셀도 그대로 쓸 수 있습니다</span>' +
-    '<div style="margin-left:auto"><button class="btn sm" data-act="taxImport">⬆ 주문 CSV/JSON 불러오기</button></div></div>';
+    '<span class="hint">주문관리 CSV·엑셀(.xlsx)을 그대로 넣을 수 있습니다</span>' +
+    '<div style="margin-left:auto"><button class="btn sm" data-act="taxImport">⬆ 주문 CSV·엑셀 불러오기</button></div></div>';
   if(!list.length){
     html += '<div class="empty" style="border:0;background:transparent"><div class="big">🧾</div>' +
       '<div style="font-weight:700;color:#4b5573">아직 장부가 비어 있습니다</div>' +
@@ -6876,11 +7066,8 @@ function taxFromProducts(){
   renderTaxView();
   toast("상품 " + list.length + "건으로 예상 장부를 만들었습니다 — 실제 주문 금액으로 고쳐 주세요", "ok");
 }
-function taxImportText(text, filename){
-  var s = String(text || "").replace(/^\uFEFF/, "").trim();
-  if(!s) return 0;
-  var rows = parseCsv(s);
-  if(rows.length < 2){ toast("행이 없습니다", "bad"); return 0; }
+function taxRowsToItems(rows){
+  if(!rows || rows.length < 2) return null;
   var head = rows[0].map(normKey);
   function col(){
     for(var a = 0; a < arguments.length; a++){
@@ -6901,8 +7088,8 @@ function taxImportText(text, filename){
     etc: col("기타","기타비용","부대비용","etc"),
     memo: col("메모","비고","memo")
   };
-  if(ic.name < 0 && ic.sale < 0){ toast("상품명·판매금액 열을 찾지 못했습니다", "bad"); return 0; }
-  var n = 0;
+  if(ic.name < 0 && ic.sale < 0) return null;
+  var items = [];
   rows.slice(1).forEach(function(r){
     function g(k){ return ic[k] >= 0 ? str(r[ic[k]]).trim() : ""; }
     function m(k){ return num(String(g(k)).replace(/[^\d.\-]/g, ""), 0); }
@@ -6911,13 +7098,25 @@ function taxImportText(text, filename){
       sale: m("sale"), cost: m("cost"), ship: m("ship"), fee: m("fee"), etc: m("etc"), memo: g("memo")
     });
     if(!row.name && !row.sale) return;
-    state.tax.rows.push(row); n++;
+    items.push(row);
   });
-  if(!n){ toast("넣을 주문이 없습니다", "bad"); return 0; }
+  return items;
+}
+function taxImportRows(rows, sourceName){
+  var items = taxRowsToItems(rows);
+  if(items === null){ toast("상품명·판매금액 열을 찾지 못했습니다", "bad"); return 0; }
+  if(!items.length){ toast("넣을 주문이 없습니다 — " + (sourceName || "파일") + "을 확인해 주세요", "bad"); return 0; }
+  items.forEach(function(r){ state.tax.rows.push(r); });
   save();
   renderTaxView();
-  toast("주문 " + n + "건을 장부에 넣었습니다", "ok");
-  return n;
+  toast("주문 " + items.length + "건을 장부에 넣었습니다", "ok");
+  return items.length;
+}
+function taxImportText(text, filename){
+  var s = String(text || "").replace(/^\uFEFF/, "").trim();
+  if(!s) return 0;
+  if(/<table|<tr[\s>]/i.test(s)) return taxImportRows(htmlTableRows(s), str(filename));
+  return taxImportRows(parseCsv(s), str(filename));
 }
 var TAX_HEAD = ["주문일","마켓","주문번호","상품명","판매금액","원가(매입)","배송비","마켓수수료","기타비용","순수익(과세표준)","남는비율%","메모"];
 function taxRows(list){
@@ -7216,16 +7415,33 @@ function bindV24(){
     }
     if(t.id === "domesticFile" && t.files && t.files[0]){
       var f2 = t.files[0];
-      var rd2 = new FileReader();
-      rd2.onload = function(){ domesticImportText(String(rd2.result || ""), f2.name); t.value = ""; };
-      rd2.readAsText(f2, "utf-8");
+      if(/\.json$/i.test(f2.name || "")){
+        var rd2 = new FileReader();
+        rd2.onload = function(){ domesticImportText(String(rd2.result || ""), f2.name); t.value = ""; };
+        rd2.readAsText(f2, "utf-8");
+      }else{
+        readTableFile(f2).then(function(rows){
+          domesticImportRows(rows, f2.name);
+          t.value = "";
+        }, function(e){
+          var msg = String(e && e.message);
+          toast(msg === "old-xls" ? "옛 엑셀(.xls) 형식입니다 — 엑셀에서 .xlsx나 CSV로 저장해 불러와 주세요"
+            : (/inflate/.test(msg) ? "이 브라우저에서는 엑셀 압축을 풀지 못했습니다 — CSV로 저장해 불러와 주세요"
+            : "파일을 읽지 못했습니다 — 엑셀에서 CSV로 저장해 불러와 주세요"), "bad");
+          t.value = "";
+        });
+      }
       return;
     }
     if(t.id === "taxFile" && t.files && t.files[0]){
       var f3 = t.files[0];
-      var rd3 = new FileReader();
-      rd3.onload = function(){ taxImportText(String(rd3.result || ""), f3.name); t.value = ""; };
-      rd3.readAsText(f3, "utf-8");
+      readTableFile(f3).then(function(rows){
+        taxImportRows(rows, f3.name);
+        t.value = "";
+      }, function(e){
+        toast(String(e && e.message) === "old-xls" ? "옛 엑셀(.xls) 형식입니다 — 엑셀에서 .xlsx나 CSV로 저장해 불러와 주세요" : "파일을 읽지 못했습니다 — 엑셀에서 CSV로 저장해 불러와 주세요", "bad");
+        t.value = "";
+      });
       return;
     }
   });
@@ -7345,13 +7561,19 @@ var RoiChanggoCore = {
   importTzItemFile: importTzItemFile,
   domesticCalc: domesticCalc,
   domesticImportText: domesticImportText,
+  domesticImportRows: domesticImportRows,
+  domesticRowsToItems: domesticRowsToItems,
   domesticFromCollected: domesticFromCollected,
+  readTableFile: readTableFile,
+  xlsxToRows: xlsxToRows,
+  htmlTableRows: htmlTableRows,
   domesticToProduct: domesticToProduct,
   taxNet: taxNet,
   taxSummary: taxSummary,
   taxMonthly: taxMonthly,
   taxFromProducts: taxFromProducts,
   taxImportText: taxImportText,
+  taxImportRows: taxImportRows,
   taxCsvText: taxCsvText,
   taxRows: taxRows,
   buildXlsx: buildXlsx,
