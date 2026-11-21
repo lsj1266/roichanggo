@@ -1,0 +1,188 @@
+/* =========================================================
+ * 로이창고 상품 수집기 — percenty.css
+ * 퍼센티 사이트 CSS와 섞이지 않도록 loi-pct- 접두사 + !important
+ * ========================================================= */
+
+#loi-pct-root {
+  position: fixed !important;
+  left: 20px !important;
+  bottom: 20px !important;
+  z-index: 2147483646 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  width: auto !important;
+  height: auto !important;
+  line-height: normal !important;
+  text-align: left !important;
+  pointer-events: auto !important;
+}
+
+#loi-pct-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  margin: 0 !important;
+  padding: 12px 18px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #ff6a00 0%, #ff3d00 100%) !important;
+  color: #ffffff !important;
+  font-family: "Malgun Gothic", "맑은 고딕", -apple-system, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.2px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  cursor: grab !important;
+  box-shadow: 0 10px 26px -10px rgba(255, 61, 0, 0.85), 0 3px 8px rgba(0, 0, 0, 0.16) !important;
+  text-shadow: none !important;
+}
+
+#loi-pct-toggle:hover { filter: brightness(1.06) !important; }
+
+.loi-pct-panel {
+  width: 292px !important;
+  max-width: calc(100vw - 40px) !important;
+  padding: 12px 12px 10px !important;
+  border: 1px solid #e7e3de !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  box-shadow: 0 18px 40px -14px rgba(15, 23, 42, 0.35), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  font-family: "Malgun Gothic", "맑은 고딕", -apple-system, "Segoe UI", sans-serif !important;
+  font-size: 12px !important;
+  color: #1b2138 !important;
+  text-align: left !important;
+  box-sizing: border-box !important;
+}
+
+.loi-pct-panel.hidden { display: none !important; }
+
+.loi-pct-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+}
+.loi-pct-title { font-size: 12.5px !important; font-weight: 800 !important; color: #1b2138 !important; }
+.loi-pct-total { font-size: 11px !important; color: #c2410c !important; font-weight: 800 !important; white-space: nowrap !important; }
+
+.loi-pct-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin-bottom: 6px !important;
+  flex-wrap: wrap !important;
+}
+
+.loi-pct-btn {
+  flex: 1 1 auto !important;
+  padding: 8px 10px !important;
+  border: 1px solid #d6d3cd !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  color: #1b2138 !important;
+  font-family: inherit !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+}
+.loi-pct-btn:hover:not(:disabled) { background: #faf9f7 !important; border-color: #9ca3af !important; }
+.loi-pct-btn.primary {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, #ff6a00 0%, #ff3d00 100%) !important;
+  color: #fff !important;
+}
+.loi-pct-btn.primary:hover:not(:disabled) { filter: brightness(1.05) !important; }
+.loi-pct-btn.danger { border-color: #fecaca !important; color: #b91c1c !important; }
+.loi-pct-btn:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+
+.loi-pct-label { font-size: 11px !important; color: #6b7280 !important; font-weight: 700 !important; white-space: nowrap !important; }
+
+.loi-pct-input {
+  width: 52px !important;
+  padding: 6px 6px !important;
+  border: 1px solid #d6d3cd !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #1b2138 !important;
+  font-family: inherit !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+}
+
+.loi-pct-bar-wrap {
+  height: 6px !important;
+  margin: 8px 0 6px !important;
+  border-radius: 999px !important;
+  background: #f1efec !important;
+  overflow: hidden !important;
+}
+.loi-pct-bar {
+  height: 100% !important;
+  width: 0% !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, #ff8a00, #ff3d00) !important;
+  transition: width 0.25s ease !important;
+}
+
+#loi-pct-progress {
+  margin-bottom: 6px !important;
+  color: #374151 !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.45 !important;
+  word-break: keep-all !important;
+}
+
+#loi-pct-log {
+  max-height: 74px !important;
+  overflow-y: auto !important;
+  color: #6b7280 !important;
+  font-size: 10.5px !important;
+  line-height: 1.5 !important;
+}
+#loi-pct-log div { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+
+.loi-pct-note {
+  margin-top: 8px !important;
+  padding-top: 8px !important;
+  border-top: 1px dashed #e7e3de !important;
+  color: #9ca3af !important;
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+  word-break: keep-all !important;
+}
+
+.loi-pct-toast {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 40px !important;
+  transform: translateX(-50%) translateY(10px) !important;
+  z-index: 2147483647 !important;
+  max-width: 78vw !important;
+  padding: 11px 16px !important;
+  border-radius: 10px !important;
+  background: rgba(17, 24, 39, 0.95) !important;
+  color: #fff !important;
+  font-family: "Malgun Gothic", "맑은 고딕", -apple-system, "Segoe UI", sans-serif !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  white-space: pre-wrap !important;
+  opacity: 0 !important;
+  transition: opacity 0.25s ease, transform 0.25s ease !important;
+  pointer-events: none !important;
+}
+.loi-pct-toast--warn { background: rgba(153, 27, 27, 0.95) !important; }
+.loi-pct-toast--show { opacity: 1 !important; transform: translateX(-50%) translateY(0) !important; }

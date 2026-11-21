@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "로이창고 상품 수집기",
-  "version": "2.0.4",
-  "description": "타오바오·티몰·1688·라쿠텐의 상품 상세 페이지와 검색 목록에서 상품을 한 번에 담아 로이창고(웹앱)로 보냅니다.",
+  "version": "2.1.0",
+  "description": "타오바오·티몰·1688·라쿠텐 상품과 퍼센티 신규 상품 등록 목록을 한 번에 담아 로이창고(웹앱)로 보냅니다.",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ],
   "action": {
     "default_title": "로이창고 수집함",
@@ -38,6 +39,20 @@
       ],
       "css": [
         "content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://www.percenty.co.kr/*",
+        "https://percenty.co.kr/*"
+      ],
+      "js": [
+        "percenty.js"
+      ],
+      "css": [
+        "percenty.css"
       ],
       "run_at": "document_idle",
       "all_frames": false

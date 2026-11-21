@@ -196,6 +196,15 @@
         font-weight: 700;
       }
       .status:empty { display: none; }
+      .bulk {
+        display: grid;
+        gap: 6px;
+        padding-top: 9px;
+        border-top: 1px dashed #e5e2dd;
+      }
+      .bulk-info { color: #6b7280; font-size: 11px; font-weight: 700; }
+      .bulk-row { display: grid; gap: 6px; }
+      .bulk button.action { font-size: 11.5px; padding: 8px 10px; }
       .foot-note {
         padding: 0 16px 12px;
         background: #fff;
@@ -213,9 +222,10 @@
     </header>
 
     <div class="hint">
-      담는 방법은 두 가지입니다.
+      담는 방법은 세 가지입니다.
       <div class="row"><span class="no">1</span><div>상품 상세 페이지 오른쪽 아래 <b>[🛒 로이창고로 수집]</b> 버튼</div></div>
       <div class="row"><span class="no">2</span><div>검색 목록에서 상품 카드 오른쪽 위 <b>[🛒 로이창고]</b> 작은 버튼</div></div>
+      <div class="row"><span class="no">3</span><div>퍼센티 <b>신규 상품 등록</b> 화면 왼쪽 아래 <b>[🛒 퍼센티 목록 수집]</b> → 현재 페이지·선택·범위·전체 자동 수집</div></div>
     </div>
 
     <div class="list" id="list"></div>
@@ -230,6 +240,20 @@
         <div class="row">
           <button class="yes" id="confirmYes" type="button">예, 모두 지우기</button>
           <button id="confirmNo" type="button">아니요</button>
+        </div>
+      </div>
+      <div class="bulk">
+        <div class="bulk-info" id="bulkInfo">퍼센티 대량 수집 보관분: 없음</div>
+        <div class="bulk-row">
+          <button class="action" id="bulkExport" type="button">⬇ 퍼센티 분할 JSON 다시 저장</button>
+          <button class="action danger" id="bulkClear" type="button">🗑 퍼센티 보관분 비우기</button>
+        </div>
+        <div class="confirm hidden" id="bulkConfirm">
+          <div>퍼센티 대량 수집 보관분을 지울까요?<br />이미 내려받은 파일은 다운로드 폴더에 그대로 남습니다.</div>
+          <div class="row">
+            <button class="yes" id="bulkConfirmYes" type="button">예, 지우기</button>
+            <button id="bulkConfirmNo" type="button">아니요</button>
+          </div>
         </div>
       </div>
       <div class="foot-note">저장된 데이터는 이 크롬 브라우저 안에만 보관됩니다. 내보낸 파일은 다운로드 폴더에 저장됩니다.</div>
