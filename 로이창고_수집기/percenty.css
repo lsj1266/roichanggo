@@ -154,6 +154,29 @@
 }
 #loi-pct-log div { white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
 
+.loi-pct-urlrow {
+  margin: 8px 0 0 !important;
+  justify-content: flex-start !important;
+}
+.loi-pct-urlmode {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #4b5563 !important;
+  font-family: "Malgun Gothic", "맑은 고딕", -apple-system, "Segoe UI", sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  cursor: pointer !important;
+}
+.loi-pct-urlmode input {
+  width: 13px !important;
+  height: 13px !important;
+  margin: 0 !important;
+  accent-color: #ff3d00 !important;
+  cursor: pointer !important;
+}
+
 .loi-pct-note {
   margin-top: 8px !important;
   padding-top: 8px !important;

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "로이창고 상품 수집기",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "타오바오·티몰·1688·라쿠텐·퍼센티·온채널·오너클랜·도매매 상품을 한 번에 담고, 천조직구 배송대행 신청서까지 채워 줍니다.",
   "permissions": [
     "activeTab",

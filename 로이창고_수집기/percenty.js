@@ -11,7 +11,9 @@
  *                    .ant-pagination-options-quick-jumper input  (번호 입력 후 Enter)
  *    - 보기 개수   : 20개씩 / 50개씩  (50개씩 = 38,534건 → 771페이지)
  *    - 목록은 스크롤할 때마다 아래 행이 붙는 방식 → 페이지마다 끝까지 스크롤하며 모음
- *    - 목록에는 원문(타오바오 등) 링크가 노출되지 않음 → 상품 ID 로 식별
+ *    - 목록에는 원문(타오바오 등) 링크가 노출되지 않음 → 상품 ID 로 퍼센티 내부 API 조회
+ *      (GET /products?ids=…&includes=from,fromId,url  +  타오바오는 /products/{id}/link)
+ *      → 각 상품의 url 에 원문 타오바오·1688·라쿠텐 주소를 채운다
  *
  *  ■ 기능
  *    1) 현재 페이지 담기 / 선택한 행만 담기  → 수집함(collectedProducts)
@@ -89,6 +91,286 @@
 
   function alive() {
     return typeof document !== 'undefined' && document && typeof document.getElementById === 'function';
+  }
+
+  /* ---------------------------------------------------------
+   * 원문(소싱) 링크 조회 — 퍼센티 내부 API
+   *  2026-11-21 실제 사이트에서 확인한 것:
+   *   · 목록 조회 : GET  https://api.percenty.co.kr/products
+   *                 ?ids=<상품ID>&ids=…&includes=from&includes=fromId&includes=url
+   *                 → { list:[{ _id, from, fromId, url, … }] }
+   *   · 원문 해석 : GET  https://api.percenty.co.kr/products/<상품ID>/link
+   *                 → { success:true, data:"https://item.taobao.com/…" }   (미로그인 시 code:-900)
+   *   · 인증      : 헤더 X-AUTH-TOKEN = 쿠키 _jg_tk 의 값 (사이트 JS 도 같은 쿠키를 읽어 쓴다)
+   *                 + x-client-platform: web, Accept: application/json
+   *   · CORS      : api.percenty.co.kr 는 Origin https://www.percenty.co.kr 만 허용
+   *                 → host_permissions 를 새로 받지 않고 페이지 발(fetch) 요청으로 동작한다
+   *   · from 값   : tb(타오바오) / tw(타오월드) / osee(1688) / ali / vvic / rkt / rkt_fs /
+   *                 iherb / temu / ople / zozo / shein / amz_*
+   *   · 타오바오·타오월드는 목록의 url 이 짧은 링크·변환 주소라서, 사이트도 상품마다
+   *     /products/<id>/link 를 호출해 실제 상품 주소로 바꾼다. 나머지는 from+fromId 로 만든다.
+   * ------------------------------------------------------- */
+  var API_BASE = 'https://api.percenty.co.kr';
+  var TOKEN_COOKIE = '_jg_tk';
+  var LINK_PARALLEL = 4;        // 동시에 보내는 원문 링크 요청 수
+  var LINK_GAP_MS = 120;        // 요청 사이 최소 간격(차단 방지)
+  var LINK_TIMEOUT_MS = 15000;
+  var URL_MODE_KEY = 'percentyUrlOn';
+
+  var urlCache = Object.create(null);      // percentyId → 원문 URL (이 탭에서 재사용)
+  var urlMode = true;                      // 원문 링크도 수집 (패널 체크박스)
+  var urlModeTouched = false;              // 사용자가 직접 바꿨으면 저장값으로 덮지 않는다
+
+  function readCookie(name) {
+    try {
+      var parts = String(document.cookie || '').split(';');
+      for (var i = 0; i < parts.length; i++) {
+        var t = parts[i].replace(/^\s+/, '');
+        var eq = t.indexOf('=');
+        if (eq < 0 || t.slice(0, eq) !== name) continue;
+        var raw = t.slice(eq + 1);
+        try { return decodeURIComponent(raw); } catch (e) { return raw; }
+      }
+    } catch (e) { /* ignore */ }
+    return '';
+  }
+
+  function authToken() {
+    return readCookie(TOKEN_COOKIE);
+  }
+
+  /* api.percenty.co.kr 는 Origin 이 www.percenty.co.kr 일 때만 CORS 를 허용한다 */
+  function apiReady() {
+    return HOST === 'www.percenty.co.kr' && typeof fetch === 'function';
+  }
+
+  function apiUrl(path, params) {
+    var qs = [];
+    if (params) {
+      Object.keys(params).forEach(function (k) {
+        if (params[k] === undefined || params[k] === null) return;
+        var arr = Array.isArray(params[k]) ? params[k] : [params[k]];
+        for (var i = 0; i < arr.length; i++) {
+          var v = arr[i];
+          if (v === undefined || v === null || v === '') continue;
+          qs.push(encodeURIComponent(k) + '=' + encodeURIComponent(String(v)));
+        }
+      });
+    }
+    return API_BASE + path + (qs.length ? '?' + qs.join('&') : '');
+  }
+
+  function pctApiGet(path, params) {
+    return new Promise(function (resolve, reject) {
+      var token = authToken();
+      if (!token) { reject(new Error('no-token')); return; }
+      var opts = {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-AUTH-TOKEN': token,
+          'x-client-platform': 'web'
+        },
+        credentials: 'omit',
+        cache: 'no-store'
+      };
+      var timer = null;
+      var ctrl = null;
+      try {
+        if (typeof AbortController === 'function') {
+          ctrl = new AbortController();
+          opts.signal = ctrl.signal;
+          timer = setTimeout(function () { try { ctrl.abort(); } catch (e) { /* ignore */ } }, LINK_TIMEOUT_MS);
+        }
+      } catch (e) { ctrl = null; }
+      function done(fn, arg) {
+        if (timer) clearTimeout(timer);
+        fn(arg);
+      }
+      fetch(apiUrl(path, params), opts).then(function (res) {
+        if (!res || !res.ok) {
+          reject(new Error('http-' + (res && res.status)));
+          return null;
+        }
+        return res.json();
+      }).then(function (body) {
+        if (body !== null) done(resolve, body);
+      }).catch(function (e) {
+        done(reject, e || new Error('fetch-failed'));
+      });
+    });
+  }
+
+  /* 타오바오·타오월드(또는 타오바오/티몰 주소)인지 — 사이트의 같은 판단 기준 */
+  function isTaobaoLink(from, url) {
+    if (from) return from === 'tb' || from === 'tw';
+    if (!url) return false;
+    var u = String(url);
+    if (u.indexOf('//') === 0) u = 'https:' + u;
+    var m = u.match(/^[a-z][a-z\d+.-]*:\/\/([^/?#]+)/i);
+    if (!m) return false;
+    var host = m[1].toLowerCase().replace(/:\d+$/, '').replace(/\.$/, '');
+    if (!host) return false;
+    return host === 'taobao.com' || /\.taobao\.com$/.test(host)
+      || host === 'tmall.com' || /\.tmall\.com$/.test(host)
+      || host === 'tmall.hk' || /\.tmall\.hk$/.test(host)
+      || host === 'distributor.taobao.global';
+  }
+
+  /* 목록의 from · fromId · url 로 원문 주소 만들기 (사이트 createSourcingSiteUrl 과 같은 규칙) */
+  function buildSourcingUrl(from, fromId, url) {
+    if (url) return String(url);
+    if (!from || !fromId) return '';
+    var id = String(fromId).replace(/^\/+/, '');
+    switch (from) {
+      case 'tb': return 'https://item.taobao.com/item.htm?id=' + encodeURIComponent(id);
+      case 'ali': return 'https://ko.aliexpress.com/item/' + encodeURIComponent(id) + '.html';
+      case 'osee': return 'https://detail.1688.com/offer/' + encodeURIComponent(id) + '.html';
+      case 'vvic': return 'https://www.vvic.com/item/' + encodeURIComponent(id);
+      case 'rkt': return 'https://item.rakuten.co.jp/' + id;
+      case 'rkt_fs': return 'https://brandavenue.rakuten.co.jp/item/' + id;
+      case 'iherb': return 'https://kr.iherb.com/' + id;
+      case 'temu': return 'https://www.temu.com/kr/' + encodeURIComponent(id) + '.html';
+      case 'ople': return 'https://www.ople.com/mall5/shop/item.php?it_id=' + encodeURIComponent(id);
+      case 'zozo': return 'https://zozo.jp/shop/' + id;
+      case 'shein': return 'https://kr.shein.com/' + id;
+      case 'tw': return 'https://distributor.taobao.global/apps/source/detail?itemId=' + encodeURIComponent(id);
+      default: return '';
+    }
+  }
+
+  /* 상품ID 여러 개의 from · fromId · url 을 한 번에 (페이지당 1회 요청) */
+  async function fetchSourceMeta(ids) {
+    var body = await pctApiGet('/products', { ids: ids, includes: ['from', 'fromId', 'url'] });
+    var list = [];
+    if (body && Array.isArray(body.list)) list = body.list;
+    else if (body && body.data && Array.isArray(body.data.list)) list = body.data.list;
+    else if (body && Array.isArray(body.data)) list = body.data;
+    else if (Array.isArray(body)) list = body;
+    else if (body && body.success === false) throw new Error('api-' + (body.code || 'fail'));
+
+    var map = Object.create(null);
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i] || {};
+      var id = p._id || p.id;
+      if (!id) continue;
+      map[id] = { from: p.from || '', fromId: p.fromId || '', url: p.url || '' };
+    }
+    return map;
+  }
+
+  /* 타오바오·타오월드 상품의 실제 원문 주소 */
+  async function fetchResolvedLink(id) {
+    var body = await pctApiGet('/products/' + encodeURIComponent(id) + '/link', null);
+    var url = '';
+    if (typeof body === 'string') url = body;
+    else if (body && typeof body.data === 'string') url = body.data;
+    if (!/^https?:\/\//i.test(String(url || ''))) return '';
+    return String(url);
+  }
+
+  /* 여러 건을 동시 4개·간격 두고 해석. 연속 실패가 쌓이면 더 두드리지 않고 접는다. */
+  async function resolveLinks(list, stats) {
+    var idx = 0;
+    var strike = 0;
+    async function worker() {
+      while (idx < list.length) {
+        if (bulk.stop) return;
+        var it = list[idx++];
+        var got = '';
+        try {
+          got = await fetchResolvedLink(it.percentyId);
+          strike = 0;
+        } catch (e) {
+          got = '';
+          if (++strike >= 5) { stats.aborted = true; return; }
+        }
+        if (got) {
+          it.url = got;
+          urlCache[it.percentyId] = got;
+        }
+        await sleep(LINK_GAP_MS);
+      }
+    }
+    var n = Math.min(LINK_PARALLEL, list.length);
+    var jobs = [];
+    for (var i = 0; i < n; i++) jobs.push(worker());
+    await Promise.all(jobs);
+  }
+
+  /* 수집한 항목들에 원문 URL 채우기. 실패해도 수집 자체는 계속된다. */
+  async function enrichUrls(items) {
+    var stats = { asked: 0, filled: 0, empty: 0, skipped: 0, reason: '', aborted: false };
+    if (!items || !items.length) return stats;
+
+    var todo = [];
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || !it.percentyId) continue;
+      stats.asked++;
+      if (it.url) continue;
+      if (urlCache[it.percentyId]) { it.url = urlCache[it.percentyId]; continue; }
+      todo.push(it);
+    }
+    if (todo.length) {
+      if (!urlMode) {
+        stats.skipped = todo.length;
+        stats.reason = 'off';
+      } else if (!apiReady()) {
+        stats.skipped = todo.length;
+        stats.reason = 'not-www';
+      } else if (!authToken()) {
+        stats.skipped = todo.length;
+        stats.reason = 'no-login';
+      } else {
+        var meta = null;
+        try { meta = await fetchSourceMeta(todo.map(function (x) { return x.percentyId; })); }
+        catch (e) { meta = null; }
+
+        var needResolve = [];
+        for (var k = 0; k < todo.length; k++) {
+          var t = todo[k];
+          var m = meta ? meta[t.percentyId] : null;
+          var from = m ? m.from : '';
+          var fromId = m ? m.fromId : '';
+          var direct = m ? m.url : '';
+          var built = buildSourcingUrl(from, fromId, direct);
+
+          if (meta && isTaobaoLink(from, direct || built)) {
+            // 타오바오·타오월드: 해석 전이라도 만들 수 있는 주소는 넣어 두고, 되면 실제 주소로 덮는다
+            if (built) t.url = built;
+            needResolve.push(t);
+          } else if (built) {
+            t.url = built;
+            urlCache[t.percentyId] = built;
+          } else {
+            // 목록 조회가 실패했거나 from 을 모르는 경우: 링크 API 로 한 번 더 시도
+            needResolve.push(t);
+          }
+        }
+        if (needResolve.length) await resolveLinks(needResolve, stats);
+      }
+    }
+
+    for (var z = 0; z < items.length; z++) {
+      var o = items[z];
+      if (!o) continue;
+      if (o.url) stats.filled++;
+      else if (o.percentyId) stats.empty++;
+    }
+    return stats;
+  }
+
+  function urlStatsLine(stats) {
+    if (!stats) return '';
+    if (stats.reason === 'off') return '원문 링크 수집 꺼짐';
+    if (stats.reason === 'no-login') return '⚠️ 원문 링크: 퍼센티 로그인 정보를 찾지 못했습니다';
+    if (stats.reason === 'not-www') return '⚠️ 원문 링크: www.percenty.co.kr 에서만 조회됩니다';
+    if (!stats.filled && !stats.empty) return '';
+    var s = '🔗 원문 링크 ' + stats.filled + '/' + (stats.filled + stats.empty) + '건';
+    if (stats.empty) s += ' (' + stats.empty + '건 미확인)';
+    if (stats.aborted) s += ' · 요청 실패가 이어져 중단';
+    return s;
   }
 
   /* ---------------------------------------------------------
@@ -611,6 +893,13 @@
       if (stale >= 4) break;
     }
     harvest();
+
+    if (list.length) {
+      var urlStats = await enrichUrls(list);
+      var urlLine = urlStatsLine(urlStats);
+      if (urlLine) logLine(urlLine);
+    }
+
     return list;
   }
 
@@ -869,6 +1158,15 @@
     barWrap.appendChild(el('div', { class: 'loi-pct-bar', id: 'loi-pct-bar' }));
     panel.appendChild(barWrap);
 
+    var rowUrl = el('div', { class: 'loi-pct-row loi-pct-urlrow' });
+    var urlCb = el('input', { id: 'loi-pct-urlmode', type: 'checkbox' });
+    urlCb.checked = true;
+    var urlLabel = el('label', { class: 'loi-pct-urlmode', title: '상품마다 원문 타오바오·1688·라쿠텐 주소를 퍼센티에서 조회해 함께 저장합니다' });
+    urlLabel.appendChild(urlCb);
+    urlLabel.appendChild(el('span', null, ' 원문 링크(타오바오·1688 주소)도 가져오기'));
+    rowUrl.appendChild(urlLabel);
+    panel.appendChild(rowUrl);
+
     panel.appendChild(el('div', { id: 'loi-pct-progress' }, '대기 중'));
     var log = el('div', { id: 'loi-pct-log' });
     panel.appendChild(log);
@@ -954,6 +1252,26 @@
       setProgress('중단 요청 — 현재 페이지를 마치고 멈춥니다', 0);
     });
     document.getElementById('loi-pct-resume').addEventListener('click', onClickResume);
+
+    var urlCb = document.getElementById('loi-pct-urlmode');
+    if (urlCb) {
+      urlCb.checked = !!urlMode;
+      urlCb.addEventListener('change', function () {
+        urlMode = !!urlCb.checked;
+        urlModeTouched = true;
+        var o = {}; o[URL_MODE_KEY] = urlMode;
+        storageSet(o);
+        logLine(urlMode ? '🔗 원문 링크도 함께 저장합니다' : '🔗 원문 링크 없이 상품 정보만 저장합니다');
+      });
+    }
+    var urlDefaults = {}; urlDefaults[URL_MODE_KEY] = true;
+    storageGet(urlDefaults).then(function (res) {
+      if (!alive()) return;
+      if (urlModeTouched) return;
+      urlMode = !(res && res[URL_MODE_KEY] === false);
+      var cb = document.getElementById('loi-pct-urlmode');
+      if (cb) cb.checked = urlMode;
+    });
   }
 
   function refreshPanel() {
@@ -996,7 +1314,10 @@
       return;
     }
     var res = await saveToBasket(items);
-    var msg = '✅ ' + items.length + '건 담음 (수집함 ' + res.total + '개)';
+    var withUrl = 0;
+    for (var u = 0; u < items.length; u++) { if (items[u] && items[u].url) withUrl++; }
+    var msg = '✅ ' + items.length + '건 담음 (수집함 ' + res.total + '개)'
+      + (withUrl ? ' · 원문 링크 ' + withUrl + '건' : '');
     setProgress(msg, 100);
     showToast(msg, 'ok');
   }
@@ -1019,6 +1340,11 @@
       var it = null;
       try { it = parseRow(picked[k], iMap); } catch (e) { it = null; }
       if (it) items.push(it);
+    }
+    if (items.length) {
+      var urlStats = await enrichUrls(items);
+      var urlLine = urlStatsLine(urlStats);
+      if (urlLine) logLine(urlLine);
     }
     var res = await saveToBasket(items);
     var msg = '✅ 선택 ' + items.length + '건 담음 (수집함 ' + res.total + '개)';
