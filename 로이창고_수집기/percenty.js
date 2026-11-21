@@ -275,7 +275,7 @@
     var strike = 0;
     async function worker() {
       while (idx < list.length) {
-        if (bulk.stop) return;
+        if (bulk.stop || strike >= 5) return;
         var it = list[idx++];
         var got = '';
         try {
