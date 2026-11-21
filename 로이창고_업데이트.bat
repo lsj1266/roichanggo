@@ -22,6 +22,13 @@ if defined DLRAW call set "DLTEST=%DLRAW%"
 if defined DLTEST if exist "%DLTEST%" set "DL=%DLTEST%"
 set "DEST=%DL%\로이창고"
 
+rem 구글 크롬을 먼저 찾습니다 - 있으면 크롬으로 열고, 없을 때만 기본 브라우저로 엽니다
+rem 확인 순서: Program Files -> Program Files x86 -> LocalAppData
+set "CHROME="
+if exist "%ProgramFiles%\Google\Chrome\Application\chrome.exe" set "CHROME=%ProgramFiles%\Google\Chrome\Application\chrome.exe"
+if not defined CHROME if exist "%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe" set "CHROME=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"
+if not defined CHROME if exist "%LocalAppData%\Google\Chrome\Application\chrome.exe" set "CHROME=%LocalAppData%\Google\Chrome\Application\chrome.exe"
+
 echo.
 echo ============================================================
 echo    로이창고 최신판 자동 업데이트
@@ -54,7 +61,7 @@ if not exist "%DEST%\로이창고_수집기\manifest.json" goto FAIL
 
 echo [4/4] 바탕화면 아이콘 만들기...
 rem 한글 파일명은 코드값으로 만들어 인코딩 문제를 피합니다 (로이창고 = B85C C774 CC3D ACE0)
-%PS% "$ErrorActionPreference='SilentlyContinue'; $ro=[string][char]0xB85C+[string][char]0xC774+[string][char]0xCC3D+[string][char]0xACE0; $dest='%DEST%'; $html=Join-Path $dest ($ro+'.html'); if(-not (Test-Path $html)){ exit 2 }; $reg=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -Name Desktop -ErrorAction SilentlyContinue).Desktop; $desk=[Environment]::ExpandEnvironmentVariables([string]$reg); if(-not $desk -or -not (Test-Path $desk)){ $desk=[Environment]::GetFolderPath('Desktop') }; if(-not $desk -or -not (Test-Path $desk)){ $desk=Join-Path $env:USERPROFILE 'Desktop' }; if(-not (Test-Path $desk)){ New-Item -ItemType Directory -Force -Path $desk | Out-Null }; $ws=New-Object -ComObject WScript.Shell; $lnk=Join-Path $desk ($ro+'.lnk'); $sc=$ws.CreateShortcut($lnk); $sc.TargetPath=$html; $sc.WorkingDirectory=$dest; $sc.Description=$ro; $chrome=Join-Path $env:ProgramFiles 'Google\Chrome\Application\chrome.exe'; $edge=Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'; if(Test-Path $chrome){ $sc.IconLocation=($chrome+',0') } elseif(Test-Path $edge){ $sc.IconLocation=($edge+',0') }; $sc.Save(); if(Test-Path $lnk){ exit 0 } else { exit 1 }"
+%PS% "$ErrorActionPreference='SilentlyContinue'; $ro=[string][char]0xB85C+[string][char]0xC774+[string][char]0xCC3D+[string][char]0xACE0; $dest='%DEST%'; $html=Join-Path $dest ($ro+'.html'); if(-not (Test-Path $html)){ exit 2 }; $reg=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -Name Desktop -ErrorAction SilentlyContinue).Desktop; $desk=[Environment]::ExpandEnvironmentVariables([string]$reg); if(-not $desk -or -not (Test-Path $desk)){ $desk=[Environment]::GetFolderPath('Desktop') }; if(-not $desk -or -not (Test-Path $desk)){ $desk=Join-Path $env:USERPROFILE 'Desktop' }; if(-not (Test-Path $desk)){ New-Item -ItemType Directory -Force -Path $desk | Out-Null }; $ws=New-Object -ComObject WScript.Shell; $lnk=Join-Path $desk ($ro+'.lnk'); $sc=$ws.CreateShortcut($lnk); $q=[string][char]34; $sc.TargetPath=$html; $sc.Arguments=''; $chrome=[string]$env:CHROME; if($chrome -ne '' -and (Test-Path $chrome)){ $sc.TargetPath=$chrome; $sc.Arguments=($q+$html+$q); $sc.IconLocation=($chrome+',0') } else { $edge=Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'; if(Test-Path $edge){ $sc.IconLocation=($edge+',0') } }; $sc.WorkingDirectory=$dest; $sc.Description=$ro; $sc.Save(); if(Test-Path $lnk){ exit 0 } else { exit 1 }"
 if errorlevel 1 (
   echo   바탕화면 아이콘은 만들지 못했습니다 ^(앱은 정상 설치되었습니다^)
 ) else (
@@ -84,8 +91,13 @@ echo.
 echo   * 다음부터는 바탕화면의 [로이창고] 아이콘을 누르면 바로 열립니다.
 echo.
 
-echo   로이창고를 엽니다...
-start "" "%DEST%\로이창고.html"
+if defined CHROME (
+  echo   로이창고를 크롬으로 엽니다...
+  start "" "%CHROME%" "%DEST%\로이창고.html"
+) else (
+  echo   로이창고를 엽니다... ^(크롬이 없어 기본 브라우저로 엽니다^)
+  start "" "%DEST%\로이창고.html"
+)
 
 echo   창을 닫으셔도 됩니다.
 timeout /t 6 >nul
