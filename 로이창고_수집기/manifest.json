@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "로이창고 상품 수집기",
-  "version": "2.1.0",
-  "description": "타오바오·티몰·1688·라쿠텐 상품과 퍼센티 신규 상품 등록 목록을 한 번에 담아 로이창고(웹앱)로 보냅니다.",
+  "version": "2.2.0",
+  "description": "타오바오·티몰·1688·라쿠텐·퍼센티·온채널·오너클랜·도매매 상품을 한 번에 담고, 천조직구 배송대행 신청서까지 채워 줍니다.",
   "permissions": [
     "activeTab",
     "storage",
@@ -53,6 +53,34 @@
       ],
       "css": [
         "percenty.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://www.onch.co.kr/*",
+        "https://onch.co.kr/*",
+        "https://www.onch3.co.kr/*",
+        "https://onch3.co.kr/*",
+        "https://www.ownerclan.com/*",
+        "https://ownerclan.com/*",
+        "https://domeme.domeggook.com/*",
+        "https://domemedb.domeggook.com/*"
+      ],
+      "js": [
+        "domestic.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    },
+    {
+      "matches": [
+        "https://www.tz1004.co.kr/Front/Acting/Delivery_W1.asp*",
+        "https://tz1004.co.kr/Front/Acting/Delivery_W1.asp*"
+      ],
+      "js": [
+        "tz1004.js"
       ],
       "run_at": "document_idle",
       "all_frames": false

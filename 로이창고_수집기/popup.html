@@ -226,6 +226,7 @@
       <div class="row"><span class="no">1</span><div>상품 상세 페이지 오른쪽 아래 <b>[🛒 로이창고로 수집]</b> 버튼</div></div>
       <div class="row"><span class="no">2</span><div>검색 목록에서 상품 카드 오른쪽 위 <b>[🛒 로이창고]</b> 작은 버튼</div></div>
       <div class="row"><span class="no">3</span><div>퍼센티 <b>신규 상품 등록</b> 화면 왼쪽 아래 <b>[🛒 퍼센티 목록 수집]</b> → 현재 페이지·선택·범위·전체 자동 수집</div></div>
+      <div class="row"><span class="no">4</span><div>온채널·오너클랜·도매매 상품 상세에서 오른쪽 <b>[🏠 로이창고 담기]</b> → 앱 <b>[🏠 국내 위탁]</b>으로 들어갑니다 (가격이 회원전용이면 도매가만 직접 넣으면 됩니다)</div></div>
     </div>
 
     <div class="list" id="list"></div>
@@ -248,6 +249,7 @@
           <button class="action" id="bulkExport" type="button">⬇ 퍼센티 분할 JSON 다시 저장</button>
           <button class="action danger" id="bulkClear" type="button">🗑 퍼센티 보관분 비우기</button>
         </div>
+        <button class="action" id="openTz" type="button">📦 천조직구 배송대행 신청서 열기</button>
         <div class="confirm hidden" id="bulkConfirm">
           <div>퍼센티 대량 수집 보관분을 지울까요?<br />이미 내려받은 파일은 다운로드 폴더에 그대로 남습니다.</div>
           <div class="row">

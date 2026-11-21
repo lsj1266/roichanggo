@@ -54,7 +54,8 @@
         '타오바오 · 티몰 · 1688 · 라쿠텐 상품 페이지에서<br />' +
         '<b style="display:inline">[🛒 로이창고로 수집]</b> 을 눌러 보세요.<br />' +
         '<span style="font-size:11px">검색 목록에서는 상품 카드의 작은 [🛒 로이창고] 버튼을 쓰면 됩니다.<br />' +
-        '퍼센티는 <b style="display:inline">신규 상품 등록</b> 화면 왼쪽 아래 [🛒 퍼센티 목록 수집] 버튼을 쓰세요.</span>';
+        '퍼센티는 <b style="display:inline">신규 상품 등록</b> 화면 왼쪽 아래 [🛒 퍼센티 목록 수집] 버튼을 쓰세요.<br />' +
+        '온채널·오너클랜·도매매 상품 상세에서는 오른쪽 <b style="display:inline">[🏠 로이창고 담기]</b> 버튼을 쓰세요.</span>';
       listEl.appendChild(empty);
     } else {
       for (var i = 0; i < products.length; i++) {
@@ -148,7 +149,13 @@
     if (source === '1688') return '1688';
     if (source === 'rakuten') return '라쿠텐';
     if (source === 'percenty') return '퍼센티';
+    if (source === 'onch') return '온채널';
+    if (source === 'ownerclan') return '오너클랜';
+    if (source === 'domeme') return '도매매';
     return source || '-';
+  }
+  function isDomestic(p) {
+    return !!(p && (p.source === 'onch' || p.source === 'ownerclan' || p.source === 'domeme'));
   }
 
   function formatPrice(p) {
@@ -212,6 +219,15 @@
       from: p.from || 'detail',
       collectedAt: p.collectedAt || ''
     };
+    if (isDomestic(p)) {
+      o.name = p.name || p.originalTitle || '';
+      o.cost = p.cost === undefined ? null : p.cost;
+      o.shippingFee = p.shippingFee === undefined ? null : p.shippingFee;
+      o.stock = p.stock === undefined ? null : p.stock;
+      o.supplierName = p.supplierName || '';
+      o.code = p.code || '';
+      o.priceHidden = !!p.priceHidden;
+    }
     if (p.source === 'percenty') {
       o.name = p.name || p.originalTitle || '';
       o.percentyId = p.percentyId || '';
@@ -243,7 +259,7 @@
   }
 
   function exportCsv() {
-    var header = ['수집일시', '사이트', '상품명', '가격', '통화', '옵션', '이미지URL', '상세이미지', '상품URL', '상품ID', '원가'];
+    var header = ['수집일시', '사이트', '상품명', '가격', '통화', '옵션', '이미지URL', '상세이미지', '상품URL', '상품ID', '원가', '배송비', '재고', '상품코드'];
     var lines = [header.map(csvCell).join(',')];
     for (var i = 0; i < products.length; i++) {
       var p = products[i];
@@ -258,7 +274,10 @@
         csvCell((p.images || []).join('|')),
         csvCell(p.url || ''),
         csvCell(p.percentyId || ''),
-        csvCell(p.cost === null || p.cost === undefined ? '' : p.cost)
+        csvCell(p.cost === null || p.cost === undefined ? '' : p.cost),
+        csvCell(p.shippingFee === null || p.shippingFee === undefined ? '' : p.shippingFee),
+        csvCell(p.stock === null || p.stock === undefined ? '' : p.stock),
+        csvCell(p.code || '')
       ].join(','));
     }
     var text = '\uFEFF' + lines.join('\r\n') + '\r\n';
@@ -268,6 +287,17 @@
 
   /* ---------------- 이벤트 ---------------- */
   btnJson.addEventListener('click', exportJson);
+
+  var tzOpen = document.getElementById('openTz');
+  if (tzOpen) {
+    tzOpen.addEventListener('click', function () {
+      try {
+        chrome.tabs.create({ url: 'https://www.tz1004.co.kr/Front/Acting/Delivery_W.asp' });
+      } catch (e) {
+        flash('천조직구 주소를 직접 열어 주세요: tz1004.co.kr');
+      }
+    });
+  }
   btnCsv.addEventListener('click', exportCsv);
 
   btnClear.addEventListener('click', function () {

@@ -452,6 +452,51 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   .ohead,.orow{grid-template-columns:36px minmax(0,1fr) 52px 88px 66px 34px}
   .g2,.g3{grid-template-columns:1fr}
 }
+
+/* ---------- v2.4 화면 탭 ---------- */
+.viewtabs{position:sticky;top:60px;z-index:29;display:flex;gap:6px;padding:8px 22px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);overflow-x:auto}
+.vtab{flex:none;height:32px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.vtab:hover{border-color:#cfd7ea;color:var(--ink)}
+.vtab.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 8px 18px -12px rgba(232,89,12,.9)}
+.layout.wide{grid-template-columns:minmax(0,1fr)}
+.mini-badge.mb-kr{background:#e9f0ff;color:#2b4fa0}
+/* ---------- v2.4 표 ---------- */
+.vtable{border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.vhead,.vrow{display:grid;gap:6px;align-items:start;padding:7px 9px}
+.vtable .vhead{background:#f7f9fe;border-bottom:1px solid var(--line);font-size:11px;font-weight:800;color:var(--muted)}
+.vtable .vrow{border-bottom:1px solid var(--line-2);font-size:12px}
+.vtable .vrow:last-child{border-bottom:0}
+.vtable input,.vtable select{width:100%;height:28px;border:1px solid var(--line);border-radius:7px;background:#fff;padding:0 6px;font-size:12px;outline:none}
+.vtable input:focus,.vtable select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,89,12,.08)}
+.vtable .num{text-align:right;font-variant-numeric:tabular-nums;padding-top:5px;font-size:12px}
+.vtable .num.ok{color:var(--ok);font-weight:800}
+.vtable .num.bad{color:var(--danger);font-weight:800}
+.vtable .vno{font-weight:800;color:var(--accent);padding-top:5px}
+.vtable .vacts{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end}
+.vtable .g2mini{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.vtable.tz .vhead,.vtable.tz .vrow{grid-template-columns:26px minmax(150px,1.4fr) minmax(150px,1.3fr) 54px 74px minmax(110px,1fr) minmax(140px,1.2fr) minmax(100px,.9fr) minmax(110px,1fr) 92px}
+.vtable.dom .vhead,.vtable.dom .vrow{grid-template-columns:92px minmax(160px,1.6fr) 88px 82px 64px 70px 96px 92px 60px 132px}
+.vtable.tax .vhead,.vtable.tax .vrow{grid-template-columns:90px 92px minmax(90px,.9fr) minmax(140px,1.5fr) 88px 82px 78px 74px 70px 90px 52px}
+.vtable.month .vhead,.vtable.month .vrow{grid-template-columns:90px 56px repeat(5,minmax(0,1fr))}
+.tzfindbox{margin-top:2px}
+.tzfindbox .tzopt{padding:3px 5px;border-radius:5px;cursor:pointer;font-size:11px;line-height:1.35;background:#fbfcff;border:1px solid var(--line-2);margin-top:2px}
+.tzfindbox .tzopt:hover{background:var(--accent-soft);border-color:#ffd6bd}
+.tzfindbox .tzno{font-size:10.5px;color:var(--muted);padding:2px 4px}
+.svcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:6px}
+.svc{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:11.5px;cursor:pointer;background:#fff}
+.svc input{accent-color:var(--accent)}
+.svc.on{background:var(--accent-soft);border-color:#ffd6bd}
+.svc .nm{font-weight:700;color:var(--ink-2);flex:1;min-width:0}
+.svc .fee{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.domfoot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;font-size:12px;color:var(--ink-2)}
+.cautions,.caution{margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:var(--ink-2)}
+.caution li{margin-bottom:5px;word-break:keep-all}
+.caution b{color:var(--ink)}
+@media (max-width:900px){
+  .viewtabs{top:0;padding:7px 10px}
+  .vtable{overflow-x:auto}
+  .vtable .vhead,.vtable .vrow{min-width:760px}
+}
 </style>
 </head>
 <body>
@@ -460,7 +505,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   <div class="brand">
     <div class="logo">🛒</div>
     <div>
-      <h1>로이창고 <span class="ver">v2.3</span></h1>
+      <h1>로이창고 <span class="ver">v2.4</span></h1>
       <div class="sub">로이 전용 구매대행 상품 가공·업로드 작업실 · 중국/일본 소싱 → 스마트스토어·쿠팡·G마켓</div>
     </div>
   </div>
@@ -476,6 +521,13 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
     <button class="btn ghost" data-act="openSettings" title="환율 · 마진 · 해운 요율 · API 키 (고급 설정)">⚙ 설정</button>
   </div>
 </header>
+
+<nav class="viewtabs" id="viewTabs" aria-label="화면 선택">
+  <button type="button" class="vtab on" data-view="products">🛒 상품 작업</button>
+  <button type="button" class="vtab" data-view="tz">📦 천조직구 신청서</button>
+  <button type="button" class="vtab" data-view="domestic">🏠 국내 위탁</button>
+  <button type="button" class="vtab" data-view="tax">🧾 세무 장부</button>
+</nav>
 
 <section class="steps" id="steps">
   <div class="steps-inner">
@@ -531,8 +583,8 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   </div>
 </section>
 
-<div class="layout">
-  <aside class="sidebar">
+<div class="layout" id="layout">
+  <aside class="sidebar" id="sidebar">
     <div class="side-head">
       <div class="search">
         <span class="ico">🔍</span>
@@ -548,6 +600,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
         <button class="fchip" data-filter="nocut">누끼 전</button>
         <button class="fchip" data-filter="cn">중국</button>
         <button class="fchip" data-filter="jp">일본</button>
+        <button class="fchip" data-filter="kr">원화</button>
       </div>
     </div>
     <div class="selbar">
@@ -578,6 +631,9 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 </div>
 <div class="toasts" id="toasts"></div>
 <input type="file" id="anyFile" accept=".json,.csv,application/json,text/csv" hidden>
+<input type="file" id="tzItemFile" accept=".xls,.csv,.html,.txt,text/html,text/csv" hidden>
+<input type="file" id="domesticFile" accept=".json,.csv,application/json,text/csv" hidden>
+<input type="file" id="taxFile" accept=".json,.csv,application/json,text/csv" hidden>
 
 <script>
 (function(){
@@ -587,7 +643,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
    1. 상수 · 금칙어 · 샘플 데이터
    ========================================================= */
 var STORAGE_KEY = "roi_changgo_v2";
-var APP_VERSION = 2.3;
+var APP_VERSION = 2.4;
 
 // 실제 확인된 퍼센티 / 스마트스토어 금칙어 20종 + 치환 제안
 var BANNED = [
@@ -670,6 +726,10 @@ var SOURCES = [
   {v:"타오바오", label:"타오바오"},
   {v:"라쿠텐",  label:"라쿠텐"},
   {v:"슈퍼딜리버리", label:"슈퍼딜리버리"},
+  {v:"퍼센티",  label:"퍼센티 (원화)"},
+  {v:"온채널",  label:"온채널 (국내 위탁)"},
+  {v:"오너클랜", label:"오너클랜 (국내 위탁)"},
+  {v:"도매매",  label:"도매매 (국내 위탁)"},
   {v:"직접",    label:"직접 등록"}
 ];
 
@@ -706,7 +766,13 @@ var DEFAULT_SETTINGS = {
   // 기본값은 반드시 빈 문자열: 공개 저장소에 실제 키가 들어가지 않도록 합니다.
   geminiKeys: "", geminiImageAuto: true,
   // 이름 번역 방식: auto = 구글 번역(무료) + 사전 / dict = 번역 없이 사전 치환만
-  translateMode: "auto"
+  translateMode: "auto",
+  // 국내 위탁(온채널·오너클랜·도매매) 기본값 — 환율·해외배대지를 쓰지 않습니다
+  domesticShip: 3000, domesticFee: 5.5,
+  // 천조직구 신청서 기본값 (접수·결제는 하지 않습니다)
+  tzCenter: "위해", tzWay: "해운(인천)",
+  // 개인용 천조직구 API 키 — 이 브라우저(localStorage)에만 저장, 저장소에는 절대 넣지 않음
+  tzApiKey: ""
 };
 
 // 수집기 source 코드/한글 라벨 → 로이창고 표준 표기
@@ -714,8 +780,740 @@ var SOURCE_MAP = {
   taobao: "타오바오", tmall: "타오바오", "1688": "1688", alibaba: "1688",
   rakuten: "라쿠텐", superdelivery: "슈퍼딜리버리",
   "타오바오": "타오바오", "티몰": "타오바오", "1688": "1688", "라쿠텐": "라쿠텐",
-  "슈퍼딜리버리": "슈퍼딜리버리", "직접": "직접", "직접 등록": "직접"
+  "슈퍼딜리버리": "슈퍼딜리버리", "직접": "직접", "직접 등록": "직접",
+  percenty: "퍼센티", "퍼센티": "퍼센티",
+  onch: "온채널", "온채널": "온채널",
+  ownerclan: "오너클랜", "오너클랜": "오너클랜",
+  domeme: "도매매", "도매매": "도매매"
 };
+
+/* ---------- v2.4: 통화 (중국·일본·원화) ---------- */
+var CURRENCIES = [
+  { v: "CNY", label: "중국 위안(CNY)" },
+  { v: "JPY", label: "일본 엔(JPY)" },
+  { v: "KRW", label: "원화(KRW) — 퍼센티·국내 위탁" }
+];
+function normalizeCurrency(c){
+  var s = str(c).toUpperCase();
+  return (s === "JPY" || s === "KRW") ? s : "CNY";
+}
+
+/* ---------- v2.4: 국내 위탁 공급처 ---------- */
+var DOMESTIC_SOURCES = [
+  { v: "온채널", key: "onch", label: "온채널", host: "onch.co.kr" },
+  { v: "오너클랜", key: "ownerclan", label: "오너클랜", host: "ownerclan.com" },
+  { v: "도매매", key: "domeme", label: "도매매", host: "domeme.domeggook.com" }
+];
+function isDomesticSource(src){
+  var s = str(src);
+  for(var i = 0; i < DOMESTIC_SOURCES.length; i++){
+    var d = DOMESTIC_SOURCES[i];
+    if(s === d.v || s.toLowerCase() === d.key) return true;
+  }
+  return false;
+}
+function domesticLabel(src){
+  var s = str(src);
+  for(var i = 0; i < DOMESTIC_SOURCES.length; i++){
+    var d = DOMESTIC_SOURCES[i];
+    if(s === d.v || s.toLowerCase() === d.key) return d.label;
+  }
+  return s || "국내";
+}
+
+/* ---------- v2.4: 천조직구 부가서비스 46종 (2026-11-21 기준) ---------- */
+var TZ_SERVICES = [
+  { c:"65", n:"천조안심케어", f:"가입비 별도", care:true },
+  { c:"66", n:"배송비보험", f:"500" },
+  { c:"2",  n:"일반검수", f:"0" },
+  { c:"33", n:"택배개봉금지", f:"0" },
+  { c:"30", n:"정밀검수", f:"1,000~" },
+  { c:"34", n:"수량확인", f:"건당 50" },
+  { c:"35", n:"사이즈실측", f:"800~" },
+  { c:"52", n:"(전자제품)작동영상 촬영검수", f:"2,000" },
+  { c:"36", n:"폴리백포장", f:"0" },
+  { c:"3",  n:"박스포장", f:"500~" },
+  { c:"70", n:"내부 뽁뽁이", f:"300~" },
+  { c:"6",  n:"에어캡(뽁뽁이)", f:"300~" },
+  { c:"13", n:"스틱형 에어팩", f:"1,000~" },
+  { c:"37", n:"합배송&묶음배송", f:"1,000" },
+  { c:"38", n:"분할포장", f:"1,000~" },
+  { c:"39", n:"특수우든박스포장", f:"별도" },
+  { c:"71", n:"우드프레임", f:"30,000~" },
+  { c:"40", n:"어댑터(일반)", f:"500" },
+  { c:"53", n:"어댑터(고급)", f:"1,500" },
+  { c:"72", n:"어댑터(특대형)", f:"7,000" },
+  { c:"58", n:"랩핑", f:"300~" },
+  { c:"41", n:"사업자검수", f:"8,000" },
+  { c:"28", n:"규격외 화물비용", f:"600" },
+  { c:"49", n:"특수각보호대", f:"1,500" },
+  { c:"51", n:"마대포장", f:"800" },
+  { c:"54", n:"자율포장", f:"0" },
+  { c:"59", n:"스펀지 외부 포장", f:"2,000~" },
+  { c:"60", n:"OPP 투명비닐 포장", f:"100" },
+  { c:"67", n:"파렛트포장", f:"20,000" },
+  { c:"68", n:"종이각프레임포장", f:"2,000~" },
+  { c:"69", n:"라벨 템플릿 동봉", f:"500" },
+  { c:"42", n:"택배박스제거", f:"0" },
+  { c:"4",  n:"신발박스 제거", f:"0" },
+  { c:"16", n:"영수증 및 라벨 제거", f:"0" },
+  { c:"15", n:"우든포장제거", f:"5,000~" },
+  { c:"20", n:"간이통관", f:"3,000" },
+  { c:"43", n:"원산지 작업", f:"50~" },
+  { c:"56", n:"MADE IN CHINA 미싱(봉제)", f:"300" },
+  { c:"44", n:"깨짐주의 스티커", f:"0" },
+  { c:"45", n:"원산지 증명서", f:"33,000" },
+  { c:"7",  n:"사업자통관", f:"10,000" },
+  { c:"46", n:"간이통관(본인체크)", f:"3,000" },
+  { c:"63", n:"배차요청", f:"0" },
+  { c:"64", n:"자체픽업", f:"0" },
+  { c:"61", n:"BL서류비용", f:"20,000" },
+  { c:"31", n:"도서산간", f:"3,000~" },
+  { c:"57", n:"경동택배선불", f:"0" },
+  { c:"47", n:"경동택배착불", f:"0" }
+];
+function tzServiceName(code){
+  var c = str(code);
+  for(var i = 0; i < TZ_SERVICES.length; i++){ if(TZ_SERVICES[i].c === c) return TZ_SERVICES[i].n; }
+  return c;
+}
+
+/* ---------- v2.4: 천조직구 대량등록 엑셀 39칸 (실제 양식 그대로) ---------- */
+var TZ_HEADER = [
+  "묶음번호",
+  "자동결제 여부\n( 자동결제 = 1, 수동결제 = 2 )",
+  "수취인(한글)",
+  "수취인(영문)",
+  "휴대폰 번호",
+  "우편번호",
+  "수취인 주소",
+  "수취인 상세주소",
+  "수취인 주소(영문)",
+  "수취인 상세주소(영문)",
+  "통관구분\n( 개인 = 1, 사업자 = 2 )",
+  "개인통관번호 또는 사업자번호",
+  "* 관/부가세 대납 여부\n( 대납사용 = 1, 미사용 = 2 )",
+  "* 관/부가세 안내 전화번호\n(관/부가세 대납 사용 시 필수입력)",
+  "센터 요청사항",
+  "국내택배 요청사항",
+  "통관품목 번호",
+  "쇼핑몰 URL",
+  "쇼핑몰 오더번호",
+  "상품명",
+  "브랜드",
+  "색상",
+  "사이즈",
+  "수량",
+  "합계",
+  "이미지 URL",
+  "상품URL",
+  "트래킹번호\n(중국 운송장번호)",
+  "국내 마켓명",
+  "마켓주문번호",
+  "부가서비스코드",
+  "셀러마켓명",
+  "셀러사업자번호",
+  "사업자명(영문)",
+  "사업자 주소(영문)",
+  "사업자 이메일",
+  "천조안심케어가입\n(가입내용확인 필수)\n(가입: Y, 미가입시 공란)",
+  "가입내용확인\n(확인: Y)\n공란시 안심케어가입 불가",
+  "재고번호"
+];
+
+/* ---------- v2.4: 통관품목 주요 카테고리 (천조직구 목록에서 고른 471건) ----------
+   전체 4,698건은 천조직구 [통관품목 다운로드] 파일을 앱에 넣으면 검색됩니다. */
+var TZ_ITEMS = [
+  [5180, "가정용 의류건조기 · household clothes dryer · 家用衣物烘干机"],
+  [5184, "가정용 의류관리기 · Clothing care appliances of household type · 家用服装护理器具"],
+  [3395, "가죽 점퍼 · leather jumper · 皮夹克"],
+  [3394, "가죽바지 · leather pants · 皮裤"],
+  [3346, "강아지 의류 · Puppy clothes · 小狗服装"],
+  [3580, "겨울 방한의류 · winter clothing · 冬季防寒服"],
+  [3561, "기타의류 · clothes cosplay · 角色扮演衣服"],
+  [3601, "남방셔츠 · shirts · 衬衫"],
+  [3554, "니트 · Knit · 针织衫"],
+  [3588, "면 바지 · cotton trousers · 棉裤"],
+  [3546, "면 티셔츠 · cotton T-shirt · 棉t恤"],
+  [3599, "면셔츠 · cotton shirt · 棉质衬衫"],
+  [3556, "바람막이의류 · windbreaker · 防风衣"],
+  [3593, "바람막이자켓 · a windbreaker · 防风夹克"],
+  [3598, "바지 · Pants · 裤子"],
+  [3597, "반바지 · shorts · 短裤"],
+  [3631, "반팔반바지세트 · short-sleeved shorts set · 短袖短裤套装"],
+  [3595, "발열바지 · heating pants · 发热裤"],
+  [3572, "발열양말 · hot socks · 发热袜子"],
+  [5596, "발열의류 · thermal clothing · 发热服装"],
+  [3592, "발열패딩 · thermal padded jacket · 发热羽绒服"],
+  [3642, "방한 귀마개 · cold earplugs · 防寒护耳"],
+  [3765, "방한화 · arctic boots · 防寒鞋"],
+  [3607, "보정속옷 · Correction Underwear · 修身内衣"],
+  [3637, "속옷 · underwear · 内裤"],
+  [3613, "스노우보드의류 · snowboard clothing · 滑雪板服装"],
+  [3535, "스포츠 바지 · sports pants · 运动裤"],
+  [3634, "스포츠브라，속옷 · sports bra · 运动胸衣"],
+  [3625, "애완동물의류 · pet clothes · 宠物衣服"],
+  [3569, "양말 · socks · 袜子"],
+  [3636, "여성 속바지 · womens underpants · 内裤"],
+  [3538, "여성기모바지 · womens napping pants · 女士拉绒裤"],
+  [3633, "여성용 속옷 · Underwear for women · 女式内衣"],
+  [3589, "옷바지세트 · garment suit · 上下衣套装"],
+  [3573, "요가양말 · Yoga socks · 瑜伽袜"],
+  [3537, "원피스 · dress · 连衣裙"],
+  [3531, "윈드자켓 · a wind jacket · 防风夹克"],
+  [3703, "의류커버 · Clothing cover · 衣套"],
+  [3532, "자켓 · a wind jacket(DA0002-010) · 防风夹克"],
+  [3585, "재킷 · Jacket · 夹克"],
+  [3570, "전기보온양말 · electrically insulated socks · 电热袜子"],
+  [3582, "점퍼 · jumper · 夹克外套"],
+  [3586, "청바지 · jeans · 牛仔裤"],
+  [3624, "쿨링자켓셋트 · Cooling jacket set · 凉爽夹克套装"],
+  [3632, "트렌치코트 · trench coat · 风衣"],
+  [3548, "티셔츠 · T-shirts · t恤"],
+  [3583, "패딩 · Padding · 羽绒服"],
+  [3591, "패딩 털모자 · Fur hat from padded jacket · 羽绒毛帽子"],
+  [3581, "패딩조끼 · Padded vest · 羽绒马夹"],
+  [3529, "플리스자켓 · Fleece Jacket · 绒布夹克"],
+  [5848, "행사용 마스코트 인형탈 (축제·홍보용 오락용품) · Mascot Costume for Event / Promotional Use · 活动用吉祥物玩偶面具（庆典·宣传用娱乐用品）"],
+  [3540, "후드셔츠 · sweatshirt · 带帽衬衫"],
+  [859, "의류단추 · button · 衣服扣"],
+  [1370, "가죽자켓 · leather jacket · 皮夹克"],
+  [878, "가죽포함된의류 · LEATHER CLOTHES · 皮衣"],
+  [2135, "플라스틱 신발장 · plastic shoe rack · 塑料鞋柜"],
+  [1881, "구두닦이기계 · shoe cleaning machine · 擦鞋机"],
+  [3790, "가죽신발 · leather shoes · 皮鞋"],
+  [3771, "구두 · shoes · 皮鞋"],
+  [3791, "구두골 · shoe tree · 皮鞋模"],
+  [4529, "구두주걱 · shoehorn · 鞋拔子"],
+  [3758, "레인부츠 · rain boots · 雨鞋"],
+  [3792, "롱부츠 · long boots · 长靴"],
+  [3781, "방직신발 · textile shoes · 纺织鞋"],
+  [3767, "베드민턴신발 · Badminton shoes · 羽毛球鞋"],
+  [3764, "샌들 · sandals · 凉鞋"],
+  [4434, "스케이트 신발 · Skate shoes · 滑冰鞋"],
+  [3759, "스키부츠 · ski boots · 滑雪靴"],
+  [3782, "스포츠용 운동화 · sports sneakers · 运动鞋"],
+  [3773, "스포츠용신발 · sports shoes · 运动鞋"],
+  [3768, "슬리퍼 · Slippers · 拖鞋"],
+  [3766, "신발 · shoes · 鞋"],
+  [2366, "신발 거치대 · shoe holder · 鞋架子"],
+  [2285, "신발 변색제 · shoe discoloration agent · 鞋类变色剂"],
+  [3382, "신발 비닐 커버 · shoe plastic cover · 塑料鞋套"],
+  [3166, "신발 악세사리 · shoe accessories · 鞋饰"],
+  [5710, "신발건조기 · shoe dryer · 干鞋器"],
+  [4217, "신발걸이대 · shoe rack · 鞋架"],
+  [3788, "신발끈 · shoelace · 鞋带"],
+  [5724, "신발소독기 · shoe sterilizer · 鞋子消毒器"],
+  [3139, "신발장 · Shoebox · 鞋柜"],
+  [3384, "신발주머니 · shoe pouch · 鞋袋"],
+  [5330, "신발청소기 · a shoe cleaner · 擦鞋机"],
+  [1211, "벽시계 · wall clocks · 挂钟"],
+  [2189, "시계거치대 · Watch holder · 钟架"],
+  [659, "시계 · clock · 表"],
+  [1503, "공구가방 · tool room · 工具包"],
+  [1181, "바이올린가방 · violin bag · 小提琴背包"],
+  [2247, "시계수리공구 · watch repair tool · 修表工具"],
+  [3372, "가방 · bag · 包"],
+  [3389, "가방끈 · string of bag · 包带"],
+  [3623, "가방만들기키트包制作套装 · Package making suit · 包制作套装"],
+  [4637, "가방체인 스트랩 · Bag Chain Strap · 链条包"],
+  [3388, "가방프레임 · Bag Frame · 包框架"],
+  [3009, "강아지 가방 · Pet Package · 宠物包"],
+  [3348, "강아지모자 · pet hat · 小狗帽子"],
+  [3902, "귀걸이 · earrings · 耳环"],
+  [4672, "귀걸이 뒷마개 · Earrings support · 耳环耳堵"],
+  [3359, "낚시가방 · Fishing bag · 钓鱼包"],
+  [3381, "노트북가방 · Laptop bag · 手提电脑包"],
+  [3386, "도시락 가방 · a lunch bag · 饭盒包"],
+  [3704, "런닝 벨트 · a running belt · 背心腰带"],
+  [3889, "모래시계 · Hourglass · 沙漏计时器"],
+  [3797, "모자 · hat · 帽子"],
+  [3714, "모자 패드 · hat pad · 帽子垫子"],
+  [3903, "목걸이 · necklace · 项链"],
+  [3802, "방수모자 · waterproof hat · 防水帽"],
+  [3401, "벨트 · belt · 腰带"],
+  [5766, "벨트커버 · beltcover · 安全带套"],
+  [4149, "벽시계,벽걸이시계,장식시계 · Wall clock · 挂钟"],
+  [3748, "부직포 가방 · nonwoven bag · 无纺布袋"],
+  [3350, "서류가방 · briefcase · 公文包"],
+  [4023, "선글라스 · sunglasses · 墨镜"],
+  [2641, "전동 매트리스 · an electric mattress · 电动床垫"],
+  [2299, "커튼 전동레일 · Curtain Electric Rail · 窗帘电动轨道"],
+  [1513, "PVC 커튼 · pvc curtain · PVC窗帘"],
+  [649, "매트리스 · Mattresses · 床垫"],
+  [651, "베개 · Pillow · 枕头"],
+  [654, "블라인드 · Blind · 窗帘用品"],
+  [666, "이불 · Quilt · 被子"],
+  [677, "카시트 · Car Seat · 汽车垫"],
+  [679, "커튼 · Curtain · 窗帘"],
+  [680, "쿠션 · Cushion · 靠垫"],
+  [681, "쿠션솜 · Cushion Cotton · 棉垫"],
+  [1843, "온열매트 · thermal mat · 地暖垫"],
+  [2274, "코크스방지 매트 · anti-focus pad · 防焦垫"],
+  [4279, "걸음보조매트 · walking mat · 辅助走路垫"],
+  [4421, "골프 연습용매트 · a golf practice mat · 高尔夫练习用套餐"],
+  [3885, "그라스울 매트 · Grasswool mat · 草绒垫"],
+  [3890, "금박시트 · old sheet · 金箔纸"],
+  [4284, "뜀틀 매트 · vault mat · 跳马垫"],
+  [3685, "매트 · mat · 床垫"],
+  [3075, "매트리스 받침대 · mattress support · 床垫支架"],
+  [4287, "매트리스패드 · Mattress pad · 床垫"],
+  [3497, "면시트 · cotton sheet · 棉床单"],
+  [3314, "미끄럼방지 매트 · an anti-slip mat · 防滑垫"],
+  [3514, "발매트 · Foot mat · 脚垫"],
+  [4290, "방석 · cushion · 坐垫"],
+  [3662, "방풍커튼 · Windproof curtain · 防风窗帘"],
+  [3653, "베개커버 · Pillow cover · 枕套"],
+  [3516, "부직포매트 · nonwoven mat · 无纺布垫"],
+  [3067, "샤워커튼 · Shower curtain · 淋浴隔帘"],
+  [3638, "손수건 · handkerchief · 手帕"],
+  [4007, "수건걸이 · towel hanger · 手巾架"],
+  [4864, "수건카트 · Towel cart · 毛巾车"],
+  [2256, "간이옷장 · Simple wardrobe · 简易衣柜"],
+  [2204, "그네식 의자 · Hanging chair · 吊椅"],
+  [1924, "리프트테이블 · Lift table · 升降台"],
+  [2295, "목제 진열장 · Wooden display case · 木制展示柜"],
+  [1360, "스테인리스 진열대 · stainless steel display stand · 不锈钢展示架"],
+  [2250, "스텐 수납바구니 · stainless steel storage basket · 不锈钢收纳篮"],
+  [5834, "스텐거울 · Stainless steel mirror · 不锈钢镜子"],
+  [1480, "싱크대 선반 · sink shelf · 铁制洗碗架"],
+  [2317, "아크릴 스툴 · acrylic stools · 亚克力凳子"],
+  [2228, "야외의자세트(플라스틱) · Chair Set · 椅子套装（塑料）"],
+  [1475, "옷장 · wardrobe · 更衣柜"],
+  [1291, "원목 진열대 · wooden display stand · 实木货架"],
+  [1294, "원목 턴테이블 · wooden turntable · 实木转盘"],
+  [2167, "조립 선반 · an assembly shelf · 组装置物架"],
+  [1700, "책상의자셋트 · set of desks · 桌椅套装"],
+  [2795, "철제선반 · an iron shelf · 铁制置物架"],
+  [1363, "컴퓨터의자 · computer chair · 电脑椅"],
+  [2012, "LED 테이블 · led table · LED桌子"],
+  [1699, "LED스툴의자 · LED tool chair · LED 椅子"],
+  [646, "거울 · mirror · 镜子"],
+  [655, "선반 · shelf · 架子"],
+  [657, "수납장 · storage · 收纳箱"],
+  [664, "유아용의자 · Baby chair · 儿童椅"],
+  [665, "의자 · Chair · 椅子"],
+  [682, "테이블 · Table · 桌子"],
+  [683, "테이블보 · Tablecloths · 桌垫"],
+  [685, "행거 · hanger · 衣挂"],
+  [1505, "용접 테이블 · welding table · 焊台"],
+  [1447, "의자부품 · chair parts · 椅子配件"],
+  [1471, "픽업트럭 선반 · pickup truck rack · 皮卡车货架"],
+  [1899, "유압식 테이블 · a hydraulic table · 液压工作台"],
+  [1592, "에어하키 테이블 · Air hockey game table · 空气曲棍球游戏桌"],
+  [5556, "가열 테이블 · heating table · 加热桌"],
+  [4224, "거울 장식장 · a mirror cabinet · 镜子装饰柜"],
+  [4387, "게임테이블 · Game table · 游戏桌"],
+  [4185, "공기주입식의자 · inflatable chair · 充气座椅"],
+  [1702, "등유램프 · a kerosene lamp · 煤油灯"],
+  [2008, "샤워스탠드 · Shower stand · 花洒架"],
+  [1427, "스탠드 전시판 · stand display panel · 立牌展示牌"],
+  [648, "램프 · Lamp · 灯具"],
+  [660, "실내조명기구 · Indoor Lighting Fixtures · 照明灯具"],
+  [2397, "전구 · light bulb · 灯泡"],
+  [689, "LED램프 · LED Lamp · 灯具"],
+  [2369, "고정클램프 · retaining clip · 固定夹"],
+  [2433, "워터클램프 · water stop clip · 止水夹"],
+  [2065, "전동클램프 · an electric clamp · 电动夹具"],
+  [5853, "지게차용 드럼 클램프 · Forklift Drum Clamp Attachment · 叉车用滚筒夹"],
+  [2147, "카메라 스탠드 · Camera stand · 摄影机支架"],
+  [1871, "클램프셋트 · a clamp set · 夹具套装"],
+  [5100, "굴삭기 클램프 · excavator clamp · 挖掘機夾具"],
+  [5213, "드릴링 스탠드 · drilling stand · 钻头支架"],
+  [4298, "무드등 · Mood light · 小夜灯"],
+  [5698, "설탕공예용 램프 · sugar lamp · 糖灯"],
+  [4297, "스탠드조명 · Stand lighting · 立式照明"],
+  [4603, "스테인리스 스탠드 · steel bracket · 不锈钢支架"],
+  [3184, "아크릴 장식 스탠드 · Acrylic Decorative Stand · 腈纶装饰台灯"],
+  [4313, "야외조명 · outdoor lighting · 野外照明"],
+  [4307, "야외조명셋트 · Outdoor lighting set · 户外照明套装"],
+  [2072, "냄비뚜껑 · lid of a pot · 锅盖"],
+  [2170, "종이 모종컵 · Paper Seedling Cup · 纸育苗杯"],
+  [1844, "전기냄비 · an electric pot · 电暖锅"],
+  [1532, "대나무 컵 · bamboo cup · 竹筒杯"],
+  [2014, "대패칼 · plane knife · 刨床用刨刀"],
+  [2328, "카펫커터 칼 · carpet cutter · 地毯割刀"],
+  [1941, "컵살균기 · cup sterilizer · 杯子杀菌器"],
+  [3232, "강아지물병 · Water bottle for dogs · 狗水瓶"],
+  [3032, "계량컵 · measuring cup · 量杯"],
+  [2125, "구리 발음 그릇 · copper pronunciation bowl · 铜制发音碗"],
+  [3852, "그릇 · tableware · 餐具"],
+  [3853, "그릇 셋트 · bowl set · 餐具套装"],
+  [3087, "냄비뚜껑 받침대 · pot lid stand · 锅盖支架"],
+  [3034, "냄비받침 · Pot stand · 锅垫"],
+  [4820, "눈썹칼 · eyebrow cutter · 眉刀"],
+  [3980, "도마 · cutting board · 切板"],
+  [3060, "도시락통 · Lunch box · 饭盒儿"],
+  [3857, "머그워머 · Mug warmer · 保温杯"],
+  [5322, "머그컵 열전사기 · mug thermocouple · 马克杯热电器"],
+  [3719, "물병 스트랩 · Water bottle strap · 水瓶带"],
+  [3012, "물병(플라스틱) · bottle · 水瓶"],
+  [5696, "보온가전제품 · Insulation appliances · 保温家电"],
+  [3509, "보온덮개 · an insulation cover · 保温罩"],
+  [3639, "보온목도리 · thermos muffler · 保温围巾"],
+  [4588, "보온병 · Thermos · 暖瓶"],
+  [3506, "보온재 · insulating material · 保温材料"],
+  [3379, "보온주머니 · thermal pocket · 保温袋"],
+  [4804, "빵칼 · a bread knife · 面包刀"],
+  [4830, "사무용칼 · office knife · 办公用刀"],
+  [4739, "수동칼갈이 · manual knife sharpener · 手动换刀"],
+  [3078, "수저 받침 · Tableware mat · 餐具垫"],
+  [4848, "수저세트 · spoon and chopsticks · 勺子和筷子"],
+  [3975, "수저통 · Cutlery holder · 筷子筒"],
+  [3979, "스테인리스 냄비 · stainless steel pot · 不锈钢锅"],
+  [4812, "식칼 · kitchen knife · 菜刀"],
+  [3084, "실리콘 주방 장갑 · silicone kitchen gloves · 硅胶厨房手套"],
+  [670, "전기장판 · Electric blanket · 电热毯"],
+  [1839, "다리미,스팀다리미 · Garment Steamer · 蒸气熨斗"],
+  [695, "선풍기 · electric fan · 电风扇"],
+  [690, "스팀다리미 · steam iron · 蒸汽熨斗"],
+  [1197, "습식청소기 · wet cleaner · 湿式吸尘器"],
+  [1342, "전기밥솥 · electric rice cookers · 电饭锅"],
+  [1524, "전기튀김기 · electric fryer · 电油炸锅"],
+  [1845, "토스터기 · toaster machine · 烤面包机"],
+  [1930, "녹제거에어건 · Rust Removal Air Gun · 除锈气枪"],
+  [1897, "농업용전기스틱 · agricultural electric stick · 农用电杆"],
+  [1786, "데이터케이블 · Data cable · 数据线"],
+  [1385, "배관청소공구 · pipe cleaning tool · 管道疏通器"],
+  [2172, "배터리 충전 연장선 · Battery-Charging Extension · 电池充电延长线"],
+  [1966, "벽청소도구 · Wall cleaning tools · 墙壁清扫工具"],
+  [2128, "변기청소기 · toilet drainer · 马桶疏通器"],
+  [1312, "보일러배관청소기 · Boiler Piping Cleaner · 锅炉管道清扫机"],
+  [1488, "스테인리스 청소 커버 · Stainless Steel Cleaning Cover · 不锈钢吸尘罩"],
+  [1534, "스피커 더스트캡 · Speaker dust cap · 音箱防尘帽"],
+  [2018, "에어 연마펜 · Pneumatic polishing pen · 气动抛光笔"],
+  [2226, "에어컨호스 · Air conditioning exhaust duct · 空调排风管"],
+  [1814, "연결단자케이블 · Connection terminal cable · 连接端子电缆"],
+  [1079, "전기케이블 · electric cable · 电缆"],
+  [1999, "청소솔 · Cleaning brush · 清洗刷"],
+  [2159, "케이블가위 · cable scissors · 电缆剪"],
+  [1787, "케이블와이어 · Cable Wire · 电缆钢丝绳"],
+  [1733, "케이블테스터 · Cable tester · 电缆测试器"],
+  [2220, "키보드 받침대 · Keyboard holder · 键盘底座"],
+  [1785, "USB케이블 · usb cable · USB电缆"],
+  [5835, "디젤발전기 · a diesel generator · 柴油发电机"],
+  [2230, "목공 전기목밀링 · woodworking electric wood milling · 木工电木铣"],
+  [2623, "바닥 타일 청소기 · tile cleaner · 地砖吸尘器"],
+  [1368, "발전기 · generators · 发电机"],
+  [2040, "사료 믹서기 · feed mixer · 饲料搅拌机"],
+  [1942, "식기건조기 · dish dryer · 烘碗机"],
+  [5828, "애완견 사료건조기 · a dog food dryer · 宠物狗饲料干燥机"],
+  [2319, "에어믹서기 · Pneumatic mixer · 气动搅拌机"],
+  [1848, "에어크락션 · Air Cracks · 气动破碎机"],
+  [1481, "청소기계 · Cleaning machine · 清洁机"],
+  [2030, "키보드 노킹 클릭기 · Keyboard knocking clicker · 键盘敲击器"],
+  [1406, "탁상용 히터 · desk heater · 台式暖风机"],
+  [1655, "수영장 사다리 페달 · Swimming pool ladder pedal · 游泳池梯子踏板"],
+  [2131, "톱밥 · sawdust · 锯末"],
+  [2223, "공구받침세트 · tool support set · 工具托架套装"],
+  [1285, "공구집게 · tool tongs · 工夹具"],
+  [1180, "드라이버공구 · driver tool · 螺丝刀工具"],
+  [2081, "리벳 건 공구 · rivet gun tool · 铆枪工具"],
+  [2027, "망치 · Hammer · 铁锤"],
+  [5838, "밀링용 공구 · Tools for milling · 铣削工具"],
+  [1512, "배선공구 · wiring tool · 布线工具"],
+  [2448, "베어링 공구 · Removal Tool Bearings · 轴承拆卸工具"],
+  [1953, "연장튜브공구 · Extension tube tool · 延长管工具"],
+  [2060, "오일 주입공구 · oiling tool · 注油工具"],
+  [1391, "오일주입공구 · Oil injection tool · 油加注工具"],
+  [1539, "원목 공구함 · wooden toolbox · 实木工具箱"],
+  [1483, "원목망치 · wooden hammer · 实木锤子"],
+  [2237, "원예공구 액세서리 · Garden Tools Accessories · 园艺工具配件"],
+  [2305, "위치 지정 지원 공구 · positioning support tool · 定位支撑工具"],
+  [2056, "인쇄용측정공구 · Measurement tools for printing · 印刷用测量工具"],
+  [2098, "자동차수리공구 · Automotive Repair Tools · 汽修工具"],
+  [1379, "전동대패기 · an electric planer · 电动刨机"],
+  [1896, "전동렌치 · Electric wrench · 电动扳手"],
+  [2248, "전동유압집게 · electric hydraulic tongs · 电动液压钳"],
+  [1791, "전동전지가위 · Electric scissors · 电动修枝剪刀"],
+  [2044, "전동접착 분무기 · Electric glue sprayer · 电动打胶机"],
+  [1313, "전동축 · transmission shafts · 传动轴"],
+  [1518, "톱날 · saw blade · 锯片"],
+  [2241, "식물 생장 텐트 · Plant Growth Tent · 室内植物生长帐篷"],
+  [2233, "자전거 댐퍼 · Bicycle shock absorber · 自行车减震器"],
+  [1148, "자전거 타이어 튜브 · Bicycle tire tube · 自行车轮胎管"],
+  [1687, "자전거주차대 · bicycle parking lot · 自行车停车台"],
+  [1768, "자전건타이어,타이어튜브,자전거타이어튜브 · Bicycle tire tube · 自行车轮胎内胎"],
+  [1155, "캠핑랜턴커버 · Lampshade · 野营灯罩"],
+  [1154, "캠핑용버너 · camping burner furnace · 野营炉"],
+  [1268, "테니스 공 카트 · tennis ball cart · 网球推车"],
+  [1354, "테니스 볼머신기 · tennis ball machine · 网球滚珠机"],
+  [4454, "가정용운동용품 · household exercise supplies · 家用运动用品"],
+  [4416, "골프공 · golf ball · 高尔夫球"],
+  [4418, "골프공 회수기 · Golf ball recovery device · 高尔夫球回收装置"],
+  [3341, "골프그립 교체용(미끄럼방지) · For replacement of golf grip (anti-slip) · 更换高尔夫握把用（防滑）"],
+  [4417, "골프백 · golf bag · 高尔夫球包"],
+  [4420, "골프용품 · Golf Supplies · 高尔夫用品"],
+  [4415, "골프채 부분품 · Club accessories · 推杆"],
+  [5351, "골프퍼딩연습기 · golf-pudding machine · 高尔夫球推杆练习机"],
+  [4422, "골프퍼팅장비 · Golf putting equipment · 高尔夫推杆设备"],
+  [3621, "기타운동복 · Other sportswear · 其他运动服"],
+  [2387, "낚시대 고무캡 · Fishing rod rubber cap · 钓鱼竿橡胶帽"],
+  [4493, "낚시대세트 · fishing rod set · 钓鱼竿套装"],
+  [4495, "낚시바늘 · fish hook · 鱼钩"],
+  [3562, "낚시복 · fishing suit · 钓鱼服"],
+  [4497, "낚시용 루어 · Fishing Lure · 鱼饵"],
+  [4498, "낚시용품 · fishing gear · 钓鱼用品"],
+  [4678, "낚시좌대 · fishing stand · 钓鱼台"],
+  [3505, "낚시줄 · Fishing Line · 钓鱼线"],
+  [5304, "낚시지렁이탐지기 · fishing worm detector · 鱼蚯蚓探测器"],
+  [5782, "대형자전거 · large bicycle · 大型自行车"],
+  [4472, "등산보조도구 · Climbing equipment · 登山辅助工具"],
+  [2258, "가지치기 가위 · pruning shears · 修枝剪"],
+  [1959, "고강도테이프 · high-strength tape · 高强度胶带"],
+  [2177, "양면테이프 · double-sided tape · 两面胶"],
+  [2472, "재단가위 · cutting scissors · 剪裁剪刀"],
+  [1460, "접착테이프 · adhesive tape · 胶带"],
+  [4720, "금속 절단 가위 · metal cutting scissors · 金属剪刀"],
+  [5257, "노트북 · notebook · 笔记本"],
+  [4697, "노트북거치대 · Laptop stand · 笔记本电脑支架"],
+  [4926, "노트북쿨러 · Laptop Cooler · 笔记本电脑散热器"],
+  [4534, "녹음테이프 · recording tape · 录音带"],
+  [3261, "문구 · stationery · 文具"],
+  [4551, "문구학습도구 · Stationery learning tools · 文具学习工具"],
+  [2856, "물감 · watercolor · 水彩"],
+  [4831, "미술도구 · art tool · 美术工具"],
+  [4553, "미술용품 · art supplies · 绘画用品"],
+  [3844, "미술용품(고체물감) · art supplies · 绘画用品"],
+  [4826, "미용가위 · scissors · 美容剪刀"],
+  [2944, "박스 테이프 · Box tape · 封箱胶带"],
+  [2956, "반사판스티커 · Reflector tablecloth · 反光板贴纸"],
+  [2777, "방수테이프 · Waterproof tape · 防水胶带"],
+  [3520, "벨크로테이프 · Velcro tape · 魔术贴胶带"],
+  [5395, "병라벨스티커부착기 · Bottle label cover attachment machine · 瓶式标签贴纸机"],
+  [2275, "독수리 모형 · The Eagle Model · 老鹰模型"],
+  [1690, "모형자동차 · model car · 汽车模型"],
+  [2219, "인체모형 · dummy · 人体模型"],
+  [1417, "제빵모형 · baking model · 烘焙模具"],
+  [1485, "인형뽑기 · claw machine game · 夹娃娃机"],
+  [3337, "강아지용 장난감 · Toys for dogs · 狗玩具"],
+  [4073, "교육용모형 · educational model · 科教模型"],
+  [4324, "모형개미집 · Model Ant Collection · 模型蚂蚁窝"],
+  [4875, "모형장식품 · Model decoration · 模型装饰"],
+  [3290, "모형장식플라스틱거치대 · model decoration plastic holder · 模型装饰塑料支架"],
+  [3484, "모형책 · model book · 模型书"],
+  [3482, "모형책세트 · model book set · 模型书套装"],
+  [4600, "미니 모형 부자재 · Mini model subsidiary materials · 小模型辅料"],
+  [5210, "바이스 평행 블록 · Vice parallel block · 虎钳平行砌块"],
+  [4872, "발모형장식품 · Foot-shaped ornaments · 脚模装饰品"],
+  [3168, "수술도구모형 · Prop model · 道具模型"],
+  [5840, "스트레스 방지 장난감 · Anti-stress Toys · 解压玩具"],
+  [4362, "아크릴퍼즐 · Acrylic puzzle · 亚克力拼图"],
+  [4331, "어린이완구자동차 · toy car for children · 儿童玩具汽车"],
+  [3212, "완구 · Plastic toys · 塑料玩具"],
+  [3179, "완구셋트 · Plastic toys set · 塑料玩具"],
+  [4323, "우드퍼즐 · WOOD HOLDER · 木质拼图"],
+  [2185, "비누받침대 · Soap support · 肥皂架"],
+  [2025, "이동식화장실 · portable toilet · 移动厕所"],
+  [1070, "헤어드라이기 · hair dryer · 吹风机"],
+  [2895, "가루세제 · powdered detergent · 去污粉"],
+  [4835, "네일 · nail · 美甲"],
+  [2867, "네일 트리트먼트 · Nail treatment · 美甲护理"],
+  [4836, "네일아트툴 · nailart tools · 美甲工具"],
+  [2959, "네일악세사리 · nail accessories · 美甲饰品"],
+  [3720, "마스크 · face mask · 面罩"],
+  [3717, "마스크악세사리 · Mask accessory · 口罩饰品"],
+  [4821, "면도기날부품 · Razor Blade Components · 剃须刀片部件"],
+  [4819, "면도날 · razor-edge · 剃须刀片"],
+  [3711, "미용마스크 · mask · 口罩"],
+  [3702, "버프마스크 · buff mask · 黄面罩"],
+  [2960, "뷰티 실리콘 테이프 · Beauty Silicone Tape · 美容硅胶带"],
+  [2892, "비누 · soap · 肥皂"],
+  [4360, "비누거품 · soapsuds · 肥皂泡儿"],
+  [3731, "비누망 · Soap net · 肥皂网兜"],
+  [5336, "비누방울기계 · soap bubble machine · 肥皂泡机"],
+  [4753, "비누커팅기 · soap cutter · 肥皂剪裁机"],
+  [3698, "산업용 마스크 · industrial mask · 工业用口罩"],
+  [2877, "샴푸 · shampoo · 洗发露"],
+  [1314, "원목 강아지 집 · Wooden puppy house · 实木狗笼"],
+  [2033, "강아지 휠체어 · Dog wheelchair · 狗轮椅"],
+  [1510, "마이크로피펫 · Micro pipette · 微型净水吸管"],
+  [1854, "펫드라이룸 · Pet Dry Room · 宠物干衣间"],
+  [2351, "강아지 드라이어 · a dog dryer · 小狗吹风机"],
+  [3344, "강아지 목줄 · leash for dog · 狗脖圈"],
+  [2413, "강아지 용변 주머니 · dog′s toilet bag · 狗屎袋"],
+  [4569, "강아지빗 · dog comb · 狗梳"],
+  [3336, "강아지용 가루 · Powder for dogs · 狗粉"],
+  [5811, "강아지운반기구 · dog-carrying device · 小狗搬运器具"],
+  [4508, "강아지칫솔 · Dog toothbrush · 狗牙刷"],
+  [2370, "고양이 캣타워 · Cat tower · 猫爬架"],
+  [2927, "고양이모래 · Cat sand · 猫砂"],
+  [3483, "고양이스크래쳐 · Cat Scratch · 猫抓板"],
+  [3280, "고양이용품 · Cat items · 猫用品"],
+  [3741, "고양이집 · cats house · 猫窝"],
+  [4250, "고양이침대 · cat bed · 猫床"],
+  [3723, "고양이해먹 · cat hammock · 猫吊床"],
+  [2164, "차량용 냉장고 · Car refrigerator · 车载冰箱"],
+  [2061, "자동차 크리스털 라이트 · Automotive Crystal Light · 汽车水晶灯"],
+  [1734, "자동차배터리방전 체크기 · Car battery discharge checker · 汽车电池放电检测器"],
+  [1198, "차량용 방지턱 · vehicle’s · 车载减速带"],
+  [2389, "차량용 빙점계 · Vehicle Freezing Point Meter · 车载冰点仪"],
+  [2330, "차량용온도계 · Vehicle Thermometer · 车载温度计"],
+  [2045, "타이어 접착제 · tire adhesive · 轮胎胶粘剂"],
+  [1444, "타이어 휠 · tire wheel · 轮毂"],
+  [2294, "타이어공기압체크기 · Tire pressure check size · 轮胎气压计"],
+  [1439, "타이어 탈착기 · tire desorption machine · 轮胎拆卸器"],
+  [2122, "타이어 평형 측정기 · Tire dynamic balance measuring machine · 轮胎动平衡测定机"],
+  [5850, "금속 장식 자동차 모델 · METAL DECORATIVE CAR MODEL · 金属装饰车型"],
+  [5786, "기타오토바이용품 · Other motorcycle items · 其他摩托车用品"],
+  [5776, "사륜 오토바이 · four-wheeled motorcycle · 四轮摩托车"],
+  [5746, "사륜 자동차 · four-wheeler · 四轮车"],
+  [5775, "오토바이 · Motorcycle · 摩托车"],
+  [5801, "오토바이 부품 · motorcycle parts · 摩托车配件"],
+  [5800, "오토바이 부품 범퍼 · motorcycle parts bumper · 摩托车配件保险杠"],
+  [2367, "가구부품 모듈 · Furniture Parts Module · 家具配件模块"],
+  [1709, "가구용프레임 · furniture frame · 家具用框架"],
+  [1710, "가정용 가구 부자재 · household furniture subsidiary materials · 家用家具构件"],
+  [2778, "도자기 유약 · ceramic glaze · 陶瓷釉"],
+  [1380, "도자기어항 · fish port · 陶瓷鱼缸"],
+  [1452, "스테인리스작업대 · Stainless Steel Workbench · 不锈钢工作台"],
+  [1962, "실리콘필름 · a silicone film · 硅胶膜"],
+  [1648, "야외용가구 · outdoor furniture · 户外家具"],
+  [1508, "원목 십자가 · wooden cross · 实木十字架"],
+  [2165, "원목 지지대 · hardwood support · 实木支架"],
+  [1366, "원목벌집 · hive of wood · 实木蜂窝"],
+  [2670, "유리 큐브 타일 · GLASS CUBES TILE · 玻璃立方体瓷砖"],
+  [2007, "유리관 · glass tube · 玻璃管"],
+  [5825, "유리관 세트 · glass tube set · 玻璃管"],
+  [2696, "유리어항 · free fishing port · 玻璃鱼缸"],
+  [2150, "플라스틱 어항 · plastic fish tank · 塑料鱼缸"],
+  [2257, "플라스틱 정리함 · plastic organizer · 塑料整理箱"],
+  [2376, "실리콘 부항 · silicone cupping · 硅胶拔罐"],
+  [5837, "금속 선 가공기 · a metal wire machine · 金属丝加工机"],
+  [2028, "금속용제련솥 · a metal smelting cooker · 金属熔炼锅"],
+  [1387, "금속탐지기 안경 · metal detector glasses · 金属探测眼镜"],
+  [2240, "스테인레스 C자 못 · stainless C-shaped nail for Dog cage · 狗笼用C型钉"],
+  [1466, "스테인리스 거치대 · stainless holder · 不锈钢支架"],
+  [2141, "스테인리스 꼬챙이 · Stainless steel wire cutting · 不锈钢丝扦"],
+  [1346, "스테인리스 발판 · stainless steel scaffolding · 不锈钢跳板"],
+  [2085, "스테인리스 배수관 · Stainless steel drain pipe · 不锈钢排水管"],
+  [1493, "스테인리스 배전함 · Stainless Steel Distribution Box · 不锈钢配电箱"],
+  [1252, "스테인리스 수도 계량기 · Stainless Water Meter · 不锈钢水表"],
+  [2362, "스테인리스 스트랩 · Stainless steel tie plate · 不锈钢扎带盘"],
+  [1264, "스테인리스레인지 · stainless steel stove · 不锈钢炉灶"],
+  [1467, "스테인리스로스터 · stainless steel roaster · 不锈钢烤炉"],
+  [2161, "알루미늄미끄럼틀 · aluminum slide · 铝滑梯"],
+  [1607, "알루미늄합금자 · Aluminum alloy ruler · 铝合金直尺"],
+  [1608, "원목 손잡이 · wooden handle · 实木扶手"]
+];
+
+/* ---------- v2.4: 국내 위탁 · 천조직구 신청서 · 세무 장부 기본 모양 ---------- */
+function blankTzItem(){
+  return {
+    shopSite: "www.taobao.com", brand: "", orderNo: "", trkNo: "",
+    itemSeq: "", itemName: "", proNm: "", qty: 1, amt: 0,
+    color: "", size: "", proUrl: "", imgUrl: "",
+    marketNm: "", marketOrderNo: "", stockNo: ""
+  };
+}
+function normTzItem(raw){
+  var o = Object.assign(blankTzItem(), raw || {});
+  o.shopSite = str(o.shopSite);
+  o.brand = str(o.brand);
+  o.orderNo = str(o.orderNo);
+  o.trkNo = str(o.trkNo);
+  o.itemSeq = str(o.itemSeq);
+  o.itemName = str(o.itemName);
+  o.proNm = str(o.proNm);
+  o.qty = Math.max(0, num(o.qty, 1));
+  o.amt = Math.max(0, num(o.amt, 0));
+  o.color = str(o.color);
+  o.size = str(o.size);
+  o.proUrl = str(o.proUrl);
+  o.imgUrl = str(o.imgUrl);
+  o.marketNm = str(o.marketNm);
+  o.marketOrderNo = str(o.marketOrderNo);
+  o.stockNo = str(o.stockNo);
+  return o;
+}
+function blankTz(){
+  return {
+    bundleNo: "1",
+    autoPay: "1",
+    ctmsDvs: "1",
+    dutyPay: "2",
+    dutyPhone: "",
+    consKr: "", consEn: "", phone: "", zip: "", addr: "", addrDet: "",
+    addrEn: "", addrDetEn: "",
+    centerReq: "", dlvrReq: "", dlvrReqSel: "",
+    sellerMarketNm: "", sellerBusiNo: "",
+    care: "N",
+    services: [],
+    items: [blankTzItem()]
+  };
+}
+function normTz(raw){
+  var d = Object.assign(blankTz(), raw || {});
+  d.bundleNo = str(d.bundleNo) || "1";
+  d.autoPay = str(d.autoPay) === "2" ? "2" : "1";
+  d.ctmsDvs = str(d.ctmsDvs) === "2" ? "2" : "1";
+  d.dutyPay = str(d.dutyPay) === "1" ? "1" : "2";
+  d.care = str(d.care).toUpperCase() === "Y" ? "Y" : "N";
+  ["dutyPhone","consKr","consEn","phone","zip","addr","addrDet","addrEn","addrDetEn",
+   "centerReq","dlvrReq","dlvrReqSel","sellerMarketNm","sellerBusiNo"].forEach(function(k){
+    d[k] = str(d[k]);
+  });
+  d.services = (Array.isArray(d.services) ? d.services : []).map(function(c){ return str(c); })
+    .filter(function(c){ return !!c; })
+    .filter(function(c, i, a){ return a.indexOf(c) === i; });
+  var items = Array.isArray(d.items) ? d.items.map(normTzItem) : [];
+  d.items = items.length ? items : [blankTzItem()];
+  return d;
+}
+function blankDomestic(){
+  return {
+    id: uid(), supplier: "온채널", name: "", code: "", cost: 0, ship: 0,
+    fee: num(state ? state.settings.domesticFee : 5.5, 5.5),
+    margin: num(state ? state.settings.margin : 30, 30),
+    stock: 0, url: "", img: "", memo: "", lowest: "", updatedAt: Date.now()
+  };
+}
+function normDomestic(raw){
+  var d = Object.assign({}, raw || {});
+  d.id = str(d.id) || uid();
+  d.supplier = domesticLabel(d.supplier || "");
+  d.name = str(d.name);
+  d.code = str(d.code);
+  d.cost = num(d.cost, 0);
+  d.ship = num(d.ship, 0);
+  d.fee = num(d.fee, state ? num(state.settings.domesticFee, 5.5) : 5.5);
+  d.margin = num(d.margin, state ? num(state.settings.margin, 30) : 30);
+  d.stock = num(d.stock, 0);
+  d.url = str(d.url);
+  d.img = str(d.img);
+  d.memo = str(d.memo);
+  d.lowest = str(d.lowest);
+  d.updatedAt = num(d.updatedAt, Date.now());
+  return d;
+}
+function blankTaxRow(){
+  var d = new Date();
+  return {
+    id: uid(), date: d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()),
+    market: "", orderNo: "", name: "",
+    sale: 0, cost: 0, ship: 0, fee: 0, etc: 0, memo: ""
+  };
+}
+function normTaxRow(raw){
+  var r = Object.assign({}, raw || {});
+  r.id = str(r.id) || uid();
+  r.date = str(r.date);
+  r.market = str(r.market);
+  r.orderNo = str(r.orderNo);
+  r.name = str(r.name);
+  ["sale","cost","ship","fee","etc"].forEach(function(k){ r[k] = num(r[k], 0); });
+  r.memo = str(r.memo);
+  return r;
+}
+function blankTax(){
+  return { rows: [] };
+}
+function normTax(raw){
+  var t = Object.assign(blankTax(), raw || {});
+  t.rows = (Array.isArray(t.rows) ? t.rows : []).map(normTaxRow);
+  return t;
+}
+
 
 // 금칙어 자동 검사 대상 필드 (상품명·원제·카테고리·속성·검색태그)
 var TEXT_FIELDS = [
@@ -851,6 +1649,7 @@ var state = loadState();
 var selection = {};
 var uiFilter = "all";
 var uiSearch = "";
+var uiView = "products";
 var saveTimer = null;
 
 function loadState(){
@@ -865,6 +1664,9 @@ function loadState(){
           if(!p.updatedAt) p.updatedAt = now - i*1000;
           return normProduct(p);
         });
+        s.domestic = (Array.isArray(s.domestic) ? s.domestic : []).map(normDomestic);
+        s.tax = normTax(s.tax);
+        s.tz = normTz(s.tz);
         return s;
       }
     }
@@ -879,7 +1681,10 @@ function makeInitialState(){
     version: APP_VERSION,
     settings: Object.assign({}, DEFAULT_SETTINGS),
     selectedId: null,
-    products: []
+    products: [],
+    domestic: [],
+    tax: blankTax(),
+    tz: blankTz()
   };
 }
 
@@ -893,12 +1698,17 @@ function normProduct(raw){
   p.origTitle = str(p.origTitle);
   p.name = str(p.name);
   p.category = str(p.category);
-  p.currency = (str(p.currency).toUpperCase() === "JPY") ? "JPY" : "CNY";
+  p.currency = normalizeCurrency(p.currency);
   p.rate = num(p.rate, 0);
   p.cost = num(p.cost, 0);
   p.weightKg = num(p.weightKg, 0);
   p.volumeMode = !!p.volumeMode;
   p.manualShipping = num(p.manualShipping, 0);
+  // 국내 위탁 상품은 해외 배대지 대신 국내 택배비로 계산합니다
+  p.shipMode = (str(p.shipMode) === "domestic") ? "domestic" : "overseas";
+  p.domesticShip = num(p.domesticShip, 0);
+  p.percentyId = str(p.percentyId);
+  p.priceMax = num(p.priceMax, 0);
   p.shipBasis = (p.shipBasis === "repr") ? "repr" : "option3";
   p.shipOptionNo = Math.min(50, Math.max(1, Math.round(num(p.shipOptionNo, 3))));
   p.marginRate = num(p.marginRate, state ? num(state.settings.margin, 30) : 30);
@@ -1037,9 +1847,10 @@ function esc(s){
 }
 function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
 function charCount(s){ return Array.from(String(s||"")).length; }
-function curSym(c){ return c === "JPY" ? "¥" : "¥"; }
-function curLabel(c){ return c === "JPY" ? "JPY" : "CNY"; }
+function curSym(c){ return c === "KRW" ? "원" : "¥"; }
+function curLabel(c){ return c === "KRW" ? "KRW" : (c === "JPY" ? "JPY" : "CNY"); }
 function sourceLang(p){
+  if(p.currency === "KRW") return "국문";
   if(p.source === "라쿠텐" || p.source === "슈퍼딜리버리") return "일문";
   if(p.source === "1688" || p.source === "타오바오") return "중문";
   return /[\u3040-\u30ff]/.test(p.origTitle||"") ? "일문" : "중문";
@@ -1061,6 +1872,7 @@ function toast(msg, kind){
    4. 계산 · 금칙어
    ========================================================= */
 function rateOf(p){
+  if(p && p.currency === "KRW") return 1;
   var r = num(p.rate, 0);
   if(r > 0) return r;
   return p.currency === "JPY" ? num(state.settings.rateJPY, 8.4) : num(state.settings.rateCNY, 223);
@@ -1093,6 +1905,7 @@ function basisInfo(p){
 }
 
 function shipFee(p){
+  if(p.shipMode === "domestic") return num(p.domesticShip, 0);
   if(p.volumeMode) return num(p.manualShipping, 0);
   return seaShipping(basisInfo(p).kg);
 }
@@ -2513,6 +3326,7 @@ function visibleProducts(){
     if(uiFilter === "nocut" && p.thumbCutout) return false;
     if(uiFilter === "cn" && p.currency !== "CNY") return false;
     if(uiFilter === "jp" && p.currency !== "JPY") return false;
+    if(uiFilter === "kr" && p.currency !== "KRW") return false;
     if(!q) return true;
     return (p.name + " " + p.origTitle + " " + p.category).toLowerCase().indexOf(q) >= 0;
   });
@@ -2534,14 +3348,16 @@ function renderList(){
       var lang = sourceLang(p);
       var mb = p.currency === "JPY"
         ? '<span class="mini-badge mb-jp">일본</span>'
-        : '<span class="mini-badge mb-cn">중국</span>';
+        : (p.currency === "KRW"
+          ? '<span class="mini-badge mb-kr">원화</span>'
+          : '<span class="mini-badge mb-cn">중국</span>');
       var thumbStyle = p.imageUrl
         ? ' style="background-image:url(&quot;' + esc(p.imageUrl) + '&quot;);background-size:cover;background-position:center;background-color:#fff;font-size:0"'
         : '';
       var imgBadge = (p.images||[]).length ? '<span class="mini-badge mb-cn">사진 ' + (p.images||[]).length + '</span>' : '';
       return '<div class="pitem' + (p.id===state.selectedId?" on":"") + (p.excluded?" excluded":"") + '" data-id="' + p.id + '">' +
         '<input type="checkbox" data-sel="' + p.id + '"' + (selection[p.id]?" checked":"") + '>' +
-        '<div class="thumb"' + thumbStyle + '>' + (p.imageUrl ? '' : (p.currency==="JPY"?"🗾":"🀄")) + '</div>' +
+        '<div class="thumb"' + thumbStyle + '>' + (p.imageUrl ? '' : (p.currency==="JPY"?"🗾":(p.currency==="KRW"?"🏠":"🀄"))) + '</div>' +
         '<div class="meta">' +
           '<div class="nm">' + esc(p.name || "(상품명 없음)") + '</div>' +
           '<div class="row2">' + mb +
@@ -2699,17 +3515,22 @@ function cardPrice(p, c){
       '<div class="g2">' +
         '<label class="field">통화' +
           '<select data-field="currency">' +
-            '<option value="CNY"' + (p.currency==="CNY"?" selected":"") + '>중국 위안(CNY)</option>' +
-            '<option value="JPY"' + (p.currency==="JPY"?" selected":"") + '>일본 엔(JPY)</option>' +
+            CURRENCIES.map(function(c){
+              return '<option value="' + c.v + '"' + (p.currency===c.v?" selected":"") + '>' + esc(c.label) + '</option>';
+            }).join("") +
           '</select></label>' +
+        (p.currency === "KRW" ?
+        '<label class="field">환율' +
+          '<input type="text" value="원화 그대로 (환율 없음)" disabled>' +
+        '</label>' :
         '<label class="field">환율 (1' + curLabel(p.currency) + ' = 몇 원)' +
           '<input type="number" step="0.1" min="0" data-field="rate" value="' + num(p.rate,0) + '">' +
-        '</label>' +
+        '</label>') +
       '</div>' +
       '<div class="g2">' +
         '<label class="field">사입 가격 (' + curLabel(p.currency) + ')' +
           '<div class="addon"><input type="number" min="0" step="1" data-field="cost" value="' + num(p.cost,0) + '">' +
-          '<span class="unit">' + (p.currency==="JPY"?"JPY":"CNY") + '</span></div>' +
+          '<span class="unit">' + curLabel(p.currency) + '</span></div>' +
         '</label>' +
         '<label class="field">무게 (kg)' +
           '<div class="addon"><input type="number" min="0" step="0.1" data-field="weightKg" value="' + num(p.weightKg,0) + '">' +
@@ -2719,10 +3540,14 @@ function cardPrice(p, c){
 
       '<div class="card" style="padding:11px 12px;background:#fffaf6;box-shadow:none;border-radius:11px;border-color:#ffe2d0">' +
         '<div class="row" style="justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:6px">' +
-          '<div class="switchrow"><label class="sw"><input type="checkbox" data-field="volumeMode"' + (p.volumeMode?" checked":"") + '><i></i></label> 배송비 직접 넣기</div>' +
+          '<div class="switchrow"><label class="sw"><input type="checkbox" data-field="shipModeDomestic"' + (p.shipMode==="domestic"?" checked":"") + '><i></i></label> 국내 위탁 (국내 택배비로 계산)</div>' +
           '<span class="tiny" id="shipHint" style="font-weight:800;color:#a33c0a">' + (p.volumeMode ? "직접 입력 적용" : "자동 " + won(c.ship)) + '</span>' +
         '</div>' +
-        (p.volumeMode ?
+        (p.shipMode === "domestic" ?
+          '<label class="field">국내 택배비 (원)' +
+            '<div class="addon"><input type="number" min="0" step="100" data-field="domesticShip" value="' + num(p.domesticShip,0) + '"><span class="unit">원</span></div>' +
+          '</label>' : '') +
+        (p.volumeMode && p.shipMode !== "domestic" ?
           '<label class="field">국제 배송비 직접 입력 (원)' +
             '<input type="number" min="0" step="100" data-field="manualShipping" value="' + num(p.manualShipping,0) + '">' +
           '</label>' : '') +
@@ -2739,7 +3564,9 @@ function cardPrice(p, c){
         '<div class="kv" style="border-bottom:0;padding-bottom:2px"><span>지금 계산 기준</span>' +
           '<b id="calcBasis">' + esc(basis.label) + ' · ' + (basis.kg>0 ? basis.kg + "kg" : "무게 미입력") + '</b></div>' +
         '<button class="btn sm warn" data-act="calcOption3" style="width:100%;margin-top:6px">3번 옵션 기준으로 배송비·판매가 자동 계산</button>' +
-        '<div class="friendly" style="margin-top:6px">천조직구 해운(인천) : 기본 ' + nf(num(state.settings.shipBase,4100)) + '원 + kg당 ' + nf(num(state.settings.shipPerKg,1500)) + '원 (' + num(state.settings.shipStepKg,0.5) + 'kg 단위 올림)</div>' +
+        (p.shipMode === "domestic" ?
+          '<div class="friendly" style="margin-top:6px">환율·해외배대지 없이 <b>도매가 + 국내 택배비</b>로 계산합니다. 국내 위탁(온채널·오너클랜·도매매) 상품에 쓰세요.</div>' :
+          '<div class="friendly" style="margin-top:6px">천조직구 해운(인천) : 기본 ' + nf(num(state.settings.shipBase,4100)) + '원 + kg당 ' + nf(num(state.settings.shipPerKg,1500)) + '원 (' + num(state.settings.shipStepKg,0.5) + 'kg 단위 올림)</div>') +
       '</div>' +
 
       '<div class="g2">' +
@@ -2752,7 +3579,7 @@ function cardPrice(p, c){
       '</div>' +
 
       '<div class="kv"><span>상품 원가 (원화)</span><b id="calcCost">' + won(c.costKrw) + '</b></div>' +
-      '<div class="kv"><span>중국→한국 배송비</span><b id="calcShip2">' + won(c.ship) + '</b></div>' +
+      '<div class="kv"><span>' + (p.shipMode === "domestic" ? "국내 택배비" : "중국→한국 배송비") + '</span><b id="calcShip2">' + won(c.ship) + '</b></div>' +
       '<div class="kv total"><span style="color:#1b2138;font-weight:700">모두 합친 원가</span><b id="calcTotal" style="color:#a33c0a">' + won(c.total) + '</b></div>' +
 
       '<div class="pricebox">' +
@@ -3427,7 +4254,8 @@ function bindGlobal(){
       p2.attrs[field.slice(6)] = t.value;
     }else if(field === "cost" || field === "weightKg" || field === "rate" ||
              field === "marginRate" || field === "feeRate" || field === "price" ||
-             field === "manualShipping" || field === "stock" || field === "shipOptionNo"){
+             field === "manualShipping" || field === "stock" || field === "shipOptionNo" ||
+             field === "domesticShip"){
       p2[field] = num(t.value, 0);
       if(field === "price"){ p2.priceAuto = false; }
       if(field === "weightKg" && num(t.value,0) > 30 && !p2.volumeMode){
@@ -3453,9 +4281,17 @@ function bindGlobal(){
     var field = t.dataset.field;
     if(field === "currency"){
       var p = current(); if(!p) return;
-      p.currency = t.value;
-      p.rate = t.value === "JPY" ? state.settings.rateJPY : state.settings.rateCNY;
+      p.currency = normalizeCurrency(t.value);
+      if(p.currency === "KRW") p.rate = 1;
+      else p.rate = p.currency === "JPY" ? state.settings.rateJPY : state.settings.rateCNY;
       touch(p); renderEditor(); save();
+      return;
+    }
+    if(field === "shipModeDomestic"){
+      var psd = current(); if(!psd) return;
+      psd.shipMode = t.checked ? "domestic" : "overseas";
+      if(psd.shipMode === "domestic" && !num(psd.domesticShip,0)) psd.domesticShip = num(state.settings.domesticShip, 3000);
+      touch(psd); renderEditor(); save();
       return;
     }
     if(field === "volumeMode"){
@@ -3742,7 +4578,7 @@ function handleAction(act, el, ev){
       if(tg) tg.textContent = bar.classList.contains("min") ? "안내 펼치기" : "안내 접기";
       break;
     }
-    default: break;
+    default: v24Action(act, el, ev); break;
   }
 }
 
@@ -4613,15 +5449,25 @@ function fromCollected(e){
   var nm = str(e.name || "");
   var srcRaw = str(e.source || e.site || e.sourceLabel || "");
   var src = SOURCE_MAP[srcRaw] || SOURCE_MAP[srcRaw.toLowerCase()] || "";
+  // 퍼센티(KRW) · 국내 위탁(온채널·오너클랜·도매매) 구분 — 원화를 CNY로 읽으면 원가가 223배 틀어집니다
+  var isPercenty = /^percenty$/i.test(srcRaw) || srcRaw === "퍼센티" || !!e.percentyId;
+  var isDomestic = isDomesticSource(srcRaw) || isDomesticSource(src);
   if(!src){
     var probe = srcRaw + " " + str(e.url);
-    if(/rakuten|라쿠텐|楽天/i.test(probe)) src = "라쿠텐";
+    if(/onch\.co\.kr|온채널/i.test(probe)) src = "온채널";
+    else if(/ownerclan/i.test(probe)) src = "오너클랜";
+    else if(/domeme|domeggook|도매매/i.test(probe)) src = "도매매";
+    else if(/percenty|퍼센티/i.test(probe)) src = "퍼센티";
+    else if(/rakuten|라쿠텐|楽天/i.test(probe)) src = "라쿠텐";
     else if(/1688/i.test(probe)) src = "1688";
     else if(/taobao|tmall|淘宝|天猫/i.test(probe)) src = "타오바오";
     else src = "직접";
   }
+  if(isPercenty) src = "퍼센티";
   var cur = str(e.currency).toUpperCase();
-  if(cur !== "JPY" && cur !== "CNY") cur = (src === "라쿠텐") ? "JPY" : "CNY";
+  if(cur === "KRW" || isPercenty || isDomestic) cur = "KRW";
+  else if(cur !== "JPY" && cur !== "CNY") cur = (src === "라쿠텐") ? "JPY" : "CNY";
+  if(cur === "KRW") src = isDomestic ? src : (isPercenty || src === "퍼센티" ? "퍼센티" : src);
 
   var optsIn = Array.isArray(e.options) ? e.options
     : (str(e.options) ? str(e.options).split(/\s*[|/]\s*|\s*,\s*/) : []);
@@ -4642,7 +5488,7 @@ function fromCollected(e){
     name: nm || (orig && !isCJK(orig) ? truncChars(applyAllBanned(orig), 50) : ""),
     category: str(e.category),
     currency: cur,
-    rate: num(e.rate, 0),
+    rate: cur === "KRW" ? 1 : num(e.rate, 0),
     cost: hasCost ? num(e.cost, 0) : priceIn,
     weightKg: num(e.weightKg, 0),
     options: opts,
@@ -4658,7 +5504,11 @@ function fromCollected(e){
     priceAuto: e.priceAuto === undefined ? true : !!e.priceAuto,
     stock: num(e.stock, 0),
     excluded: !!e.excluded,
-    searchKeyword: str(e.searchKeyword)
+    searchKeyword: str(e.searchKeyword),
+    percentyId: str(e.percentyId),
+    priceMax: num(e.priceMax, 0),
+    shipMode: (cur === "KRW" && src !== "퍼센티") ? "domestic" : "overseas",
+    domesticShip: (cur === "KRW" && src !== "퍼센티") ? num(e.shippingFee, 0) : 0
   });
   if(!p.name && p.origTitle && !isCJK(p.origTitle)) p.name = truncChars(applyAllBanned(p.origTitle), 50);
   return p;
@@ -4718,7 +5568,21 @@ function mergeProducts(list, kind){
 function importJsonText(text){
   var list = parseJsonProducts(text);
   if(!list.length){ toast("불러올 상품이 없습니다 — 수집기에서 내보낸 JSON인지 확인해 주세요", "bad"); return 0; }
-  mergeProducts(list, "JSON");
+  // 국내 위탁(온채널·오너클랜·도매매) 상품은 국내 위탁 목록으로 보냅니다
+  var dom = list.filter(function(p){ return isDomesticSource(p.source) || (p.currency === "KRW" && p.shipMode === "domestic" && p.source !== "퍼센티"); });
+  var rest = list.filter(function(p){ return dom.indexOf(p) < 0; });
+  if(dom.length){
+    dom.forEach(function(p){
+      state.domestic.unshift(normDomestic({
+        id: uid(), supplier: p.source, name: p.name || p.origTitle,
+        cost: num(p.cost, 0), ship: num(p.domesticShip, 0), stock: num(p.stock, 0),
+        url: p.url, img: p.imageUrl, updatedAt: Date.now()
+      }));
+    });
+  }
+  if(rest.length) mergeProducts(rest, "JSON");
+  else { saveNow(); renderAll(); }
+  if(dom.length) toast("국내 위탁 상품 " + dom.length + "건은 [🏠 국내 위탁]으로 넣었습니다", "ok");
   return list.length;
 }
 
@@ -4881,6 +5745,23 @@ function openSettings(){
     '</div>' +
     '<div class="friendly" style="margin-top:4px">예: 16kg → ' + won(seaShipping(16)) + ' / 2kg → ' + won(seaShipping(2)) + '</div>' +
 
+    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">국내 위탁 (온채널 · 오너클랜 · 도매매)</h4>' +
+    '<div class="g2">' +
+      numField("국내 택배비 기본값", "setDomesticShip", s.domesticShip, "원", "100") +
+      numField("국내 마켓 수수료 기본값", "setDomesticFee", s.domesticFee, "%", "0.1") +
+    '</div>' +
+    '<div class="friendly" style="margin-top:4px">국내 위탁은 환율·해외배대지 없이 <b>도매가 + 국내 택배비</b>로 판매가를 계산합니다.</div>' +
+
+    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">천조직구 배송대행 신청서</h4>' +
+    '<div class="g2">' +
+      txtField("물류센터", "setTzCenter", s.tzCenter, "위해") +
+      txtField("운송방식", "setTzWay", s.tzWay, "해운(인천)") +
+    '</div>' +
+    '<label class="field" style="margin-top:8px">천조직구 API 키 (개인용 · 선택)' +
+      '<input type="text" id="setTzApiKey" value="' + esc(str(s.tzApiKey)) + '" placeholder="비워 두셔도 됩니다" autocomplete="off">' +
+    '</label>' +
+    '<div class="friendly" style="margin-top:4px">이 키는 <b>이 브라우저(localStorage)에만</b> 저장되고 저장소·README·커밋에는 들어가지 않습니다. 지금 천조직구는 공개 API를 제공하지 않아 자동 접수에는 쓰이지 않으며, 신청서 채우기는 엑셀·확장 프로그램으로 합니다.</div>' +
+
     '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">스마트스토어기본값</h4>' +
     '<div class="g2">' +
       txtField("수입사명", "setImporter", s.importer, "예: ○○커머스") +
@@ -4948,6 +5829,11 @@ function openSettings(){
     var gAuto = document.getElementById("setGeminiAuto");
     state.settings.geminiImageAuto = gAuto ? !!gAuto.checked : true;
     state.settings.translateMode = str(v("setTranslateMode")) === "dict" ? "dict" : "auto";
+    state.settings.domesticShip = num(v("setDomesticShip"), 3000);
+    state.settings.domesticFee = num(v("setDomesticFee"), 5.5);
+    state.settings.tzCenter = str(v("setTzCenter")) || "위해";
+    state.settings.tzWay = str(v("setTzWay")) || "해운(인천)";
+    state.settings.tzApiKey = str(v("setTzApiKey")).trim();
   }
 
   var ct = document.getElementById("clearTrans");
@@ -4966,9 +5852,13 @@ function openSettings(){
   document.getElementById("applyAll").onclick = function(){
     collect();
     state.products.forEach(function(p){
-      p.rate = p.currency === "JPY" ? state.settings.rateJPY : state.settings.rateCNY;
+      p.rate = p.currency === "KRW" ? 1 : (p.currency === "JPY" ? state.settings.rateJPY : state.settings.rateCNY);
       p.marginRate = state.settings.margin;
       p.feeRate = state.settings.fee;
+    });
+    (state.domestic || []).forEach(function(d){
+      d.fee = state.settings.domesticFee;
+      d.margin = state.settings.margin;
     });
     closeModal(); renderAll(); saveNow();
     toast("전체 상품에 환율·마진을 다시 적용했습니다", "ok");
@@ -4982,6 +5872,10 @@ function closeModal(){ document.getElementById("overlay").classList.remove("on")
    ========================================================= */
 function renderAll(){
   if(!hasDOM()) return;
+  syncViewChrome();
+  if(uiView === "tz"){ renderTzView(); return; }
+  if(uiView === "domestic"){ renderDomesticView(); return; }
+  if(uiView === "tax"){ renderTaxView(); return; }
   renderStats();
   renderList();
   renderEditor();
@@ -4990,6 +5884,7 @@ function renderAll(){
 
 function init(){
   bindGlobal();
+  bindV24();
   var any = state.products.some(function(p){ return p.id === state.selectedId; });
   if(!any && state.products.length) state.selectedId = state.products[0].id;
   renderAll();
@@ -4998,6 +5893,1352 @@ function init(){
   });
   window.addEventListener("beforeunload", function(){ saveNow(); });
   try{ if(!localStorage.getItem(STORAGE_KEY)) saveNow(); }catch(e){ setSaveLabel(true); }
+}
+
+/* =========================================================
+   12-5 ~ 12-9. v2.4 화면 (천조직구 신청서 · 국내 위탁 · 세무 장부)
+   ========================================================= */
+/* =========================================================
+   12-5. v2.4 — 화면 전환 (상품 작업 · 천조직구 신청서 · 국내 위탁 · 세무 장부)
+   ========================================================= */
+function setView(v){
+  if(["products", "tz", "domestic", "tax"].indexOf(v) < 0) v = "products";
+  uiView = v;
+  renderAll();
+  try{ if(typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0); }catch(e){}
+}
+function syncViewChrome(){
+  if(!hasDOM()) return;
+  var steps = document.getElementById("steps");
+  var side = document.getElementById("sidebar");
+  var lay = document.getElementById("layout");
+  var prod = uiView === "products";
+  if(steps) steps.style.display = prod ? "" : "none";
+  if(side) side.style.display = prod ? "" : "none";
+  if(lay) lay.className = "layout" + (prod ? "" : " wide");
+  var tabs = document.querySelectorAll("[data-view]");
+  for(var i = 0; i < tabs.length; i++){
+    var b = tabs[i];
+    if(b.classList && b.classList.toggle) b.classList.toggle("on", b.getAttribute("data-view") === uiView);
+  }
+}
+
+/* ---------- 공통 작은 조각 ---------- */
+function vField(label, attr, val, ph, opt){
+  opt = opt || {};
+  var input = opt.area
+    ? '<textarea rows="' + (opt.rows || 2) + '" ' + attr + ' placeholder="' + esc(ph || "") + '">' + esc(str(val)) + '</textarea>'
+    : '<input type="' + (opt.type || "text") + '" ' + attr + ' value="' + esc(str(val)) + '" placeholder="' + esc(ph || "") + '">';
+  return '<label class="field">' + label + input + '</label>';
+}
+function wonOrDash(n){ return num(n, 0) ? won(n) : "—"; }
+
+/* =========================================================
+   12-6. 천조직구 신청서
+   ========================================================= */
+function tzIssues(d){
+  d = d || state.tz;
+  var out = [];
+  if(!str(d.consKr).trim()) out.push("수취인 한글 이름");
+  if(!str(d.phone).trim()) out.push("휴대폰 번호");
+  if(!str(d.addr).trim()) out.push("수취인 주소");
+  if(!str(d.personNo).trim()) out.push(d.ctmsDvs === "2" ? "사업자번호" : "개인통관고유부호");
+  if(d.dutyPay === "1" && !str(d.dutyPhone).trim()) out.push("관/부가세 대납 안내 전화번호");
+  (d.items || []).forEach(function(it, i){
+    var no = (i + 1) + "번 상품";
+    if(!str(it.itemSeq).trim()) out.push(no + " 통관품목 번호");
+    if(!str(it.proNm).trim()) out.push(no + " 영문 상품명");
+    if(!num(it.qty, 0)) out.push(no + " 수량");
+    if(!num(it.amt, 0)) out.push(no + " 합계(￥)");
+    if(!str(it.imgUrl).trim()) out.push(no + " 이미지 URL");
+    if(!str(it.proUrl).trim()) out.push(no + " 상품 URL");
+  });
+  return out;
+}
+function tzTotals(d){
+  var qty = 0, amt = 0;
+  (d.items || []).forEach(function(it){ qty += num(it.qty, 0); amt += num(it.amt, 0); });
+  return { qty: qty, amt: Math.round(amt * 100) / 100 };
+}
+function tzRows(d){
+  d = d || state.tz;
+  var svc = (d.services || []).join(",");
+  return (d.items || []).map(function(it){
+    return [
+      Math.max(1, Math.round(num(d.bundleNo, 1))),        // A 묶음번호
+      d.autoPay === "2" ? 2 : 1,                          // B 자동결제
+      str(d.consKr),                                      // C
+      str(d.consEn),                                      // D
+      str(d.phone),                                       // E
+      str(d.zip),                                         // F
+      str(d.addr),                                        // G
+      str(d.addrDet),                                     // H
+      str(d.addrEn),                                      // I
+      str(d.addrDetEn),                                   // J
+      d.ctmsDvs === "2" ? 2 : 1,                          // K 통관구분
+      str(d.personNo),                                    // L
+      d.dutyPay === "1" ? 1 : 2,                          // M
+      d.dutyPay === "1" ? str(d.dutyPhone) : "",          // N
+      str(d.centerReq),                                   // O
+      str(d.dlvrReq),                                     // P
+      num(it.itemSeq, 0) || "",                           // Q 통관품목 번호
+      str(it.shopSite),                                   // R
+      str(it.orderNo),                                    // S
+      str(it.proNm || it.itemName),                       // T
+      str(it.brand),                                      // U
+      str(it.color),                                      // V
+      str(it.size),                                       // W
+      Math.max(0, num(it.qty, 0)),                        // X
+      Math.max(0, num(it.amt, 0)),                        // Y
+      str(it.imgUrl),                                     // Z
+      str(it.proUrl),                                     // AA
+      str(it.trkNo),                                      // AB
+      str(it.marketNm),                                   // AC
+      str(it.marketOrderNo),                              // AD
+      svc,                                                // AE
+      str(d.sellerMarketNm),                              // AF
+      str(d.sellerBusiNo),                                // AG
+      "", "", "",                                         // AH AI AJ (LCL)
+      d.care === "Y" ? "Y" : "",                          // AK
+      d.care === "Y" ? "Y" : "",                          // AL
+      str(it.stockNo)                                     // AM
+    ];
+  });
+}
+function tzCsvText(d){
+  var head = TZ_HEADER.map(function(h){ return String(h).replace(/\s*\n\s*/g, " "); });
+  return buildTableCsv(head, tzRows(d));
+}
+function tzXlsxBytes(d){
+  var rows = [TZ_HEADER].concat(tzRows(d));
+  return buildXlsx([{ name: "신청", rows: rows }]);
+}
+function tzExport(kind){
+  var d = state.tz;
+  var issues = tzIssues(d);
+  if(!(d.items || []).length){ toast("상품을 1건 이상 넣어 주세요", "bad"); return; }
+  if(kind === "xlsx"){
+    downloadBytes(tzXlsxBytes(d), "천조직구_신청서_" + stamp() + ".xlsx",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    toast("천조직구 엑셀 양식으로 내려받았습니다 — [엑셀대량등록]에서 파일을 올려 주세요"
+      + (issues.length ? " (빈 칸 " + issues.length + "곳 확인)" : ""), issues.length ? "bad" : "ok");
+    return;
+  }
+  if(kind === "csv"){
+    download(tzCsvText(d), "천조직구_신청서_" + stamp() + ".csv", "text/csv;charset=utf-8");
+    toast("천조직구 39칸 CSV로 내려받았습니다", "ok");
+    return;
+  }
+  if(kind === "json"){
+    download(JSON.stringify(buildTzPayload(), null, 2), "천조직구_자동입력_" + stamp() + ".json", "application/json;charset=utf-8");
+    toast("확장 프로그램용 JSON을 만들었습니다 — 천조직구 신청서 화면에서 [📦 로이창고] 패널에 넣어 주세요", "ok");
+  }
+}
+function buildTzPayload(){
+  var d = state.tz;
+  return {
+    type: "roi_changgo_tz",
+    version: 1,
+    createdAt: new Date().toISOString(),
+    note: "로이창고가 만든 천조직구 배송대행 신청서입니다. 확장 프로그램은 이 내용을 신청서 화면에 채우기만 하고, 접수·결제는 누르지 않습니다.",
+    center: str(state.settings.tzCenter) || "위해",
+    way: str(state.settings.tzWay) || "해운(인천)",
+    bundleNo: str(d.bundleNo),
+    autoPay: d.autoPay === "2" ? "2" : "1",
+    ctmsDvs: d.ctmsDvs === "2" ? "2" : "1",
+    dutyPay: d.dutyPay === "1" ? "1" : "2",
+    dutyPhone: str(d.dutyPhone),
+    recipient: {
+      consKr: str(d.consKr), consEn: str(d.consEn), phone: str(d.phone),
+      zip: str(d.zip), addr: str(d.addr), addrDet: str(d.addrDet),
+      addrEn: str(d.addrEn), addrDetEn: str(d.addrDetEn), personNo: str(d.personNo)
+    },
+    dlvrReq: str(d.dlvrReq), dlvrReqSel: str(d.dlvrReqSel), centerReq: str(d.centerReq),
+    sellerMarketNm: str(d.sellerMarketNm), sellerBusiNo: str(d.sellerBusiNo),
+    care: d.care === "Y" ? "Y" : "N",
+    services: (d.services || []).slice(),
+    servicesText: (d.services || []).map(tzServiceName).join(", "),
+    items: (d.items || []).map(function(it){
+      return {
+        shopSite: str(it.shopSite), brand: str(it.brand), orderNo: str(it.orderNo), trkNo: str(it.trkNo),
+        itemSeq: str(it.itemSeq), itemName: str(it.itemName), proNm: str(it.proNm),
+        qty: num(it.qty, 0), amt: num(it.amt, 0), color: str(it.color), size: str(it.size),
+        proUrl: str(it.proUrl), imgUrl: str(it.imgUrl),
+        marketNm: str(it.marketNm), marketOrderNo: str(it.marketOrderNo), stockNo: str(it.stockNo)
+      };
+    })
+  };
+}
+
+/* 통관품목 검색 — 주요 471건 + (넣었으면) 전체 목록 */
+function tzItemList(){
+  var full = [];
+  try{
+    var raw = localStorage.getItem("roi_tz_items");
+    if(raw){
+      var arr = JSON.parse(raw);
+      if(Array.isArray(arr) && arr.length) full = arr;
+    }
+  }catch(e){ /* 저장소 없음 */ }
+  return full.length ? full : TZ_ITEMS;
+}
+function tzFindItems(q, max){
+  var s = str(q).trim().toLowerCase();
+  if(!s) return [];
+  var list = tzItemList(), out = [];
+  for(var i = 0; i < list.length && out.length < (max || 12); i++){
+    var code = str(list[i][0]), name = str(list[i][1]);
+    if(name.toLowerCase().indexOf(s) >= 0 || code === s || code.indexOf(s) === 0) out.push({ code: code, name: name });
+  }
+  return out;
+}
+function tzItemName(code){
+  var c = str(code);
+  if(!c) return "";
+  var list = tzItemList();
+  for(var i = 0; i < list.length; i++){ if(str(list[i][0]) === c) return str(list[i][1]); }
+  return "";
+}
+/* 천조직구 [통관품목 다운로드] 파일(HTML 표 .xls 또는 CSV)을 받아 전체 목록으로 저장 */
+function importTzItemFile(text){
+  var t = String(text || "");
+  var found = [];
+  var isHtml = /<td[\s>]/i.test(t);
+  if(isHtml){
+    var rows = t.split(/<\/tr>/i);
+    rows.forEach(function(tr){
+      var cells = [];
+      var re = /<td[^>]*>([\s\S]*?)<\/td>/gi, m;
+      while((m = re.exec(tr)) !== null){
+        var v = String(m[1]).replace(/<[^>]*>/g, " ").replace(/&nbsp;/gi, " ")
+          .replace(/&amp;/gi, "&").replace(/&lt;/gi, "<").replace(/&gt;/gi, ">").replace(/\s+/g, " ").trim();
+        cells.push(v);
+      }
+      if(cells.length >= 2){
+        var code = cells[cells.length - 2], name = cells[cells.length - 1];
+        if(/^\d{1,6}$/.test(code) && name.indexOf("·") >= 0) found.push([parseInt(code, 10), name]);
+      }
+    });
+  }else{
+    parseCsv(t).forEach(function(r){
+      var code = "", name = "";
+      for(var i = 0; i < r.length; i++){
+        var v = str(r[i]).trim();
+        if(!code && /^\d{1,6}$/.test(v)) code = v;
+        if(!name && v.indexOf("·") >= 0) name = v;
+      }
+      if(code && name) found.push([parseInt(code, 10), name]);
+    });
+  }
+  if(!found.length){ toast("통관품목을 찾지 못했습니다 — 천조직구에서 내려받은 파일인지 확인해 주세요", "bad"); return 0; }
+  try{ localStorage.setItem("roi_tz_items", JSON.stringify(found)); }catch(e){ toast("목록이 너무 커서 저장하지 못했습니다", "bad"); return 0; }
+  renderTzView();
+  toast("통관품목 " + nf(found.length) + "건을 받아 두었습니다 — 이제 검색에 전체 목록이 나옵니다", "ok");
+  return found.length;
+}
+function tzItemCount(){
+  var n = 0;
+  try{ var raw = localStorage.getItem("roi_tz_items"); if(raw){ var a = JSON.parse(raw); n = Array.isArray(a) ? a.length : 0; } }catch(e){}
+  return n || TZ_ITEMS.length;
+}
+
+/* ---------- 신청서 화면 ---------- */
+function renderTzView(){
+  if(!hasDOM()) return;
+  var ws = document.getElementById("workspace");
+  if(!ws) return;
+  var d = state.tz;
+  var tot = tzTotals(d);
+  var issues = tzIssues(d);
+  var svcSet = {};
+  (d.services || []).forEach(function(c){ svcSet[c] = true; });
+
+  var html = '';
+  html += '<div class="phead"><div class="ttl">' +
+      '<h2>📦 천조직구 배송대행 신청서</h2>' +
+      '<div class="sub"><span>받는 사람·상품을 넣으면 39칸 엑셀로 내려받습니다</span>' +
+      '<span>상품 ' + (d.items || []).length + '건 · 수량 ' + nf(tot.qty) + ' · ￥' + nf(tot.amt) + '</span>' +
+      (issues.length ? '<span class="mini-badge mb-warn">빈 칸 ' + issues.length + '</span>' : '<span class="mini-badge mb-ok">필수 항목 채움</span>') +
+      '</div></div>' +
+      '<div class="acts">' +
+        '<button class="btn sm" data-act="tzFromProduct" title="지금 목록에서 고른 상품(체크한 상품)을 신청서 상품으로 넣습니다">현재 상품에서 채우기</button>' +
+        '<button class="btn sm" data-act="tzReset">새 신청서</button>' +
+      '</div></div>';
+
+  /* 1. 받는 사람 */
+  html += '<section class="card"><div class="card-head"><div class="ico">👤</div><h3>받는 사람</h3>' +
+    '<span class="hint">세관 신고서에 그대로 들어갑니다 — 정확히 적어 주세요</span></div>' +
+    '<div class="g3">' +
+      vField("수취인 (한글) *", 'data-tz="consKr"', d.consKr, "예: 홍길동") +
+      vField("수취인 (영문)", 'data-tz="consEn"', d.consEn, "비우면 천조직구가 자동 번역") +
+      vField("휴대폰 (숫자만) *", 'data-tz="phone"', d.phone, "01012345678") +
+    '</div>' +
+    '<div class="g3" style="margin-top:10px">' +
+      '<label class="field">통관구분<select data-tz="ctmsDvs">' +
+        '<option value="1"' + (d.ctmsDvs !== "2" ? " selected" : "") + '>개인 (개인통관고유부호)</option>' +
+        '<option value="2"' + (d.ctmsDvs === "2" ? " selected" : "") + '>사업자 (사업자번호)</option>' +
+      '</select></label>' +
+      vField(d.ctmsDvs === "2" ? "사업자번호 *" : "개인통관고유부호 (P) *", 'data-tz="personNo"', d.personNo, "P123456789") +
+      '<label class="field">관/부가세 대납<select data-tz="dutyPay">' +
+        '<option value="2"' + (d.dutyPay !== "1" ? " selected" : "") + '>사용안함</option>' +
+        '<option value="1"' + (d.dutyPay === "1" ? " selected" : "") + '>대납 사용</option>' +
+      '</select></label>' +
+    '</div>' +
+    (d.dutyPay === "1" ? '<div class="g2" style="margin-top:10px">' + vField("대납 안내 전화번호 *", 'data-tz="dutyPhone"', d.dutyPhone, "01012345678") + '</div>' : '') +
+    '<div class="g3" style="margin-top:10px">' +
+      vField("우편번호", 'data-tz="zip"', d.zip, "05676") +
+      vField("주소 (도로명) *", 'data-tz="addr"', d.addr, "서울 송파구 송파대로 372") +
+      vField("상세주소", 'data-tz="addrDet"', d.addrDet, "101호") +
+    '</div>' +
+    '<div class="g2" style="margin-top:10px">' +
+      vField("주소 (영문)", 'data-tz="addrEn"', d.addrEn, "비우면 자동 번역") +
+      vField("상세주소 (영문)", 'data-tz="addrDetEn"', d.addrDetEn, "비우면 자동 번역") +
+    '</div>' +
+    '<div class="friendly" style="margin-top:6px">천조직구는 한글 주소를 소리나는 대로 자동 번역합니다. 다르게 적히길 원하면 영문 칸을 직접 채우세요. 개인통관부호는 접수 화면에서 [유효체크]를 한 번 통과해야 저장됩니다.</div>' +
+  '</section>';
+
+  /* 2. 요청사항 · 셀러 */
+  html += '<section class="card"><div class="card-head"><div class="ico">📝</div><h3>요청사항 · 셀러 정보</h3>' +
+    '<span class="hint">물류센터가 읽는 칸입니다</span></div>' +
+    '<div class="g2">' +
+      vField("국내 택배 요청사항", 'data-tz="dlvrReq"', d.dlvrReq, "예: 부재시 경비실에 맡겨주세요", { area: true }) +
+      vField("센터(물류) 요청사항", 'data-tz="centerReq"', d.centerReq, "예: 교정증명서 원본 동봉 확인 부탁드립니다", { area: true }) +
+    '</div>' +
+    '<div class="g3" style="margin-top:10px">' +
+      vField("셀러 마켓명", 'data-tz="sellerMarketNm"', d.sellerMarketNm, "예: 쿠팡") +
+      vField("셀러 사업자번호", 'data-tz="sellerBusiNo"', d.sellerBusiNo, "000-00-00000") +
+      '<label class="field">결제 방식<select data-tz="autoPay">' +
+        '<option value="1"' + (d.autoPay !== "2" ? " selected" : "") + '>자동결제 (무게 측정 후 바로 결제)</option>' +
+        '<option value="2"' + (d.autoPay === "2" ? " selected" : "") + '>수동결제 (출고보류)</option>' +
+      '</select></label>' +
+    '</div>' +
+  '</section>';
+
+  /* 3. 상품 */
+  html += '<section class="card"><div class="card-head"><div class="ico">📦</div><h3>상품</h3>' +
+    '<span class="hint">한 신청서에 여러 상품을 넣을 수 있습니다</span>' +
+    '<div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">' +
+      '<button class="btn sm" data-act="tzAddItem">＋ 상품 추가</button>' +
+    '</div></div>';
+  html += '<div class="vtable"><div class="vhead">' +
+      '<div>#</div><div>상품명 (영문) *</div><div>통관품목 *</div><div>수량</div><div>합계￥</div>' +
+      '<div>옵션</div><div>URL</div><div>트래킹</div><div>마켓</div><div></div></div>';
+  (d.items || []).forEach(function(it, i){
+    html += '<div class="vrow">' +
+      '<div class="vno">' + (i + 1) + '</div>' +
+      '<div>' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="proNm" value="' + esc(it.proNm) + '" placeholder="예: LED desk lamp">' +
+        (it.itemName ? '<div class="tiny muted" style="margin-top:3px">세관 신고명: ' + esc(it.itemName.split("·")[1] || it.itemName) + '</div>' : '') +
+      '</div>' +
+      '<div>' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="itemSeq" value="' + esc(it.itemSeq) + '" placeholder="번호">' +
+        '<div class="tiny" style="margin-top:3px;display:flex;gap:4px;align-items:center">' +
+          '<input type="text" class="tzfind" data-tzfind="' + i + '" placeholder="통관품목 검색" style="height:24px;font-size:11px">' +
+        '</div>' +
+        '<div class="tzfindbox" id="tzfind-' + i + '"></div>' +
+      '</div>' +
+      '<div><input type="number" min="0" step="1" data-tzi="' + i + '" data-tzf="qty" value="' + num(it.qty, 0) + '"></div>' +
+      '<div><input type="number" min="0" step="0.01" data-tzi="' + i + '" data-tzf="amt" value="' + num(it.amt, 0) + '"></div>' +
+      '<div class="g2mini">' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="color" value="' + esc(it.color) + '" placeholder="색상">' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="size" value="' + esc(it.size) + '" placeholder="사이즈">' +
+      '</div>' +
+      '<div class="g2mini">' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="proUrl" value="' + esc(it.proUrl) + '" placeholder="상품 URL">' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="imgUrl" value="' + esc(it.imgUrl) + '" placeholder="이미지 URL">' +
+      '</div>' +
+      '<div><input type="text" data-tzi="' + i + '" data-tzf="trkNo" value="' + esc(it.trkNo) + '" placeholder="중국 운송장"></div>' +
+      '<div class="g2mini">' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="marketNm" value="' + esc(it.marketNm) + '" placeholder="마켓명">' +
+        '<input type="text" data-tzi="' + i + '" data-tzf="marketOrderNo" value="' + esc(it.marketOrderNo) + '" placeholder="마켓주문번호">' +
+      '</div>' +
+      '<div class="vacts">' +
+        '<button class="btn tiny" data-act="tzEnName" data-idx="' + i + '" title="상품명을 구글 번역으로 영문으로 바꿉니다">영문</button>' +
+        '<button class="btn tiny danger" data-act="tzDelItem" data-idx="' + i + '">삭제</button>' +
+      '</div>' +
+    '</div>';
+  });
+  html += '</div>';
+  html += '<div class="friendly" style="margin-top:6px">통관품목 번호를 모르면 <b>검색</b>에 한글 이름(예: 커튼, 램프)을 넣어 고르세요. 전체 4,698건은 천조직구 [통관품목 다운로드] 파일을 아래에서 한 번 넣어 두면 검색됩니다.' +
+    ' <button class="btn tiny" data-act="tzLoadItems">통관품목 전체 목록 넣기</button>' +
+    ' <span class="tiny muted">지금 ' + nf(tzItemCount()) + '건 검색 가능</span></div>';
+  html += '</section>';
+
+  /* 4. 부가서비스 */
+  html += '<section class="card"><div class="card-head"><div class="ico">🧰</div><h3>부가서비스</h3>' +
+    '<span class="hint">엑셀 AE칸에 코드가 쉼표로 들어갑니다</span></div>' +
+    '<div class="svcgrid">' +
+      TZ_SERVICES.map(function(s){
+        var on = !!svcSet[s.c];
+        return '<label class="svc' + (on ? " on" : "") + '" data-svc="' + s.c + '">' +
+          '<input type="checkbox" data-tzsvc="' + s.c + '"' + (on ? " checked" : "") + '>' +
+          '<span class="nm">' + esc(s.n) + '</span><span class="fee">' + esc(s.f) + '</span></label>';
+      }).join("") +
+    '</div>' +
+    '<div class="switchrow" style="margin-top:10px"><label class="sw"><input type="checkbox" data-tzcare="1"' + (d.care === "Y" ? " checked" : "") + '><i></i></label>' +
+      ' 천조안심케어 가입 (15만원 초과 상품 · 가입내용 확인 필요)</div>' +
+    '<div class="friendly">간이통관·사업자통관은 천조직구가 자동으로 체크하므로 넣지 않아도 됩니다. 경동택배선불(57)은 예치금 10만원 이상일 때만 됩니다.</div>' +
+  '</section>';
+
+  /* 5. 내보내기 */
+  html += '<section class="card"><div class="card-head"><div class="ico">⬇</div><h3>내려받기</h3>' +
+    '<span class="hint">천조직구 [배송대행 → 엑셀대량등록]에서 올리는 파일</span></div>' +
+    (issues.length ? '<div class="negwarn">아직 비어 있는 칸: ' + esc(issues.slice(0, 8).join(" · ")) + (issues.length > 8 ? " 외 " + (issues.length - 8) : "") + '</div>' : '') +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' +
+      '<button class="btn primary" data-act="tzExportExcel">⬇ 천조직구 엑셀 (.xlsx) 내려받기</button>' +
+      '<button class="btn" data-act="tzExportCsv">⬇ CSV로 내려받기</button>' +
+      '<button class="btn" data-act="tzExportJson">⬇ 확장 자동입력용 JSON</button>' +
+    '</div>' +
+    '<div class="notice" style="margin-top:10px;display:block">' +
+      '<b>접수는 직접 눌러 주세요.</b> 이 파일은 정보만 담습니다. 천조직구 [엑셀대량등록]에서 <b>대행신청 구분·센터·운송방식을 고르고 파일을 올린 뒤 [등록]</b>을 누르면 접수됩니다. ' +
+      '개인통관부호 유효체크와 결제는 천조직구 화면에서 하셔야 합니다.' +
+    '</div>' +
+    '<div class="friendly" style="margin-top:6px">같은 신청서의 상품은 A열 묶음번호가 같아야 합니다(지금 ' + esc(str(d.bundleNo)) + '번). 수취인이 다르면 [새 신청서]로 나눠 주세요.</div>' +
+  '</section>';
+
+  ws.innerHTML = html;
+  ws.setAttribute("data-view-rendered", "tz");
+}
+
+/* ---------- 신청서 조작 ---------- */
+function tzSet(key, val){
+  var d = state.tz;
+  if(!d) return;
+  if(["bundleNo","autoPay","ctmsDvs","dutyPay","dutyPhone","consKr","consEn","phone","zip","addr","addrDet",
+      "addrEn","addrDetEn","centerReq","dlvrReq","dlvrReqSel","sellerMarketNm","sellerBusiNo"].indexOf(key) >= 0){
+    d[key] = str(val);
+  }
+  save();
+  if(key === "ctmsDvs" || key === "dutyPay") renderTzView();
+  else tzRefreshHead();
+}
+function tzItemSet(i, key, val){
+  var it = (state.tz.items || [])[i];
+  if(!it) return;
+  if(key === "qty" || key === "amt") it[key] = num(val, 0);
+  else if(key === "itemSeq"){
+    it.itemSeq = str(val).replace(/[^0-9]/g, "");
+  }else it[key] = str(val);
+  save();
+  tzRefreshHead();
+}
+function tzRefreshHead(){
+  if(!hasDOM()) return;
+  var d = state.tz, tot = tzTotals(d), issues = tzIssues(d);
+  var head = document.querySelector(".phead .sub");
+  if(head){
+    head.innerHTML = '<span>받는 사람·상품을 넣으면 39칸 엑셀로 내려받습니다</span>' +
+      '<span>상품 ' + (d.items || []).length + '건 · 수량 ' + nf(tot.qty) + ' · ￥' + nf(tot.amt) + '</span>' +
+      (issues.length ? '<span class="mini-badge mb-warn">빈 칸 ' + issues.length + '</span>' : '<span class="mini-badge mb-ok">필수 항목 채움</span>');
+  }
+}
+function tzPickItem(idx, code){
+  var it = state.tz.items[idx];
+  if(!it) return;
+  it.itemSeq = str(code);
+  it.itemName = tzItemName(code);
+  save();
+  renderTzView();
+  toast("통관품목 " + code + "번을 골랐습니다", "ok");
+}
+function tzFindBox(idx, q){
+  var box = document.getElementById("tzfind-" + idx);
+  if(!box) return;
+  var list = tzFindItems(q, 12);
+  if(!str(q).trim()){ box.innerHTML = ""; return; }
+  if(!list.length){ box.innerHTML = '<div class="tzno">찾는 품목이 없습니다 — 통관품목 전체 목록을 넣어 보세요</div>'; return; }
+  box.innerHTML = list.map(function(x){
+    return '<div class="tzopt" data-tzpick="' + idx + ':' + x.code + '"><b>' + x.code + '</b> ' + esc(x.name) + '</div>';
+  }).join("");
+}
+function tzAddItem(){
+  state.tz.items.push(blankTzItem());
+  save();
+  renderTzView();
+}
+function tzDelItem(i){
+  if((state.tz.items || []).length <= 1){ toast("상품은 1건 이상 있어야 합니다", "bad"); return; }
+  state.tz.items.splice(i, 1);
+  save();
+  renderTzView();
+}
+function tzReset(){
+  if(!confirm("신청서 내용을 모두 지우고 새로 시작할까요?")) return;
+  state.tz = blankTz();
+  save();
+  renderTzView();
+  toast("새 신청서를 열었습니다", "ok");
+}
+/* 로이창고 상품의 원가를 천조직구 ￥ 금액으로 (원화·엔화는 위안 환율로 나눔) */
+function priceToCny(p){
+  var c = num(p.cost, 0);
+  if(p.currency === "CNY") return Math.round(c * 100) / 100;
+  var rate = Math.max(1, num(state.settings.rateCNY, 223));
+  return Math.round((c * rateOf(p)) / rate * 100) / 100;
+}
+/* 지금 고른(없으면 체크한) 상품을 신청서 상품으로 */
+function tzFromProduct(){
+  var list = selectionHas()
+    ? state.products.filter(function(p){ return selection[p.id]; })
+    : (current() ? [current()] : []);
+  if(!list.length){ toast("목록에서 상품을 먼저 고르거나 체크해 주세요", "bad"); return; }
+  var d = state.tz;
+  if((d.items || []).length === 1 && !str(d.items[0].proNm).trim() && !str(d.items[0].itemSeq).trim()) d.items = [];
+  list.forEach(function(p){
+    var amt = priceToCny(p);
+    d.items.push(normTzItem({
+      shopSite: p.currency === "JPY" ? "www.rakuten.co.jp" : (p.currency === "KRW" ? "" : "www.taobao.com"),
+      brand: str(p.attrs && p.attrs.brand),
+      proNm: /^[\x20-\x7e]+$/.test(str(p.name)) ? str(p.name) : "",
+      amt: amt,
+      qty: 1,
+      color: "", size: "",
+      proUrl: str(p.url),
+      imgUrl: str(p.imageUrl),
+      marketNm: "", marketOrderNo: ""
+    }));
+  });
+  save();
+  renderTzView();
+  toast(list.length + "개 상품을 신청서에 넣었습니다 — 영문 상품명·통관품목을 확인해 주세요", "ok");
+}
+/* 상품명 → 영문 (구글 번역, 실패하면 그대로) */
+var TRANS_EN_EP = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=";
+function toEnglish(text){
+  var src = str(text).trim();
+  if(!src) return Promise.resolve("");
+  if(/^[\x20-\x7e]+$/.test(src)) return Promise.resolve(src);
+  if(typeof fetch !== "function") return Promise.resolve(src);
+  var url = TRANS_EN_EP + encodeURIComponent(src);
+  return fetch(url).then(function(r){ return r.text(); }).then(function(t){
+    var j = JSON.parse(t);
+    var segs = (j && j[0]) || [];
+    var out = segs.map(function(s){ return str(s && s[0]); }).join("").replace(/\s+/g, " ").trim();
+    return out ? out.replace(/[^A-Za-z0-9 .,'/&()\-]/g, "").trim() : src;
+  }).catch(function(){ return src; });
+}
+function tzEnName(i){
+  var it = state.tz.items[i];
+  if(!it) return;
+  var src = str(it.proNm) || str(it.itemName) || "";
+  if(!src){ toast("상품명을 먼저 적어 주세요", "bad"); return; }
+  toast("영문으로 바꾸는 중...");
+  toEnglish(src).then(function(en){
+    if(!str(en).trim()){ toast("영문으로 바꾸지 못했습니다 — 직접 적어 주세요", "bad"); return; }
+    it.proNm = truncChars(en, 80);
+    save();
+    renderTzView();
+    toast("영문 상품명: " + it.proNm, "ok");
+  });
+}
+
+/* =========================================================
+   12-7. 국내 위탁 (온채널 · 오너클랜 · 도매매)
+   ========================================================= */
+function domesticCalc(d){
+  var cost = num(d.cost, 0), ship = num(d.ship, 0);
+  var fee = num(d.fee, state.settings.domesticFee);
+  var margin = num(d.margin, state.settings.margin);
+  var denom = 1 - fee / 100 - margin / 100;
+  if(denom < 0.05) denom = 0.05;
+  var suggested = roundUnit((cost + ship) / denom);
+  var net = suggested * (1 - fee / 100) - cost - ship;
+  return {
+    cost: cost, ship: ship, fee: fee, margin: margin,
+    total: cost + ship, suggested: suggested, net: net,
+    marginPct: suggested > 0 ? (net / suggested) * 100 : 0
+  };
+}
+function domesticStats(list){
+  var n = 0, sum = 0, out = 0, sold = 0;
+  (list || []).forEach(function(d){
+    var c = domesticCalc(d);
+    n++;
+    sum += c.marginPct;
+    if(num(d.cost, 0) <= 0) out++;
+    if(num(d.stock, 0) <= 0) sold++;
+  });
+  return { n: n, avgMargin: n ? sum / n : 0, noCost: out, soldOut: sold };
+}
+function renderDomesticView(){
+  if(!hasDOM()) return;
+  var ws = document.getElementById("workspace");
+  if(!ws) return;
+  var list = state.domestic || [];
+  var st = domesticStats(list);
+  var html = '';
+  html += '<div class="phead"><div class="ttl">' +
+      '<h2>🏠 국내 위탁 모드</h2>' +
+      '<div class="sub"><span>원화 도매가 + 국내 택배비 + 마켓 수수료 + 목표 마진</span>' +
+        '<span>환율·해외배대지 계산은 쓰지 않습니다</span>' +
+        '<span>상품 ' + st.n + '건 · 평균 마진 ' + st.avgMargin.toFixed(1) + '%</span>' +
+        (st.soldOut ? '<span class="mini-badge mb-risk">품절 ' + st.soldOut + '</span>' : '') +
+        (st.noCost ? '<span class="mini-badge mb-warn">도매가 없음 ' + st.noCost + '</span>' : '') +
+      '</div></div>' +
+      '<div class="acts">' +
+        '<button class="btn sm" data-act="domesticAdd">＋ 직접 추가</button>' +
+        '<button class="btn sm primary" data-act="domesticImport">⬆ 상품 불러오기 (CSV/JSON)</button>' +
+      '</div></div>';
+
+  html += '<section class="card"><div class="card-head"><div class="ico">🏷️</div><h3>도매 상품과 계산</h3>' +
+    '<span class="hint">칸을 고치면 바로 다시 계산합니다</span></div>';
+  if(!list.length){
+    html += '<div class="empty" style="border:0;background:transparent"><div class="big">🏠</div>' +
+      '<div style="font-weight:700;color:#4b5573">아직 국내 위탁 상품이 없습니다</div>' +
+      '<div class="tiny">온채널·오너클랜·도매매에서 내려받은 CSV/엑셀을 [상품 불러오기]로 넣거나, 수집기 확장으로 상품 페이지에서 담아 오세요.</div></div>';
+  }else{
+    html += '<div class="vtable dom"><div class="vhead">' +
+      '<div>공급사</div><div>상품명</div><div>도매가</div><div>국내택배</div><div>수수료%</div>' +
+      '<div>목표마진%</div><div>추천 판매가</div><div>남는 돈</div><div>재고</div><div></div></div>';
+    list.forEach(function(d, i){
+      var c = domesticCalc(d);
+      var flags = [];
+      if(num(d.stock, 0) <= 0) flags.push('<span class="mini-badge mb-risk">품절</span>');
+      if(num(d.cost, 0) <= 0) flags.push('<span class="mini-badge mb-warn">도매가</span>');
+      if(c.net <= 0) flags.push('<span class="mini-badge mb-risk">역마진</span>');
+      html += '<div class="vrow" data-domrow="' + i + '">' +
+        '<div><select data-domi="' + i + '" data-domf="supplier">' +
+          DOMESTIC_SOURCES.map(function(s){
+            return '<option value="' + esc(s.v) + '"' + (d.supplier === s.v ? " selected" : "") + '>' + esc(s.label) + '</option>';
+          }).join("") + '</select></div>' +
+        '<div><input type="text" data-domi="' + i + '" data-domf="name" value="' + esc(d.name) + '" placeholder="상품명">' +
+          (flags.length ? '<div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap">' + flags.join("") + '</div>' : '') + '</div>' +
+        '<div><input type="number" min="0" step="100" data-domi="' + i + '" data-domf="cost" value="' + num(d.cost, 0) + '"></div>' +
+        '<div><input type="number" min="0" step="100" data-domi="' + i + '" data-domf="ship" value="' + num(d.ship, 0) + '"></div>' +
+        '<div><input type="number" min="0" max="30" step="0.1" data-domi="' + i + '" data-domf="fee" value="' + num(d.fee, 0) + '"></div>' +
+        '<div><input type="number" min="0" max="80" step="0.5" data-domi="' + i + '" data-domf="margin" value="' + num(d.margin, 0) + '"></div>' +
+        '<div class="num"><b id="domprice-' + i + '">' + won(c.suggested) + '</b></div>' +
+        '<div class="num ' + (c.net > 0 ? "ok" : "bad") + '" id="domnet-' + i + '">' + won(c.net) + '<div class="tiny muted">' + c.marginPct.toFixed(1) + '%</div></div>' +
+        '<div><input type="number" min="0" step="1" data-domi="' + i + '" data-domf="stock" value="' + num(d.stock, 0) + '"></div>' +
+        '<div class="vacts">' +
+          '<button class="btn tiny" data-act="domesticLowest" data-idx="' + i + '" title="네이버 최저가를 새 창에서 봅니다">최저가</button>' +
+          '<button class="btn tiny" data-act="domesticToProduct" data-idx="' + i + '" title="로이창고 상품 작업으로 보내 스마트스토어 내보내기에 씁니다">상품으로</button>' +
+          '<button class="btn tiny danger" data-act="domesticDel" data-idx="' + i + '">삭제</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    html += '<div class="domfoot">도매 합계 <b>' + won(list.reduce(function(a, d){ return a + num(d.cost, 0) + num(d.ship, 0); }, 0)) + '</b>' +
+      ' · 추천 판매가 합계 <b>' + won(list.reduce(function(a, d){ return a + domesticCalc(d).suggested; }, 0)) + '</b>' +
+      ' <button class="btn tiny" data-act="domesticExport" style="margin-left:auto">⬇ 국내 위탁 목록 CSV</button></div>';
+  }
+  html += '</section>';
+
+  html += '<section class="card"><div class="card-head"><div class="ico">⚠️</div><h3>국내 위탁 — 올리기 전에 꼭 볼 것</h3></div>' +
+    '<ul class="caution">' +
+      '<li><b>품절·가격은 내 것이 아닙니다.</b> 온채널·오너클랜·도매매의 재고와 도매가는 공급사가 수시로 바꿉니다. 업로드 전과 판매 중 주기적으로 재확인하고, 품절이면 마켓에서 직접 품절 처리하세요.</li>' +
+      '<li><b>최저가 경쟁.</b> 네이버쇼핑은 같은 상품의 최저가와 비교해 노출이 정해집니다. [최저가] 버튼으로 지금 시장가를 보고, 남는 돈이 마이너스면 올리지 마세요.</li>' +
+      '<li><b>배송비 조건.</b> 공급사가 무료배송인지, 조건부 무료인지 확인해 판매가에 반영하세요. 착불이면 그대로 손해가 됩니다.</li>' +
+      '<li><b>상품명·이미지 권리.</b> 공급사가 제공한 이미지의 사용 조건(가공 금지 등)을 확인하고, 브랜드 이름은 빼고 올리세요.</li>' +
+      '<li><b>반품·교환 주소.</b> 고객 반품이 공급사로 가는지, 내 주소로 오는지 미리 정해 두세요. 다르면 반품비가 두 번 나갑니다.</li>' +
+      '<li><b>표시 의무.</b> 원산지·제조자·A/S 안내는 공급사 정보 기준으로 넣고, KC 인증 대상이면 인증번호를 확인하세요.</li>' +
+    '</ul>' +
+    '<div class="friendly" style="margin-top:8px">같은 상품을 여러 마켓에 올릴 때는 마켓별 수수료(보통 3~6%)를 각각 넣어 계산하세요. 계산식: (도매가 + 국내택배) ÷ (1 − 수수료% − 목표마진%).</div>' +
+  '</section>';
+
+  ws.innerHTML = html;
+  ws.setAttribute("data-view-rendered", "domestic");
+}
+function domesticRefreshRow(i){
+  var d = (state.domestic || [])[i];
+  if(!d || !hasDOM()) return;
+  var c = domesticCalc(d);
+  var price = document.getElementById("domprice-" + i);
+  if(price) price.textContent = won(c.suggested);
+  var net = document.getElementById("domnet-" + i);
+  if(net){
+    net.className = "num " + (c.net > 0 ? "ok" : "bad");
+    net.innerHTML = won(c.net) + '<div class="tiny muted">' + c.marginPct.toFixed(1) + '%</div>';
+  }
+}
+function taxRefreshRow(i){
+  var r = (state.tax.rows || [])[i];
+  if(!r || !hasDOM()) return;
+  var el = document.getElementById("taxnet-" + i);
+  if(el){
+    var net = taxNet(r);
+    el.className = "num " + (net >= 0 ? "ok" : "bad");
+    el.innerHTML = "<b>" + won(net) + "</b>";
+  }
+}
+function domesticSet(i, key, val){
+  var d = (state.domestic || [])[i];
+  if(!d) return;
+  if(["cost","ship","fee","margin","stock"].indexOf(key) >= 0) d[key] = num(val, 0);
+  else if(key === "supplier") d.supplier = domesticLabel(val);
+  else d[key] = str(val);
+  d.updatedAt = Date.now();
+  save();
+}
+function domesticAdd(){
+  state.domestic.unshift(normDomestic(blankDomestic()));
+  save();
+  renderDomesticView();
+}
+function domesticDel(i){
+  var d = (state.domestic || [])[i];
+  if(!d) return;
+  if(!confirm("'" + (d.name || "이 상품") + "'을(를) 국내 위탁 목록에서 지울까요?")) return;
+  state.domestic.splice(i, 1);
+  save();
+  renderDomesticView();
+}
+function domesticLowest(i){
+  var d = (state.domestic || [])[i];
+  if(!d) return;
+  var q = str(d.name).trim() || str(d.code).trim();
+  if(!q){ toast("상품명을 먼저 적어 주세요", "bad"); return; }
+  var url = "https://search.shopping.naver.com/search/all?query=" + encodeURIComponent(q);
+  try{ window.open(url, "_blank", "noopener"); }catch(e){}
+  toast("네이버 최저가 검색을 새 창으로 열었습니다", "ok");
+}
+function domesticToProduct(i){
+  var d = (state.domestic || [])[i];
+  if(!d) return;
+  var p = normProduct({
+    id: uid(), source: d.supplier, name: d.name, origTitle: "", category: "",
+    currency: "KRW", rate: 1, cost: d.cost, weightKg: 0,
+    shipMode: "domestic", domesticShip: d.ship,
+    marginRate: d.margin, feeRate: d.fee, priceAuto: true,
+    stock: d.stock, imageUrl: d.img, url: d.url,
+    attrs: { origin: "대한민국", brand: "", material: "", model: "", cert: "해당없음" },
+    memo: "국내 위탁(" + d.supplier + ")" + (d.code ? " · 공급사코드 " + d.code : ""),
+    updatedAt: Date.now()
+  });
+  state.products.unshift(p);
+  state.selectedId = p.id;
+  save();
+  setView("products");
+  toast("'" + (d.name || "상품") + "'을 상품 작업으로 보냈습니다 — 스마트스토어 내보내기를 쓸 수 있습니다", "ok");
+}
+function domesticExport(){
+  var list = state.domestic || [];
+  if(!list.length){ toast("내보낼 상품이 없습니다", "bad"); return; }
+  var head = ["공급사","상품코드","상품명","도매가","국내택배비","수수료%","목표마진%","추천판매가","남는돈","재고","상품URL","메모"];
+  var rows = list.map(function(d){
+    var c = domesticCalc(d);
+    return [d.supplier, d.code, d.name, Math.round(c.cost), Math.round(c.ship), c.fee, c.margin, c.suggested, Math.round(c.net), num(d.stock,0), d.url, d.memo];
+  });
+  download(buildTableCsv(head, rows), "국내위탁_목록_" + stamp() + ".csv", "text/csv;charset=utf-8");
+  toast("국내 위탁 목록 " + list.length + "건을 내보냈습니다", "ok");
+}
+
+/* 국내 위탁 상품 불러오기 — CSV / JSON(수집기) 둘 다 */
+function domesticFromCollected(e){
+  var src = domesticLabel(str(e.source || e.site || e.supplier || ""));
+  var name = str(e.name || e.originalTitle || e.title || "");
+  var cost = num(e.cost, 0) || num(e.price, 0) || num(e.wholesale, 0);
+  return normDomestic({
+    id: str(e.id) || uid(),
+    supplier: src,
+    name: name,
+    code: str(e.code || e.productCode || e.percentyId),
+    cost: cost,
+    ship: num(e.shippingFee, num(e.ship, 0)),
+    fee: num(e.fee, state.settings.domesticFee),
+    margin: num(e.margin, state.settings.margin),
+    stock: num(e.stock, 0),
+    url: str(e.url || e.productUrl || e.link),
+    img: str(e.imageUrl || e.thumbnail),
+    memo: str(e.memo),
+    updatedAt: Date.now()
+  });
+}
+function domesticImportText(text, filename){
+  var s = String(text || "").replace(/^\uFEFF/, "").trim();
+  if(!s) return 0;
+  var list = [];
+  var isJson = /\.json$/i.test(str(filename)) || /^[\[{]/.test(s);
+  if(isJson){
+    try{
+      var data = JSON.parse(s);
+      var arr = Array.isArray(data) ? data : (data.products || data.items || data.data || []);
+      list = arr.map(domesticFromCollected).filter(function(d){ return d && (d.name || d.cost); });
+    }catch(e){ toast("JSON을 읽지 못했습니다", "bad"); return 0; }
+  }else{
+    var rows = parseCsv(s);
+    if(rows.length < 2){ toast("CSV에 상품이 없습니다", "bad"); return 0; }
+    var head = rows[0].map(normKey);
+    function col(){
+      for(var a = 0; a < arguments.length; a++){
+        var idx = head.indexOf(normKey(arguments[a]));
+        if(idx >= 0) return idx;
+      }
+      return -1;
+    }
+    var ic = {
+      name: col("상품명","상품명노출","name","productname","품명"),
+      code: col("상품코드","공급사코드","자체상품코드","code","상품번호"),
+      cost: col("도매가","공급가","공급가격","매입가","원가","도매금액","도매가격","price"),
+      ship: col("배송비","택배비","국내배송비","shippingfee"),
+      stock: col("재고","재고수량","stock","quantity"),
+      supplier: col("공급사","사이트","마켓","supplier"),
+      url: col("상품url","상품주소","url","link"),
+      img: col("이미지","이미지url","썸네일","image","imageurl"),
+      memo: col("메모","비고","memo")
+    };
+    if(ic.name < 0){ toast("상품명 열을 찾지 못했습니다 (상품명/품명/name)", "bad"); return 0; }
+    rows.slice(1).forEach(function(r){
+      function g(k){ return ic[k] >= 0 ? str(r[ic[k]]).trim() : ""; }
+      var nm = g("name");
+      if(!nm) return;
+      list.push(normDomestic({
+        id: uid(), supplier: g("supplier") || "온채널", name: nm, code: g("code"),
+        cost: num(String(g("cost")).replace(/[^\d.\-]/g, ""), 0),
+        ship: num(String(g("ship")).replace(/[^\d.\-]/g, ""), 0),
+        stock: num(String(g("stock")).replace(/[^\d.\-]/g, ""), 0),
+        url: g("url"), img: g("img"), memo: g("memo"),
+        updatedAt: Date.now()
+      }));
+    });
+  }
+  if(!list.length){ toast("불러올 상품이 없습니다 — 열 이름을 확인해 주세요", "bad"); return 0; }
+  var added = 0;
+  list.forEach(function(d){
+    var hit = null;
+    for(var i = 0; i < state.domestic.length; i++){
+      var q = state.domestic[i];
+      if(d.code && q.code && q.code === d.code){ hit = q; break; }
+      if(d.name && q.name === d.name && q.supplier === d.supplier){ hit = q; break; }
+    }
+    if(hit){
+      d.id = hit.id;
+      state.domestic[state.domestic.indexOf(hit)] = d;
+    }else{
+      state.domestic.unshift(d); added++;
+    }
+  });
+  save();
+  renderDomesticView();
+  toast("국내 위탁 상품 " + list.length + "건을 불러왔습니다 (새 상품 " + added + "건)", "ok");
+  return list.length;
+}
+
+/* =========================================================
+   12-8. 세무 장부 (홈택스 소명·신고용)
+   ========================================================= */
+function taxNet(r){
+  return num(r.sale, 0) - num(r.cost, 0) - num(r.ship, 0) - num(r.fee, 0) - num(r.etc, 0);
+}
+function taxSummary(list){
+  var s = { n: 0, sale: 0, cost: 0, ship: 0, fee: 0, etc: 0, net: 0 };
+  (list || []).forEach(function(r){
+    s.n++;
+    s.sale += num(r.sale, 0); s.cost += num(r.cost, 0); s.ship += num(r.ship, 0);
+    s.fee += num(r.fee, 0); s.etc += num(r.etc, 0); s.net += taxNet(r);
+  });
+  s.marginPct = s.sale > 0 ? (s.net / s.sale) * 100 : 0;
+  // 참고용 부가세 (일반과세자·세금계산서 수취 가정)
+  s.vatSale = Math.round(s.sale * 10 / 110);
+  s.vatBuy = Math.round((s.cost + s.ship + s.fee + s.etc) * 10 / 110);
+  s.vatDue = s.vatSale - s.vatBuy;
+  return s;
+}
+function taxMonth(r){
+  var m = str(r.date).match(/^(\d{4})-(\d{2})/);
+  return m ? (m[1] + "-" + m[2]) : "날짜없음";
+}
+function taxMonthly(list){
+  var map = {}, out = [];
+  (list || []).forEach(function(r){
+    var k = taxMonth(r);
+    if(!map[k]) map[k] = { month: k, n: 0, sale: 0, cost: 0, ship: 0, fee: 0, etc: 0, net: 0 };
+    var m = map[k];
+    m.n++; m.sale += num(r.sale, 0); m.cost += num(r.cost, 0); m.ship += num(r.ship, 0);
+    m.fee += num(r.fee, 0); m.etc += num(r.etc, 0); m.net += taxNet(r);
+  });
+  Object.keys(map).sort().forEach(function(k){ out.push(map[k]); });
+  return out;
+}
+function renderTaxView(){
+  if(!hasDOM()) return;
+  var ws = document.getElementById("workspace");
+  if(!ws) return;
+  var list = state.tax.rows || [];
+  var s = taxSummary(list);
+  var html = '';
+  html += '<div class="phead"><div class="ttl">' +
+      '<h2>🧾 세무 장부</h2>' +
+      '<div class="sub"><span>판매금액 − 원가 − 배송비 − 마켓수수료 = 구매대행 순수익</span>' +
+        '<span>' + s.n + '건 · 매출 ' + won(s.sale) + ' · 순수익 ' + won(s.net) + '</span>' +
+      '</div></div>' +
+      '<div class="acts">' +
+        '<button class="btn sm" data-act="taxAdd">＋ 주문 추가</button>' +
+        '<button class="btn sm" data-act="taxFromProducts" title="지금 상품 목록의 판매가·원가·배송비로 예상 장부를 만듭니다">현재 상품으로 예상 장부</button>' +
+        '<button class="btn sm primary" data-act="taxExportCsv">⬇ 홈택스 정산 CSV</button>' +
+        '<button class="btn sm" data-act="taxExportExcel">⬇ 엑셀</button>' +
+      '</div></div>';
+
+  html += '<section class="card"><div class="card-head"><div class="ico">📊</div><h3>합계</h3>' +
+    '<span class="hint">신고 전 세무사 확인용</span></div>' +
+    '<div class="metrics" style="grid-template-columns:repeat(4,minmax(0,1fr))">' +
+      '<div class="metric"><div class="lab">매출 합계</div><div class="val">' + won(s.sale) + '</div></div>' +
+      '<div class="metric"><div class="lab">매입(원가)</div><div class="val">' + won(s.cost) + '</div></div>' +
+      '<div class="metric"><div class="lab">배송비</div><div class="val">' + won(s.ship) + '</div></div>' +
+      '<div class="metric"><div class="lab">마켓 수수료</div><div class="val">' + won(s.fee) + '</div></div>' +
+      '<div class="metric"><div class="lab">기타 비용</div><div class="val">' + won(s.etc) + '</div></div>' +
+      '<div class="metric"><div class="lab">순수익 (과세표준)</div><div class="val ' + (s.net >= 0 ? "ok" : "bad") + '">' + won(s.net) + '</div></div>' +
+      '<div class="metric"><div class="lab">남는 비율</div><div class="val">' + s.marginPct.toFixed(1) + '%</div></div>' +
+      '<div class="metric"><div class="lab">부가세 참고 (납부예상)</div><div class="val">' + won(s.vatDue) + '</div></div>' +
+    '</div>' +
+    '<div class="notice" style="margin-top:10px;display:block">부가세 참고값은 <b>일반과세자·세금계산서 수취</b>를 가정한 단순 계산(매출×10/110 − 매입×10/110)입니다. 구매대행은 직수입·위탁·영세율 적용에 따라 달라지므로 <b>신고 전 세무사 확인이 꼭 필요합니다.</b> 이 장부는 근거 자료 정리용입니다.</div>' +
+  '</section>';
+
+  html += '<section class="card"><div class="card-head"><div class="ico">📄</div><h3>주문별 장부</h3>' +
+    '<span class="hint">CSV로 불러오면 주문관리 엑셀도 그대로 쓸 수 있습니다</span>' +
+    '<div style="margin-left:auto"><button class="btn sm" data-act="taxImport">⬆ 주문 CSV/JSON 불러오기</button></div></div>';
+  if(!list.length){
+    html += '<div class="empty" style="border:0;background:transparent"><div class="big">🧾</div>' +
+      '<div style="font-weight:700;color:#4b5573">아직 장부가 비어 있습니다</div>' +
+      '<div class="tiny">[현재 상품으로 예상 장부]를 누르면 지금 상품 목록의 판매가·원가·배송비로 한 줄씩 만들어 둡니다. 실제 주문이 생기면 [주문 추가]로 채우세요.</div></div>';
+  }else{
+    html += '<div class="vtable tax"><div class="vhead">' +
+      '<div>주문일</div><div>마켓</div><div>주문번호</div><div>상품명</div>' +
+      '<div>판매금액</div><div>원가</div><div>배송비</div><div>수수료</div><div>기타</div><div>순수익</div><div></div></div>';
+    list.forEach(function(r, i){
+      var net = taxNet(r);
+      html += '<div class="vrow">' +
+        '<div><input type="text" data-taxi="' + i + '" data-taxf="date" value="' + esc(r.date) + '" placeholder="2026-11-21"></div>' +
+        '<div><input type="text" data-taxi="' + i + '" data-taxf="market" value="' + esc(r.market) + '" placeholder="스마트스토어"></div>' +
+        '<div><input type="text" data-taxi="' + i + '" data-taxf="orderNo" value="' + esc(r.orderNo) + '" placeholder="주문번호"></div>' +
+        '<div><input type="text" data-taxi="' + i + '" data-taxf="name" value="' + esc(r.name) + '" placeholder="상품명"></div>' +
+        '<div><input type="number" min="0" step="1" data-taxi="' + i + '" data-taxf="sale" value="' + num(r.sale, 0) + '"></div>' +
+        '<div><input type="number" min="0" step="1" data-taxi="' + i + '" data-taxf="cost" value="' + num(r.cost, 0) + '"></div>' +
+        '<div><input type="number" min="0" step="1" data-taxi="' + i + '" data-taxf="ship" value="' + num(r.ship, 0) + '"></div>' +
+        '<div><input type="number" min="0" step="1" data-taxi="' + i + '" data-taxf="fee" value="' + num(r.fee, 0) + '"></div>' +
+        '<div><input type="number" min="0" step="1" data-taxi="' + i + '" data-taxf="etc" value="' + num(r.etc, 0) + '"></div>' +
+        '<div class="num ' + (net >= 0 ? "ok" : "bad") + '" id="taxnet-' + i + '"><b>' + won(net) + '</b></div>' +
+        '<div class="vacts"><button class="btn tiny" data-act="taxDel" data-idx="' + i + '">삭제</button></div>' +
+      '</div>';
+    });
+    html += '</div>';
+    html += '<div class="domfoot">순수익 합계 <b>' + won(s.net) + '</b> · 마진 ' + s.marginPct.toFixed(1) + '%' +
+      ' <button class="btn tiny danger" data-act="taxClear" style="margin-left:auto">장부 비우기</button></div>';
+  }
+  html += '</section>';
+
+  if(list.length){
+    var months = taxMonthly(list);
+    html += '<section class="card"><div class="card-head"><div class="ico">📅</div><h3>월별 요약</h3></div>' +
+      '<div class="vtable month"><div class="vhead"><div>기간</div><div>건수</div><div>매출</div><div>매입</div><div>배송비</div><div>수수료</div><div>순수익</div></div>' +
+      months.map(function(m){
+        return '<div class="vrow"><div>' + esc(m.month) + '</div><div>' + m.n + '</div><div class="num">' + won(m.sale) + '</div>' +
+          '<div class="num">' + won(m.cost) + '</div><div class="num">' + won(m.ship) + '</div>' +
+          '<div class="num">' + won(m.fee) + '</div><div class="num ' + (m.net >= 0 ? "ok" : "bad") + '">' + won(m.net) + '</div></div>';
+      }).join("") + '</div></section>';
+  }
+
+  ws.innerHTML = html;
+  ws.setAttribute("data-view-rendered", "tax");
+}
+function taxSet(i, key, val){
+  var r = (state.tax.rows || [])[i];
+  if(!r) return;
+  if(["sale","cost","ship","fee","etc"].indexOf(key) >= 0) r[key] = num(val, 0);
+  else r[key] = str(val);
+  save();
+}
+function taxAdd(){
+  state.tax.rows.unshift(blankTaxRow());
+  save();
+  renderTaxView();
+}
+function taxDel(i){
+  state.tax.rows.splice(i, 1);
+  save();
+  renderTaxView();
+}
+function taxClear(){
+  if(!(state.tax.rows || []).length) return;
+  if(!confirm("장부 " + state.tax.rows.length + "건을 모두 지울까요? 되돌릴 수 없습니다.")) return;
+  state.tax.rows = [];
+  save();
+  renderTaxView();
+}
+/* 지금 상품 목록으로 예상 장부 */
+function taxFromProducts(){
+  var list = (selectionHas() ? state.products.filter(function(p){ return selection[p.id]; }) : state.products)
+    .filter(function(p){ return !p.excluded; });
+  if(!list.length){ toast("상품이 없습니다 — 먼저 상품을 불러와 주세요", "bad"); return; }
+  var d = new Date();
+  var today = d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate());
+  list.forEach(function(p){
+    var c = calc(p);
+    if(!(c.price > 0)) return;
+    state.tax.rows.unshift(normTaxRow({
+      date: today, market: "", orderNo: "", name: p.name,
+      sale: Math.round(c.price), cost: Math.round(c.costKrw),
+      ship: Math.round(c.ship), fee: Math.round(c.feeAmt), etc: 0,
+      memo: "예상 " + p.source
+    }));
+  });
+  save();
+  renderTaxView();
+  toast("상품 " + list.length + "건으로 예상 장부를 만들었습니다 — 실제 주문 금액으로 고쳐 주세요", "ok");
+}
+function taxImportText(text, filename){
+  var s = String(text || "").replace(/^\uFEFF/, "").trim();
+  if(!s) return 0;
+  var rows = parseCsv(s);
+  if(rows.length < 2){ toast("행이 없습니다", "bad"); return 0; }
+  var head = rows[0].map(normKey);
+  function col(){
+    for(var a = 0; a < arguments.length; a++){
+      var idx = head.indexOf(normKey(arguments[a]));
+      if(idx >= 0) return idx;
+    }
+    return -1;
+  }
+  var ic = {
+    date: col("주문일","주문일자","날짜","date","결제일"),
+    market: col("마켓","판매처","사이트","market"),
+    orderNo: col("주문번호","주문번호주문번호","orderno","주문id","묶음번호"),
+    name: col("상품명","품명","name","productname"),
+    sale: col("판매금액","판매가","결제금액","매출","sale"),
+    cost: col("원가","매입","매입가","사입가","cost"),
+    ship: col("배송비","해외배송비","배대지비","국제배송비","shipping"),
+    fee: col("수수료","마켓수수료","판매수수료","fee"),
+    etc: col("기타","기타비용","부대비용","etc"),
+    memo: col("메모","비고","memo")
+  };
+  if(ic.name < 0 && ic.sale < 0){ toast("상품명·판매금액 열을 찾지 못했습니다", "bad"); return 0; }
+  var n = 0;
+  rows.slice(1).forEach(function(r){
+    function g(k){ return ic[k] >= 0 ? str(r[ic[k]]).trim() : ""; }
+    function m(k){ return num(String(g(k)).replace(/[^\d.\-]/g, ""), 0); }
+    var row = normTaxRow({
+      date: g("date"), market: g("market"), orderNo: g("orderNo"), name: g("name"),
+      sale: m("sale"), cost: m("cost"), ship: m("ship"), fee: m("fee"), etc: m("etc"), memo: g("memo")
+    });
+    if(!row.name && !row.sale) return;
+    state.tax.rows.push(row); n++;
+  });
+  if(!n){ toast("넣을 주문이 없습니다", "bad"); return 0; }
+  save();
+  renderTaxView();
+  toast("주문 " + n + "건을 장부에 넣었습니다", "ok");
+  return n;
+}
+var TAX_HEAD = ["주문일","마켓","주문번호","상품명","판매금액","원가(매입)","배송비","마켓수수료","기타비용","순수익(과세표준)","남는비율%","메모"];
+function taxRows(list){
+  return (list || []).map(function(r){
+    var net = taxNet(r);
+    return [r.date, r.market, r.orderNo, r.name, Math.round(num(r.sale,0)), Math.round(num(r.cost,0)),
+      Math.round(num(r.ship,0)), Math.round(num(r.fee,0)), Math.round(num(r.etc,0)),
+      Math.round(net), num(r.sale,0) > 0 ? Math.round(net / num(r.sale,0) * 1000) / 10 : 0, r.memo];
+  });
+}
+function taxCsvText(list){
+  list = list || state.tax.rows || [];
+  if(!list.length) return "";
+  var head = TAX_HEAD;
+  var rows = taxRows(list);
+  var s = taxSummary(list);
+  var sumRows = [
+    [],
+    ["합계", "", "", "매출", s.sale, "매입원가", s.cost, "배송비", s.ship],
+    ["", "", "", "마켓수수료", s.fee, "기타비용", s.etc, "순수익(과세표준)", s.net],
+    ["", "", "", "부가세 참고 매출세액", s.vatSale, "매입세액", s.vatBuy, "납부예상", s.vatDue]
+  ];
+  var months = taxMonthly(list);
+  var monthRows = [["기간","건수","매출","매입","배송비","수수료","기타","순수익"]].concat(
+    months.map(function(m){ return [m.month, m.n, Math.round(m.sale), Math.round(m.cost), Math.round(m.ship), Math.round(m.fee), Math.round(m.etc), Math.round(m.net)]; })
+  );
+  var monthHead = ["기간","건수","매출","매입","배송비","수수료","기타","순수익"];
+  var outRows = rows.concat([[]], [["[합계]"]],
+    [["매출 합계", s.sale, "매입(원가)", s.cost, "배송비", s.ship, "마켓수수료", s.fee, "기타", s.etc]],
+    [["순수익(과세표준)", s.net, "남는비율%", Math.round(s.marginPct * 10) / 10, "부가세 참고 납부예상", s.vatDue]],
+    [[]], [["[월별 요약]"]], [monthHead],
+    months.map(function(m){ return [m.month, m.n, Math.round(m.sale), Math.round(m.cost), Math.round(m.ship), Math.round(m.fee), Math.round(m.etc), Math.round(m.net)]; })
+  );
+  var flat = [];
+  outRows.forEach(function(r){ if(Array.isArray(r) && r.length && Array.isArray(r[0])) r.forEach(function(x){ flat.push(x); }); else flat.push(r); });
+  return buildTableCsv(head, flat);
+}
+function taxExport(kind){
+  var list = state.tax.rows || [];
+  if(!list.length){ toast("장부가 비어 있습니다", "bad"); return; }
+  if(kind === "xlsx"){
+    var s = taxSummary(list);
+    var sumRows = [
+      [],
+      ["합계", "", "", "매출", s.sale, "매입원가", s.cost, "배송비", s.ship],
+      ["", "", "", "마켓수수료", s.fee, "기타비용", s.etc, "순수익(과세표준)", s.net],
+      ["", "", "", "부가세 참고 매출세액", s.vatSale, "매입세액", s.vatBuy, "납부예상", s.vatDue]
+    ];
+    var months = taxMonthly(list);
+    var monthRows = [["기간","건수","매출","매입","배송비","수수료","기타","순수익"]].concat(
+      months.map(function(m){ return [m.month, m.n, Math.round(m.sale), Math.round(m.cost), Math.round(m.ship), Math.round(m.fee), Math.round(m.etc), Math.round(m.net)]; })
+    );
+    downloadBytes(buildXlsx([
+      { name: "주문별", rows: [TAX_HEAD].concat(taxRows(list)).concat(sumRows) },
+      { name: "월별", rows: monthRows }
+    ]), "홈택스_정산_" + stamp() + ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    toast("홈택스 정산 엑셀(주문별·월별)을 내려받았습니다", "ok");
+    return;
+  }
+  download(taxCsvText(list), "홈택스_정산_" + stamp() + ".csv", "text/csv;charset=utf-8");
+  toast("홈택스 정산 CSV를 내려받았습니다", "ok");
+}
+
+/* =========================================================
+   12-9. 엑셀(.xlsx) 만들기 — 라이브러리 없이 zip을 직접 씀
+   ========================================================= */
+function utf8Bytes(str){
+  var s = String(str), out = [];
+  for(var i = 0; i < s.length; i++){
+    var c = s.charCodeAt(i);
+    if(c < 0x80){ out.push(c); }
+    else if(c < 0x800){ out.push(0xC0 | (c >> 6), 0x80 | (c & 63)); }
+    else if(c >= 0xD800 && c <= 0xDBFF && i + 1 < s.length){
+      var c2 = s.charCodeAt(i + 1);
+      if(c2 >= 0xDC00 && c2 <= 0xDFFF){
+        var cp = 0x10000 + ((c - 0xD800) << 10) + (c2 - 0xDC00);
+        out.push(0xF0 | (cp >> 18), 0x80 | ((cp >> 12) & 63), 0x80 | ((cp >> 6) & 63), 0x80 | (cp & 63));
+        i++;
+      }else{
+        out.push(0xE0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+      }
+    }else{
+      out.push(0xE0 | (c >> 12), 0x80 | ((c >> 6) & 63), 0x80 | (c & 63));
+    }
+  }
+  return out;
+}
+var CRC_TABLE = null;
+function crc32(bytes){
+  if(!CRC_TABLE){
+    CRC_TABLE = [];
+    for(var n = 0; n < 256; n++){
+      var c = n;
+      for(var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      CRC_TABLE[n] = c >>> 0;
+    }
+  }
+  var crc = 0xFFFFFFFF;
+  for(var i = 0; i < bytes.length; i++) crc = CRC_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+function zipU16(n){ return [n & 255, (n >> 8) & 255]; }
+function zipU32(n){ return [n & 255, (n >> 8) & 255, (n >> 16) & 255, (n >>> 24) & 255]; }
+function zipStore(files){
+  var out = [], central = [], offset = 0;
+  files.forEach(function(f){
+    var name = utf8Bytes(f.name), data = f.data, crc = crc32(data);
+    var local = [].concat([0x50, 0x4B, 0x03, 0x04], zipU16(20), zipU16(0x0800), zipU16(0),
+      zipU16(0), zipU16(0), zipU32(crc), zipU32(data.length), zipU32(data.length),
+      zipU16(name.length), zipU16(0));
+    out = out.concat(local, name, data);
+    central.push([].concat([0x50, 0x4B, 0x01, 0x02], zipU16(20), zipU16(20), zipU16(0x0800), zipU16(0),
+      zipU16(0), zipU16(0), zipU32(crc), zipU32(data.length), zipU32(data.length),
+      zipU16(name.length), zipU16(0), zipU16(0), zipU16(0), zipU16(0), zipU32(0), zipU32(offset), name));
+    offset += local.length + name.length + data.length;
+  });
+  var cdStart = offset, cd = [];
+  central.forEach(function(c){ cd = cd.concat(c); });
+  out = out.concat(cd, [].concat([0x50, 0x4B, 0x05, 0x06], zipU16(0), zipU16(0),
+    zipU16(files.length), zipU16(files.length), zipU32(cd.length), zipU32(cdStart), zipU16(0)));
+  return out;
+}
+function xmlEsc(s){
+  return String(s === null || s === undefined ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+function xlCol(i){
+  var s = "", n = i + 1;
+  while(n > 0){ var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1) / 26); }
+  return s;
+}
+function xlSheetXml(rows){
+  var out = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+  (rows || []).forEach(function(row, r){
+    out += '<row r="' + (r + 1) + '">';
+    (row || []).forEach(function(v, c){
+      if(v === null || v === undefined || v === "") return;
+      var ref = xlCol(c) + (r + 1);
+      if(typeof v === "number" && isFinite(v)){
+        out += '<c r="' + ref + '"><v>' + v + '</v></c>';
+      }else{
+        out += '<c r="' + ref + '" t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(v) + '</t></is></c>';
+      }
+    });
+    out += '</row>';
+  });
+  return out + '</sheetData></worksheet>';
+}
+function buildXlsx(sheets){
+  sheets = (sheets && sheets.length) ? sheets : [{ name: "Sheet1", rows: [] }];
+  var sheetXml = [], overrides = "", rels = "", entries = "";
+  sheets.forEach(function(s, i){
+    var n = i + 1;
+    sheetXml.push(xlSheetXml(s.rows));
+    overrides += '<Override PartName="/xl/worksheets/sheet' + n + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+    rels += '<Relationship Id="rId' + n + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + n + '.xml"/>';
+    entries += '<sheet name="' + xmlEsc(String(s.name || ("Sheet" + n)).replace(/[\\\/\?\*\[\]:]/g, "").slice(0, 31)) + '" sheetId="' + n + '" r:id="rId' + n + '"/>';
+  });
+  var files = [
+    { name: "[Content_Types].xml", data: utf8Bytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/>' +
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+      '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+      overrides + '</Types>') },
+    { name: "_rels/.rels", data: utf8Bytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+      '</Relationships>') },
+    { name: "xl/workbook.xml", data: utf8Bytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<sheets>' + entries + '</sheets></workbook>') },
+    { name: "xl/_rels/workbook.xml.rels", data: utf8Bytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + rels +
+      '<Relationship Id="rIdS" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
+      '</Relationships>') },
+    { name: "xl/styles.xml", data: utf8Bytes('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+      '<fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>' +
+      '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
+      '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
+      '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+      '<cellXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/></cellXfs>' +
+      '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
+      '</styleSheet>') }
+  ];
+  sheetXml.forEach(function(xml, i){
+    files.push({ name: "xl/worksheets/sheet" + (i + 1) + ".xml", data: utf8Bytes(xml) });
+  });
+  return zipStore(files);
+}
+function downloadBytes(bytes, filename, mime){
+  if(!hasDOM()) return;
+  var arr = new Uint8Array(bytes.length);
+  for(var i = 0; i < bytes.length; i++) arr[i] = bytes[i] & 255;
+  var blob = new Blob([arr], { type: mime || "application/octet-stream" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 500);
+}
+
+/* ---------- 새 화면 입력 받기 ---------- */
+function v24Action(act, el, ev){
+  var idx = el && el.dataset ? parseInt(el.dataset.idx, 10) : -1;
+  switch(act){
+    case "setView": setView(el && el.dataset ? el.dataset.view : "products"); return true;
+    case "tzAddItem": tzAddItem(); return true;
+    case "tzDelItem": tzDelItem(idx); return true;
+    case "tzReset": tzReset(); return true;
+    case "tzFromProduct": tzFromProduct(); return true;
+    case "tzEnName": tzEnName(idx); return true;
+    case "tzLoadItems": { var fi = document.getElementById("tzItemFile"); if(fi) fi.click(); return true; }
+    case "tzExportExcel": tzExport("xlsx"); return true;
+    case "tzExportCsv": tzExport("csv"); return true;
+    case "tzExportJson": tzExport("json"); return true;
+    case "domesticAdd": domesticAdd(); return true;
+    case "domesticDel": domesticDel(idx); return true;
+    case "domesticLowest": domesticLowest(idx); return true;
+    case "domesticToProduct": domesticToProduct(idx); return true;
+    case "domesticExport": domesticExport(); return true;
+    case "domesticImport": { var df = document.getElementById("domesticFile"); if(df) df.click(); return true; }
+    case "taxAdd": taxAdd(); return true;
+    case "taxDel": taxDel(idx); return true;
+    case "taxClear": taxClear(); return true;
+    case "taxFromProducts": taxFromProducts(); return true;
+    case "taxImport": { var tf = document.getElementById("taxFile"); if(tf) tf.click(); return true; }
+    case "taxExportCsv": taxExport("csv"); return true;
+    case "taxExportExcel": taxExport("xlsx"); return true;
+    default: return false;
+  }
+}
+function bindV24(){
+  if(!hasDOM()) return;
+  document.addEventListener("input", function(e){
+    var t = e.target;
+    if(!t || !t.dataset) return;
+    if(t.tagName === "SELECT") return;
+    if(t.dataset.tz){ tzSet(t.dataset.tz, t.value); return; }
+    if(t.dataset.tzf !== undefined && t.dataset.tzi !== undefined){
+      tzItemSet(parseInt(t.dataset.tzi, 10), t.dataset.tzf, t.value); return;
+    }
+    if(t.dataset.tzfind !== undefined){ tzFindBox(parseInt(t.dataset.tzfind, 10), t.value); return; }
+    if(t.dataset.domf !== undefined && t.dataset.domi !== undefined){
+      var di = parseInt(t.dataset.domi, 10);
+      domesticSet(di, t.dataset.domf, t.value);
+      domesticRefreshRow(di);
+      return;
+    }
+    if(t.dataset.taxf !== undefined && t.dataset.taxi !== undefined){
+      var ti = parseInt(t.dataset.taxi, 10);
+      taxSet(ti, t.dataset.taxf, t.value);
+      taxRefreshRow(ti);
+      return;
+    }
+  });
+  document.addEventListener("change", function(e){
+    var t = e.target;
+    if(!t || !t.dataset) return;
+    if(t.dataset.tzsvc){
+      var d = state.tz, c = str(t.dataset.tzsvc);
+      var i = (d.services || []).indexOf(c);
+      if(t.checked && i < 0) d.services.push(c);
+      if(!t.checked && i >= 0) d.services.splice(i, 1);
+      if(c === "65") d.care = t.checked ? "Y" : "N";
+      save();
+      var lab = t.closest ? t.closest(".svc") : null;
+      if(lab && lab.classList) lab.classList.toggle("on", !!t.checked);
+      renderTzView();
+      return;
+    }
+    if(t.dataset.tzcare){
+      state.tz.care = t.checked ? "Y" : "N";
+      save();
+      return;
+    }
+    if(t.dataset.tz){
+      tzSet(t.dataset.tz, t.value);
+      return;
+    }
+    if(t.dataset.domf !== undefined && t.dataset.domi !== undefined){
+      domesticSet(parseInt(t.dataset.domi, 10), t.dataset.domf, t.value);
+      renderDomesticView();
+      return;
+    }
+    if(t.id === "tzItemFile" && t.files && t.files[0]){
+      var f = t.files[0];
+      var rd = new FileReader();
+      rd.onload = function(){ importTzItemFile(String(rd.result || "")); t.value = ""; };
+      rd.readAsText(f, "utf-8");
+      return;
+    }
+    if(t.id === "domesticFile" && t.files && t.files[0]){
+      var f2 = t.files[0];
+      var rd2 = new FileReader();
+      rd2.onload = function(){ domesticImportText(String(rd2.result || ""), f2.name); t.value = ""; };
+      rd2.readAsText(f2, "utf-8");
+      return;
+    }
+    if(t.id === "taxFile" && t.files && t.files[0]){
+      var f3 = t.files[0];
+      var rd3 = new FileReader();
+      rd3.onload = function(){ taxImportText(String(rd3.result || ""), f3.name); t.value = ""; };
+      rd3.readAsText(f3, "utf-8");
+      return;
+    }
+  });
+  document.addEventListener("click", function(e){
+    var pick = e.target && e.target.closest ? e.target.closest("[data-tzpick]") : null;
+    if(pick){
+      var parts = String(pick.getAttribute("data-tzpick")).split(":");
+      tzPickItem(parseInt(parts[0], 10), parts[1]);
+      return;
+    }
+    var tab = e.target && e.target.closest ? e.target.closest("[data-view]") : null;
+    if(tab){ setView(tab.getAttribute("data-view")); }
+  });
 }
 
 /* =========================================================
@@ -5083,7 +7324,40 @@ var RoiChanggoCore = {
   imageKoFor: imageKoFor,
   imageTrCount: imageTrCount,
   imageTrBoxHtml: imageTrBoxHtml,
-  clearImageTranslations: clearImageTranslations
+  clearImageTranslations: clearImageTranslations,
+  // v2.4 — 화면 전환 · 천조직구 · 국내 위탁 · 세무
+  setView: setView,
+  uiView: function(){ return uiView; },
+  state_tz: function(){ return state.tz; },
+  state_domestic: function(){ return state.domestic; },
+  state_tax: function(){ return state.tax; },
+  normalizeCurrency: normalizeCurrency,
+  priceToCny: priceToCny,
+  tzIssues: tzIssues,
+  tzRows: tzRows,
+  tzHeader: function(){ return TZ_HEADER; },
+  tzServices: function(){ return TZ_SERVICES; },
+  tzCsvText: tzCsvText,
+  tzXlsxBytes: tzXlsxBytes,
+  buildTzPayload: buildTzPayload,
+  tzFindItems: tzFindItems,
+  tzItemName: tzItemName,
+  importTzItemFile: importTzItemFile,
+  domesticCalc: domesticCalc,
+  domesticImportText: domesticImportText,
+  domesticFromCollected: domesticFromCollected,
+  domesticToProduct: domesticToProduct,
+  taxNet: taxNet,
+  taxSummary: taxSummary,
+  taxMonthly: taxMonthly,
+  taxFromProducts: taxFromProducts,
+  taxImportText: taxImportText,
+  taxCsvText: taxCsvText,
+  taxRows: taxRows,
+  buildXlsx: buildXlsx,
+  crc32: crc32,
+  utf8Bytes: utf8Bytes,
+  v24Action: v24Action
 };
 try{
   if(typeof globalThis !== "undefined") globalThis.RoiChanggoCore = RoiChanggoCore;
