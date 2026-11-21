@@ -537,6 +537,43 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 .ord-sum b{color:var(--ink)}
 .cspv{white-space:pre-wrap;font-size:12.5px;line-height:1.65;background:#fbfcff;border:1px solid var(--line);border-radius:10px;padding:10px;max-height:46vh;overflow:auto}
 .cshead{font-size:11.5px;color:var(--muted);margin-top:8px}
+/* ---------- v2.6 34개 마켓 주문 현황 ---------- */
+.mboard{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,#fffdfb,#fff);box-shadow:var(--shadow);padding:12px 14px 13px;margin-bottom:12px}
+.mboard-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mboard-head .ico{flex:none;width:26px;height:26px;border-radius:8px;background:var(--accent-soft);display:grid;place-items:center;font-size:14px}
+.mboard-head h3{margin:0;font-size:14.5px;font-weight:800;letter-spacing:-.2px;white-space:nowrap}
+.mboard-head .hint{font-size:11px;color:var(--muted);font-weight:600}
+.mboard-acts{margin-left:auto;display:flex;gap:5px;flex-wrap:wrap}
+.mbsum{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin:9px 0 3px}
+.madge{display:inline-flex;align-items:center;gap:4px;height:23px;padding:0 9px;border-radius:999px;font-size:11.5px;font-weight:800;background:#f2f5fb;color:#4b5573;white-space:nowrap}
+.madge b{font-size:12.5px}
+.madge.hot{background:#ffe8e8;color:#c12f36}
+.madge.new{background:#fff4e0;color:#a35c00}
+.madge.wait{background:#e9f0ff;color:#2b4fa0}
+.madge.ok{background:var(--ok-soft);color:#0b7f60}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:8px}
+.mtile{display:grid;gap:2px;text-align:left;padding:7px 8px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;min-height:56px;transition:border-color .12s,box-shadow .12s}
+.mtile:hover{border-color:#f0b48f;box-shadow:0 2px 8px -4px rgba(232,89,12,.45)}
+.mtile.has{background:#fffaf6;border-color:#ffd9bf}
+.mtile.on{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,89,12,.18)}
+.mtile .mt{display:flex;align-items:center;gap:4px;min-width:0}
+.mtile .mno{flex:none;font-size:9.5px;font-weight:800;color:var(--muted);background:#f2f5fb;border-radius:5px;padding:0 4px;line-height:14px}
+.mtile .mnm{font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtile .mal{font-size:9.5px;color:var(--muted);font-weight:600;white-space:nowrap}
+.mtile .mbadges{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
+.mtile .mb{font-size:9.5px;font-weight:800;border-radius:5px;padding:0 5px;line-height:15px;background:#f2f5fb;color:#6b748b;white-space:nowrap}
+.mtile .mb.new{background:#fff4e0;color:#a35c00}
+.mtile .mb.wait{background:#e9f0ff;color:#2b4fa0}
+.mtile .mb.due{background:var(--danger);color:#fff}
+.mtile .mb.none{background:#f6f7fb;color:#9aa3b8}
+.mtile .mfoot{font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mdetail{margin-top:9px;display:grid;gap:5px}
+.mdrow{display:grid;grid-template-columns:minmax(118px,.8fr) minmax(0,2.6fr) auto;gap:8px;align-items:center;padding:6px 8px;border:1px solid var(--line-2);border-radius:9px;background:#fbfcff}
+.mdrow .mdn{font-size:12px;font-weight:800}
+.mdrow .mdl{font-size:11.5px;color:var(--ink-2);line-height:1.55;min-width:0}
+.mdrow .mdl .o{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mboard .friendly{font-size:11.5px;line-height:1.65}
+@media(max-width:760px){.mdrow{grid-template-columns:1fr}}
 @media (max-width:900px){
   .viewtabs{top:0;padding:7px 10px}
   .vtable{overflow-x:auto}
@@ -550,7 +587,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   <div class="brand">
     <div class="logo">🛒</div>
     <div>
-      <h1>로이창고 <span class="ver">v2.5</span></h1>
+      <h1>로이창고 <span class="ver">v2.6</span></h1>
       <div class="sub">로이 전용 구매대행 상품 가공·업로드 작업실 · 중국/일본 소싱 → 스마트스토어·쿠팡·G마켓</div>
     </div>
   </div>
@@ -681,6 +718,8 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 <input type="file" id="domesticFile" accept=".json,.csv,.xlsx,.xls,application/json,text/csv" hidden>
 <input type="file" id="taxFile" accept=".csv,.xlsx,.xls,.json,text/csv" hidden>
 <input type="file" id="orderFile" accept=".csv,.xlsx,.xls,.json,.html,.txt,application/json,text/csv" hidden>
+<input type="file" id="marketFile" accept=".json,application/json,text/plain" hidden>
+<input type="file" id="marketListFile" accept=".csv,.xlsx,.xls,.json,.txt,text/csv" hidden>
 
 <script>
 (function(){
@@ -690,7 +729,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
    1. 상수 · 금칙어 · 샘플 데이터
    ========================================================= */
 var STORAGE_KEY = "roi_changgo_v2";
-var APP_VERSION = 2.5;
+var APP_VERSION = 2.6;
 
 // 실제 확인된 퍼센티 / 스마트스토어 금칙어 20종 + 치환 제안
 var BANNED = [
@@ -859,6 +898,44 @@ var ORDER_VENDORS = [
   { v: "기타", label: "기타", site: "", ch: "해외" }
 ];
 var ORDER_CHANNELS = ["해외", "국내위탁", "테무"];
+// v2.6 — 성재님이 운영하는 스마트스토어 34곳 (번호·스토어명만 — 이메일·전화번호·사업자부호는 공개 저장소에 넣지 않습니다)
+var MARKET_34 = [
+  { no: 1,  name: "유유마켓" },
+  { no: 2,  name: "유유스토어" },
+  { no: 3,  name: "유진상사", alias: "유베스트" },
+  { no: 4,  name: "모던픽" },
+  { no: 5,  name: "바이유" },
+  { no: 6,  name: "솔리드픽" },
+  { no: 7,  name: "스냅딜" },
+  { no: 8,  name: "스타트픽" },
+  { no: 9,  name: "슬릭딜" },
+  { no: 10, name: "유글로벌" },
+  { no: 11, name: "유비즈" },
+  { no: 12, name: "트렌지오", alias: "Trenzio" },
+  { no: 13, name: "웰모", alias: "Quelmo" },
+  { no: 14, name: "드라빅스", alias: "Dravix" },
+  { no: 15, name: "노제보", alias: "Nozevo" },
+  { no: 16, name: "크레피스", alias: "Krephis" },
+  { no: 17, name: "보르텔릭스", alias: "Vortelix" },
+  { no: 18, name: "줌보라", alias: "Zumvora" },
+  { no: 19, name: "플렉시보", alias: "Plexivo" },
+  { no: 21, name: "젯딜", alias: "JetDeal" },
+  { no: 22, name: "넥스트로바", alias: "Nextrova" },
+  { no: 24, name: "크레보닉스", alias: "Krevonix" },
+  { no: 25, name: "브리벨로", alias: "Brivel" },
+  { no: 28, name: "드렉시코", alias: "Drexico" },
+  { no: 29, name: "짐보라", alias: "Zymbora" },
+  { no: 30, name: "클로브릭스", alias: "Clovrix" },
+  { no: 31, name: "웰바노", alias: "Welvano" },
+  { no: 32, name: "트릭소바", alias: "Trixova" },
+  { no: 33, name: "글렌픽스", alias: "Glenfix" },
+  { no: 35, name: "블루베노", alias: "Bluveno" },
+  { no: 37, name: "젤드록스", alias: "Zeldrox" },
+  { no: 38, name: "옴니벡스", alias: "Omnivex" },
+  { no: 43, name: "플롬벡스", alias: "Flomvex" },
+  { no: 44, name: "루벨릭스", alias: "Ruvel" }
+];
+var MARKET_STORE_URL = "https://sell.smartstore.naver.com";
 // 국내 택배사 — 송장번호로 바로 조회되는 주소
 var ORDER_COURIERS = [
   { v: "CJ대한통운", label: "CJ대한통운", url: "https://trace.cjlogistics.com/next/tracking.html?wblNo=" },
@@ -1775,6 +1852,11 @@ function loadState(){
         s.tax = normTax(s.tax);
         s.tz = normTz(s.tz);
         s.orders = (Array.isArray(s.orders) ? s.orders : []).map(normOrder);
+        s.marketBoard = (s.marketBoard && typeof s.marketBoard === "object") ? s.marketBoard : {};
+        s.marketBoardAt = str(s.marketBoardAt);
+        s.marketList = Array.isArray(s.marketList) ? s.marketList.map(function(m){
+          return { no: (m && m.no !== undefined ? m.no : ""), name: str(m && m.name), alias: str(m && m.alias) };
+        }).filter(function(m){ return m.name; }) : [];
         return s;
       }
     }
@@ -1793,7 +1875,10 @@ function makeInitialState(){
     domestic: [],
     tax: blankTax(),
     tz: blankTz(),
-    orders: []
+    orders: [],
+    marketBoard: {},
+    marketBoardAt: "",
+    marketList: []
   };
 }
 
@@ -5882,6 +5967,9 @@ function openSettings(){
     '</div>' +
     '<div class="friendly" style="margin-top:4px">발송기한은 <b>주문일 + 여기 적은 날짜</b>로 자동 계산되고, 주문마다 따로 고칠 수 있습니다. 배대지 아이디·사서함 번호는 <b>이 브라우저에만</b> 저장되고 저장소에는 들어가지 않습니다.</div>' +
 
+    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">34개 마켓 주문 현황 (v2.6)</h4>' +
+    '<div class="friendly">[📦 주문·배송 관리] 맨 위에 <b>🏪 34개 마켓 주문 현황</b>이 있습니다. 스마트스토어에서 주문을 확인한 뒤 수집기(확장)의 <b>[🏪 스마트스토어 주문 수집]</b>이 저장한 JSON을 <b>[📂 주문 현황 JSON 가져오기]</b>로 넣으면 마켓별 <b>신규주문 · 발송대기 · 발송기한 임박</b>이 한눈에 보입니다. 마켓 이름·번호는 [🗂 마켓 목록]으로 내 CSV를 넣어 바꿀 수 있고, 이때 <b>이메일·전화번호는 읽지 않고 버립니다</b>. 저장되는 것은 마켓별 주문 건수와 주문 내용이고, 모두 이 브라우저(localStorage)에만 남습니다.</div>' +
+
     '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">스마트스토어기본값</h4>' +
     '<div class="g2">' +
       txtField("수입사명", "setImporter", s.importer, "예: ○○커머스") +
@@ -7488,6 +7576,15 @@ function v24Action(act, el, ev){
     case "orderInvoice": orderInvoiceSheet(); return true;
     case "orderFilter": ordFilter = (el && el.dataset && el.dataset.f) ? el.dataset.f : "all"; renderOrdersView(); return true;
     case "orderImport": { var of = document.getElementById("orderFile"); if(of) of.click(); return true; }
+    case "marketImport": { var mf = document.getElementById("marketFile"); if(mf) mf.click(); return true; }
+    case "marketListImport": { var mlf = document.getElementById("marketListFile"); if(mlf) mlf.click(); return true; }
+    case "marketListReset": marketListReset(); return true;
+    case "marketCsv": marketListCsvDownload(); return true;
+    case "marketStoreOpen": marketStoreOpen(); return true;
+    case "marketOnly": ordMarketOnly = !!(el && el.dataset && el.dataset.only === "1"); renderOrdersView(); return true;
+    case "marketOpen": marketOpen(el && el.dataset ? el.dataset.mkt : ""); return true;
+    case "marketFilterClear": ordFilter = "all"; renderOrdersView(); return true;
+    case "marketBoardReset": marketBoardReset(); return true;
     case "orderCsv": orderExportCsv(); return true;
     case "orderJson": orderExportJson(); return true;
     case "orderTemplate": orderTemplate(); return true;
@@ -7579,6 +7676,25 @@ function bindV24(){
           t.value = "";
         });
       }
+      return;
+    }
+    if(t.id === "marketFile" && t.files && t.files[0]){
+      var f6 = t.files[0];
+      var rd6 = new FileReader();
+      rd6.onload = function(){ marketImportText(String(rd6.result || ""), f6.name); t.value = ""; };
+      rd6.onerror = function(){ toast("파일을 읽지 못했습니다", "bad"); t.value = ""; };
+      rd6.readAsText(f6, "utf-8");
+      return;
+    }
+    if(t.id === "marketListFile" && t.files && t.files[0]){
+      var f7 = t.files[0];
+      readTableFile(f7).then(function(rows){
+        marketListImportRows(rows, f7.name);
+        t.value = "";
+      }, function(){
+        toast("마켓 목록을 읽지 못했습니다 — CSV나 .xlsx로 저장해 넣어 주세요", "bad");
+        t.value = "";
+      });
       return;
     }
     if(t.id === "tzItemFile" && t.files && t.files[0]){
@@ -7787,6 +7903,7 @@ function orderStats(list){
 }
 function orderFilterMatch(o, f){
   if(!f || f === "all") return true;
+  if(f.indexOf("mk:") === 0) return str(o.market) === f.slice(3);
   if(f.indexOf("stage:") === 0) return o.stage === f.slice(6);
   if(f.indexOf("ch:") === 0) return orderChannel(o) === f.slice(3);
   var d = orderDday(o);
@@ -7833,12 +7950,16 @@ function renderOrdersView(){
         (st.delayed ? '<span class="mini-badge mb-risk">발송 지연 ' + st.delayed + '</span>' : '') +
         (st.today ? '<span class="mini-badge mb-warn">오늘 발송 ' + st.today + '</span>' : '') +
         (st.noPrice ? '<span class="mini-badge mb-warn">발주가 없음 ' + st.noPrice + '</span>' : '') +
+        (str(ordFilter).indexOf("mk:") === 0 ? '<span class="mini-badge mb-warn">' + esc(ordFilter.slice(3)) + ' 마켓만</span>' : '') +
       '</div></div>' +
       '<div class="acts">' +
         '<button class="btn sm" data-act="orderAdd">＋ 주문 추가</button>' +
         '<button class="btn sm" data-act="orderInvoice">📋 송장 일괄 정리</button>' +
         '<button class="btn sm primary" data-act="orderImport">⬆ 주문 불러오기 (CSV·엑셀·JSON)</button>' +
       '</div></div>';
+
+  /* v2.6 — 34개 마켓 주문 현황 */
+  html += renderMarketBoard();
 
   /* 단계 칩 */
   html += '<div class="card"><div class="card-head"><div class="ico">🔎</div><h3>보기</h3>' +
@@ -7867,6 +7988,7 @@ function renderOrdersView(){
     '<button class="btn tiny" data-act="orderJson">⬇ JSON 백업</button>' +
     '<button class="btn tiny" data-act="orderTemplate">빈 양식</button>' +
     '<button class="btn tiny" data-act="ordersToTax" title="배송완료 건을 세무 장부(홈택스 정산)로 넘깁니다">🧾 완료 건 세무장부로</button>' +
+    (str(ordFilter).indexOf("mk:") === 0 ? '<button class="btn tiny warn" data-act="marketFilterClear">✕ ' + esc(ordFilter.slice(3)) + ' 마켓 필터 끄기</button>' : '') +
     '<span class="ordmini" style="margin-left:auto">발송기한 = 주문일 + ' + orderDueDays() + '일 (⚙ 설정에서 변경)</span>' +
   '</div>';
 
@@ -7875,7 +7997,7 @@ function renderOrdersView(){
       '<div style="font-weight:700;color:#4b5573">' + (all.length ? "이 조건에 맞는 주문이 없습니다" : "아직 주문이 없습니다") + '</div>' +
       '<div class="tiny">[＋ 주문 추가]로 하나씩 넣거나, 마켓 주문 목록 CSV·엑셀을 [주문 불러오기]로 넣으면 한 번에 채워집니다.</div></div>';
   }else{
-    html += '<div class="vtable ord"><div class="vhead">' +
+    html += '<div class="vtable ord" id="ordList"><div class="vhead">' +
       '<div>D-day</div><div>마켓 · 주문번호</div><div>상품 · 받는사람</div><div>결제</div>' +
       '<div>발주 비교 (실결제가)</div><div>배대지·도매처 · 송장</div><div>상태</div><div></div></div>';
     list.forEach(function(o){
@@ -8259,10 +8381,10 @@ function orderRowsToItems(rows){
   });
   return out;
 }
-function orderMerge(list){
-  if(!list || !list.length) return 0;
+function orderMergeCore(list){
+  var res = { added: 0, updated: 0, total: 0 };
+  if(!list || !list.length) return res;
   state.orders = state.orders || [];
-  var added = 0, updated = 0;
   list.forEach(function(o){
     var hit = null;
     for(var i = 0; i < state.orders.length; i++){
@@ -8280,15 +8402,21 @@ function orderMerge(list){
       });
       merged.id = hit.id;
       state.orders[state.orders.indexOf(hit)] = normOrder(merged);
-      updated++;
+      res.updated++;
     }else{
       state.orders.push(normOrder(o));
-      added++;
+      res.added++;
     }
   });
+  res.total = list.length;
+  return res;
+}
+function orderMerge(list){
+  if(!list || !list.length) return 0;
+  var res = orderMergeCore(list);
   save();
   renderOrdersView();
-  toast("주문 " + list.length + "건을 불러왔습니다 (새 주문 " + added + " · 갱신 " + updated + ")", "ok");
+  toast("주문 " + res.total + "건을 불러왔습니다 (새 주문 " + res.added + " · 갱신 " + res.updated + ")", "ok");
   return list.length;
 }
 function orderImportRows(rows, sourceName){
@@ -8316,6 +8444,387 @@ function orderImportText(text, filename){
   if(/\.json$/i.test(str(filename)) || /^[\[{]/.test(s)) return orderImportJsonText(s, filename);
   if(/<table|<tr[\s>]/i.test(s)) return orderImportRows(htmlTableRows(s), filename);
   return orderImportRows(parseCsv(s), filename);
+}
+
+/* =========================================================
+   12-13b. v2.6 — 34개 마켓 주문 현황 (스마트스토어 주문 확인·수집 연동)
+   - 마켓별 신규주문 / 발송대기 / 발송기한 임박 배지
+   - [로이 스캔 JSON · 수집기 JSON]을 넣으면 마켓 현황 + 주문 목록이 함께 채워짐
+   - 칸을 누르면 그 마켓 주문만 보임 (주문 목록과 연계)
+   ========================================================= */
+var ordMarketOnly = false;
+
+function marketBoardList(){
+  var mine = (state && Array.isArray(state.marketList)) ? state.marketList : [];
+  if(mine.length) return mine.map(function(m){ return { no: (m.no === undefined ? "" : m.no), name: str(m.name), alias: str(m.alias) }; })
+    .filter(function(m){ return !!m.name; });
+  return MARKET_34.map(function(m){ return { no: m.no, name: m.name, alias: m.alias || "" }; });
+}
+function marketAtText(v){
+  var s = str(v);
+  if(!s) return "";
+  var ms = Date.parse(s);
+  if(isFinite(ms)){
+    var d = new Date(ms);
+    return todayYmd(d) + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+  }
+  return s.slice(0, 16).replace("T", " ");
+}
+/* 마켓 이름을 34개 목록의 이름으로 맞춥니다 — "유진상사(유베스트)", 별칭도 같은 마켓으로 */
+function marketCanon(name){
+  var s = str(name).replace(/\s+/g, " ").trim();
+  if(!s) return "";
+  var list = marketBoardList();
+  for(var i = 0; i < list.length; i++){
+    if(list[i].name === s) return list[i].name;
+    if(list[i].alias && list[i].alias.toLowerCase() === s.toLowerCase()) return list[i].name;
+  }
+  var base = s.replace(/\(.*?\)/g, "").trim();
+  for(var k = 0; k < list.length; k++){
+    if(base && list[k].name === base) return list[k].name;
+    if(list[k].name.length > 1 && s.indexOf(list[k].name) === 0) return list[k].name;
+  }
+  return s;
+}
+function marketOrdersOf(name){
+  var nm = str(name);
+  return (state.orders || []).filter(function(o){ return str(o.market) === nm; });
+}
+/* 로이창고 주문에서 계산한 마켓 현황 — 발송대기 = 아직 배송완료가 아닌 주문(신규 포함) */
+function marketOrderSummary(name){
+  var out = { total: 0, newOrders: 0, pending: 0, dueSoon: 0, saleSum: 0, earliest: "", earliestDays: null, open: [], done: 0 };
+  var todayS = todayYmd();
+  marketOrdersOf(name).forEach(function(o){
+    out.total++;
+    if(o.stage === ORDER_CANCEL) return;
+    if(o.stage === ORDER_DONE){ out.done++; return; }
+    out.open.push(o);
+    out.pending++;
+    if(o.stage === ORDER_STAGES[0]) out.newOrders++;
+    var d = orderDday(o, todayS);
+    if(d.days !== null){
+      if(d.days <= 1) out.dueSoon++;
+      if(out.earliestDays === null || d.days < out.earliestDays){ out.earliestDays = d.days; out.earliest = orderDue(o); }
+    }
+    out.saleSum += num(o.sale, 0);
+  });
+  return out;
+}
+function marketNumOrNull(v){
+  if(v === undefined || v === null || v === "") return null;
+  var n = num(String(v).replace(/[^\d.\-]/g, ""), NaN);
+  if(!isFinite(n)) return null;
+  return Math.max(0, Math.round(n));
+}
+/* 마켓별 스캔값(있으면) + 로이창고 주문 계산(없으면)을 합쳐 한 줄로 */
+function marketRow(name){
+  var nm = str(name);
+  var list = marketBoardList(), meta = null;
+  for(var i = 0; i < list.length; i++){ if(list[i].name === nm){ meta = list[i]; break; } }
+  var ent = (state.marketBoard && typeof state.marketBoard === "object") ? state.marketBoard[nm] : null;
+  var sum = marketOrderSummary(nm);
+  var snapNew = ent ? marketNumOrNull(ent.newOrders) : null;
+  var snapPending = ent ? marketNumOrNull(ent.pending) : null;
+  var snapDue = ent ? marketNumOrNull(ent.dueSoon) : null;
+  var r = {
+    no: meta ? meta.no : "",
+    name: nm,
+    alias: meta ? str(meta.alias) : "",
+    checkedAt: ent ? str(ent.checkedAt || "") : "",
+    storeId: ent ? str(ent.storeId || "") : "",
+    source: (snapNew !== null || snapPending !== null) ? "scan" : (sum.total ? "order" : ""),
+    orderCount: sum.total,
+    openCount: sum.pending,
+    sum: sum,
+    newOrders: snapNew !== null ? snapNew : sum.newOrders,
+    pending: snapPending !== null ? snapPending : sum.pending,
+    dueSoon: snapDue !== null ? snapDue : sum.dueSoon
+  };
+  r.hasOrders = (r.newOrders + r.pending + r.dueSoon) > 0 || r.orderCount > 0;
+  return r;
+}
+function marketBoardTotals(){
+  var t = { markets: 0, withOrders: 0, newOrders: 0, pending: 0, dueSoon: 0, checked: 0, lastAt: str(state && state.marketBoardAt) };
+  marketBoardList().forEach(function(m){
+    var r = marketRow(m.name);
+    t.markets++;
+    if(r.hasOrders) t.withOrders++;
+    if(r.checkedAt) t.checked++;
+    t.newOrders += r.newOrders;
+    t.pending += r.pending;
+    t.dueSoon += r.dueSoon;
+  });
+  return t;
+}
+/* 목록(34곳)에 없는 마켓 — 주문이 들어 있으면 알려 줍니다 */
+function marketOutsideList(){
+  var names = {}, list = marketBoardList(), out = [];
+  list.forEach(function(m){ names[m.name] = 1; });
+  (state.orders || []).forEach(function(o){
+    var m = str(o.market);
+    if(m && !names[m] && out.indexOf(m) < 0) out.push(m);
+  });
+  return out;
+}
+function renderMarketBoard(){
+  var rows = marketBoardList().map(function(m){ return marketRow(m.name); });
+  var t = marketBoardTotals();
+  var active = (str(ordFilter).indexOf("mk:") === 0) ? ordFilter.slice(3) : "";
+  var shown = ordMarketOnly ? rows.filter(function(r){ return r.hasOrders; }) : rows;
+  var outside = marketOutsideList();
+  var html = '<section class="mboard" id="marketBoard">';
+  html += '<div class="mboard-head">' +
+      '<div class="ico">🏪</div><h3>34개 마켓 주문 현황</h3>' +
+      '<span class="hint">주문이 들어온 마켓부터 보세요 — 칸을 누르면 그 마켓 주문만 봅니다</span>' +
+      '<div class="mboard-acts">' +
+        '<button class="btn tiny primary" data-act="marketImport" title="로이가 스캔해 보낸 마켓별 주문 현황 JSON, 수집기(확장)가 저장한 주문 JSON을 넣습니다">📂 주문 현황 JSON 가져오기</button>' +
+        '<a class="btn tiny" href="' + MARKET_STORE_URL + '" target="_blank" rel="noreferrer noopener" title="네이버 스마트스토어센터를 엽니다">🏬 스마트스토어</a>' +
+        (state.marketList && state.marketList.length
+          ? '<button class="btn tiny" data-act="marketListReset" title="원래 34개 마켓 목록으로 되돌립니다">↺ 기본 목록</button>'
+          : '<button class="btn tiny" data-act="marketListImport" title="내가 가진 마켓 목록(CSV·엑셀)을 넣어 번호·이름을 맞춥니다">🗂 마켓 목록</button>' +
+            '<button class="btn tiny" data-act="marketCsv" title="34개 마켓 목록을 CSV로 내려받습니다">⬇ 목록 CSV</button>') +
+        (Object.keys(state.marketBoard || {}).length ? '<button class="btn tiny ghost" data-act="marketBoardReset" title="가져온 주문 현황만 지웁니다 (주문 목록은 그대로)">현황 지우기</button>' : '') +
+      '</div></div>';
+  html += '<div class="mbsum">' +
+      '<span class="madge ok">마켓 <b>' + t.markets + '</b>곳</span>' +
+      '<span class="madge' + (t.withOrders ? ' new' : '') + '">주문 들어온 마켓 <b>' + t.withOrders + '</b></span>' +
+      '<span class="madge' + (t.newOrders ? ' new' : '') + '">신규주문 <b>' + t.newOrders + '</b></span>' +
+      '<span class="madge' + (t.pending ? ' wait' : '') + '">발송대기 <b>' + t.pending + '</b></span>' +
+      '<span class="madge' + (t.dueSoon ? ' hot' : '') + '">발송기한 임박 <b>' + t.dueSoon + '</b></span>' +
+      '<span class="ordmini" style="margin-left:auto">' +
+        esc(t.lastAt ? ('주문 현황 확인 ' + marketAtText(t.lastAt)) : '아직 주문 현황 파일을 넣지 않았습니다') +
+        ' · 확인한 마켓 ' + t.checked + '/' + t.markets +
+      '</span>' +
+    '</div>';
+  html += '<div class="ordtools">' +
+      '<button class="ochip' + (!ordMarketOnly ? ' on' : '') + '" data-act="marketOnly" data-only="0">전체 ' + t.markets + '곳</button>' +
+      '<button class="ochip' + (ordMarketOnly ? ' on' : '') + '" data-act="marketOnly" data-only="1">주문 들어온 마켓만<span class="n">' + t.withOrders + '</span></button>' +
+      '<span class="ordmini" style="margin-left:auto">' +
+        (active ? ('아래 주문 목록: <b>' + esc(active) + '</b> 마켓만 · <button class="btn tiny" data-act="marketFilterClear">전체 주문</button>')
+                : '칸을 누르면 아래 주문 목록이 그 마켓만 보입니다') +
+      '</span>' +
+    '</div>';
+  html += '<div class="mgrid">' + (shown.length ? shown.map(function(r){
+      return '<button type="button" class="mtile' + (r.hasOrders ? ' has' : '') + (active && active === r.name ? ' on' : '') + '"' +
+        ' data-act="marketOpen" data-mkt="' + esc(r.name) + '"' +
+        ' title="' + esc(r.name) + (r.alias ? ' (' + r.alias + ')' : '') + (r.storeId ? ' · 스토어 ' + r.storeId : '') + ' — 누르면 이 마켓 주문만 봅니다">' +
+        '<span class="mt">' +
+          (r.no !== "" && r.no !== null && r.no !== undefined ? '<span class="mno">' + esc(r.no) + '</span>' : '') +
+          '<span class="mnm">' + esc(r.name) + '</span>' +
+          (r.alias ? '<span class="mal">' + esc(r.alias) + '</span>' : '') +
+        '</span>' +
+        '<span class="mbadges">' +
+          (r.newOrders ? '<b class="mb new">신규 ' + r.newOrders + '</b>' : '') +
+          (r.pending ? '<b class="mb wait">발송대기 ' + r.pending + '</b>' : '') +
+          (r.dueSoon ? '<b class="mb due">기한임박 ' + r.dueSoon + '</b>' : '') +
+          (!r.newOrders && !r.pending && !r.dueSoon
+            ? '<b class="mb none">' + (r.checkedAt ? '주문 없음' : (r.orderCount ? '지난 주문 ' + r.orderCount : '미확인')) + '</b>' : '') +
+        '</span>' +
+        '<span class="mfoot">' + (r.checkedAt ? ('확인 ' + esc(marketAtText(r.checkedAt))) : (r.orderCount ? ('로이창고 주문 ' + r.orderCount + '건') : '—')) + '</span>' +
+      '</button>';
+    }).join('') : '<div class="friendly" style="grid-column:1/-1">주문이 들어온 마켓이 없습니다. 스마트스토어에서 주문을 확인한 뒤 [📂 주문 현황 JSON 가져오기]로 넣으면 여기에 표시됩니다.</div>') +
+    '</div>';
+  /* 주문이 들어온 마켓의 주문 내용 (상품·기한) */
+  var detail = rows.filter(function(r){ return r.sum.open.length > 0; });
+  if(detail.length){
+    html += '<div class="mdetail">' + detail.map(function(r){
+      var lines = r.sum.open.slice(0, 3).map(function(o){
+        var d = orderDday(o);
+        return '<span class="o">' + esc(o.name || '(상품명 없음)') +
+          (str(o.option) ? ' · ' + esc(o.option) : '') + ' ' + num(o.qty, 1) + '개 · ' +
+          '<span class="dday ' + d.cls + '">' + esc(d.label) + '</span> · ' + won(o.sale) + '</span>';
+      }).join('');
+      var more = r.sum.open.length > 3 ? '<span class="o ordmini">외 ' + (r.sum.open.length - 3) + '건</span>' : '';
+      return '<div class="mdrow">' +
+        '<div><div class="mdn">' + esc(r.name) + '</div><div class="ordmini">주문 ' + r.sum.total +
+          ' · 진행 ' + r.openCount + ' · 신규 ' + r.newOrders + ' · 기한임박 ' + r.dueSoon + '</div></div>' +
+        '<div class="mdl">' + lines + more + '</div>' +
+        '<div><button class="btn tiny" data-act="marketOpen" data-mkt="' + esc(r.name) + '">주문만 보기</button></div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  if(outside.length){
+    html += '<div class="ordmini" style="margin-top:7px">목록에 없는 마켓 주문도 있습니다: <b>' + esc(outside.join(', ')) + '</b> — 주문 목록에서 구분 칩으로 볼 수 있습니다.</div>';
+  }
+  html += '<div class="friendly" style="margin-top:9px">' +
+      '스마트스토어센터 <b>주문·발송관리</b> 화면에서 수집기(확장 프로그램 v2.3.0)의 <b>[🏪 스마트스토어 주문 수집]</b>을 누르면 그 스토어 주문이 JSON으로 저장됩니다. 그 파일을 <b>[📂 주문 현황 JSON 가져오기]</b>로 넣으면 위 현황판과 아래 주문 목록이 함께 채워집니다. 로이가 스캔해 보낸 JSON도 같은 방법으로 넣습니다.' +
+      '<br><b>발송대기</b>는 아직 배송완료가 아닌 주문 전체(신규 포함), <b>발송기한 임박</b>은 발송기한이 오늘·내일이거나 이미 지난 주문입니다. 마켓에서 직접 읽은 숫자가 있으면 그 숫자를, 없으면 로이창고 주문으로 계산합니다.' +
+    '</div>';
+  html += '</section>';
+  return html;
+}
+/* ---- 가져오기 ---- */
+function marketPatchEntry(name, patch){
+  if(!name) return;
+  state.marketBoard = (state.marketBoard && typeof state.marketBoard === "object") ? state.marketBoard : {};
+  var cur = state.marketBoard[name] || {};
+  var next = Object.assign({}, cur);
+  Object.keys(patch || {}).forEach(function(k){
+    var v = patch[k];
+    if(v === undefined || v === null || v === "") return;
+    next[k] = v;
+  });
+  next.name = name;
+  next.at = Date.now();
+  state.marketBoard[name] = next;
+}
+function marketImportJson(text, sourceName){
+  var raw = String(text || "").replace(/^\uFEFF/, "").trim();
+  if(!raw) return { ok: false, msg: "빈 파일입니다" };
+  var data = null;
+  try{ data = JSON.parse(raw); }catch(e){ data = null; }
+  if(!data) return { ok: false, msg: "JSON을 읽지 못했습니다 — 파일을 확인해 주세요" };
+
+  var orders = [], markets = [], scannedAt = "";
+  if(Array.isArray(data)) orders = data;
+  else if(typeof data === "object"){
+    scannedAt = str(data.collectedAt || data.scannedAt || data.at || data.savedAt || "");
+    if(Array.isArray(data.orders)) orders = orders.concat(data.orders);
+    if(Array.isArray(data.markets)) markets = markets.concat(data.markets);
+    else if(data.markets && typeof data.markets === "object"){
+      Object.keys(data.markets).forEach(function(k){
+        var v = data.markets[k];
+        markets.push(Object.assign({ market: k }, (v && typeof v === "object") ? v : {}));
+      });
+    }
+    if(!markets.length && (data.store || data.summary)){
+      markets.push(Object.assign({ market: str(data.store && (data.store.name || data.store.market)) }, data.summary || {}));
+    }
+    if(!orders.length && Array.isArray(data.rows)) orders = data.rows;
+  }
+  if(!orders.length && !markets.length) return { ok: false, msg: "마켓 현황(markets)도 주문 목록(orders)도 없습니다" };
+
+  var flat = [], mCount = 0;
+  markets.forEach(function(m){
+    if(!m || typeof m !== "object") return;
+    var name = marketCanon(m.market || m.storeName || m.store || m.name || "");
+    var mos = Array.isArray(m.orders) ? m.orders : [];
+    var patch = { checkedAt: str(m.checkedAt || m.scannedAt || m.updatedAt || scannedAt) };
+    var n1 = marketNumOrNull(m.newOrders !== undefined ? m.newOrders : m.new);
+    var n2 = marketNumOrNull(m.pending !== undefined ? m.pending : (m.shippingPending !== undefined ? m.shippingPending : (m.waiting !== undefined ? m.waiting : m.wait)));
+    var n3 = marketNumOrNull(m.dueSoon !== undefined ? m.dueSoon : (m.urgent !== undefined ? m.urgent : m.dueSoonCount));
+    if(n1 !== null) patch.newOrders = n1;
+    if(n2 !== null) patch.pending = n2;
+    if(n3 !== null) patch.dueSoon = n3;
+    if(m.storeId) patch.storeId = str(m.storeId);
+    if(typeof m.orders === "number") patch.orderRows = Math.max(0, Math.round(num(m.orders, 0)));
+    if(!name) return;
+    if(n1 !== null || n2 !== null || n3 !== null || mos.length || typeof m.orders === "number" || patch.storeId){
+      marketPatchEntry(name, patch);
+      mCount++;
+    }
+    mos.forEach(function(o){
+      if(!o || typeof o !== "object") return;
+      var it = Object.assign({}, o);
+      it.market = it.market ? marketCanon(it.market) : name;
+      if(!str(it.stage)) it.stage = ORDER_STAGES[0];
+      flat.push(it);
+    });
+  });
+  orders.forEach(function(o){
+    if(!o || typeof o !== "object") return;
+    var it = Object.assign({}, o);
+    if(!str(it.market)) return;                 // 마켓을 모르는 주문은 현황판에 넣지 않습니다
+    it.market = marketCanon(it.market);
+    if(!str(it.stage)) it.stage = ORDER_STAGES[0];
+    flat.push(it);
+  });
+  var seen = {}, uniq = [];
+  flat.forEach(function(o){
+    var key = str(o.market) + "|" + str(o.orderNo || o.name || "");
+    if(seen[key]) return;
+    seen[key] = 1;
+    uniq.push(o);
+  });
+  var res = orderMergeCore(uniq);
+  if(!mCount && !uniq.length) return { ok: false, msg: "마켓 현황도 주문도 읽지 못했습니다 — 파일 형식을 확인해 주세요" };
+  state.marketBoardAt = scannedAt ? scannedAt : new Date().toISOString();
+  if(mCount || uniq.length){ ordMarketOnly = true; }
+  save();
+  renderOrdersView();
+  var out = { ok: true, markets: mCount, orders: uniq.length, added: res.added, updated: res.updated, source: str(sourceName) };
+  toast("마켓 " + mCount + "곳 · 주문 " + uniq.length + "건을 넣었습니다 (새 " + res.added + " · 갱신 " + res.updated + ")", "ok");
+  return out;
+}
+function marketImportText(text, filename){
+  var r = marketImportJson(text, filename || "");
+  if(!r.ok) toast(r.msg, "bad");
+  return r;
+}
+/* ---- 마켓 목록 (번호·스토어명만 읽고 이메일·전화번호는 버립니다) ---- */
+function marketListFromRows(rows){
+  if(!rows || !rows.length) return [];
+  var head = (rows[0] || []).map(function(h){ return str(h).replace(/\s+/g, "").toLowerCase(); });
+  var iNo = -1, iName = -1;
+  head.forEach(function(h, i){
+    if(iNo < 0 && /^(번호|no|n0|순번|연번)$/.test(h)) iNo = i;
+    if(iName < 0 && /(스토어명|마켓명|스토어이름|상호|스토어|마켓|이름)/.test(h)) iName = i;
+  });
+  if(iName < 0) iName = (head.length > 1 ? 1 : 0);
+  if(iNo < 0) iNo = (head.length > 1 ? 0 : -1);
+  var out = [], seen = {};
+  rows.slice(1).forEach(function(r){
+    var name = str(r[iName]).replace(/\s+/g, " ").trim();
+    if(!name) return;
+    var noRaw = iNo >= 0 ? str(r[iNo]).trim() : "";
+    var alias = "";
+    var m = name.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+    if(m){ name = m[1].trim(); alias = m[2].trim(); }
+    if(!name || seen[name]) return;
+    seen[name] = 1;
+    out.push({ no: (/^\d+$/.test(noRaw) ? parseInt(noRaw, 10) : ""), name: name, alias: alias });
+  });
+  return out;
+}
+function marketListImportRows(rows, sourceName){
+  var list = marketListFromRows(rows);
+  if(!list.length){ toast("마켓 목록을 읽지 못했습니다 — 첫 줄에 '번호'와 '스토어명' 열이 있어야 합니다", "bad"); return 0; }
+  state.marketList = list;
+  save();
+  renderOrdersView();
+  toast("마켓 목록 " + list.length + "곳을 불러왔습니다 — 번호·스토어명만 저장하고 이메일·전화번호는 읽지 않습니다", "ok");
+  return list.length;
+}
+function marketListCsvText(){
+  var lines = ["번호,스토어명,별칭"];
+  marketBoardList().forEach(function(m){
+    lines.push([str(m.no), str(m.name), str(m.alias)].join(","));
+  });
+  return "\uFEFF" + lines.join("\r\n") + "\r\n";
+}
+function marketListReset(){
+  state.marketList = [];
+  save();
+  renderOrdersView();
+  toast("마켓 목록을 기본 34곳으로 되돌렸습니다", "ok");
+}
+function marketListCsvDownload(){
+  download(marketListCsvText(), "로이창고_마켓목록_34곳_" + stamp() + ".csv", "text/csv;charset=utf-8");
+  toast("마켓 목록 CSV를 내려받았습니다 — 스토어명을 고쳐 [🗂 마켓 목록]으로 다시 넣으면 됩니다", "ok");
+}
+/* ---- 현황판 동작 ---- */
+function marketOpen(name){
+  var nm = marketCanon(name);
+  if(!nm) return;
+  ordFilter = "mk:" + nm;
+  ordMarketOnly = true;
+  renderOrdersView();
+  var el = document.getElementById("ordList");
+  if(el && el.scrollIntoView){ try{ el.scrollIntoView({ block: "start" }); }catch(e){} }
+  var n = marketOrdersOf(nm).length;
+  toast(nm + " 주문 " + n + "건만 보고 있습니다 — 위 [전체]를 누르면 모두 보입니다", n ? "ok" : "bad");
+}
+function marketBoardReset(){
+  if(!confirm("가져온 마켓 주문 현황만 지울까요? 아래 주문 목록(주문 건)은 그대로 남습니다.")) return;
+  state.marketBoard = {};
+  state.marketBoardAt = "";
+  save();
+  renderOrdersView();
+  toast("마켓 주문 현황을 지웠습니다 — 주문 목록은 그대로입니다", "ok");
+}
+function marketStoreOpen(){
+  try{ window.open(MARKET_STORE_URL, "_blank"); }catch(e){}
+  toast("스마트스토어센터를 엽니다 — 로그인한 스토어의 주문·발송관리를 보세요", "ok");
 }
 
 /* =========================================================
@@ -8719,7 +9228,31 @@ var RoiChanggoCore = {
   csPrompt: csPrompt,
   csOrderLines: csOrderLines,
   renderOrdersView: renderOrdersView,
-  orderRefreshRow: orderRefreshRow
+  orderRefreshRow: orderRefreshRow,
+  // v2.6 — 34개 마켓 주문 현황
+  MARKET_34: MARKET_34,
+  marketBoardList: marketBoardList,
+  marketCanon: marketCanon,
+  marketRow: marketRow,
+  marketOrdersOf: marketOrdersOf,
+  marketOrderSummary: marketOrderSummary,
+  marketBoardTotals: marketBoardTotals,
+  marketOutsideList: marketOutsideList,
+  marketImportJson: marketImportJson,
+  marketImportText: marketImportText,
+  marketListFromRows: marketListFromRows,
+  marketListImportRows: marketListImportRows,
+  marketListCsvText: marketListCsvText,
+  marketListReset: marketListReset,
+  marketOpen: marketOpen,
+  marketBoardReset: marketBoardReset,
+  marketOnlyOn: function(v){ ordMarketOnly = !!v; },
+  marketOnly: function(){ return ordMarketOnly; },
+  renderMarketBoard: renderMarketBoard,
+  state_marketBoard: function(){ return state.marketBoard; },
+  state_marketList: function(){ return state.marketList; },
+  state_marketBoardAt: function(){ return state.marketBoardAt; },
+  marketAtText: marketAtText
 };
 try{
   if(typeof globalThis !== "undefined") globalThis.RoiChanggoCore = RoiChanggoCore;

@@ -378,8 +378,89 @@
       });
       render();
     }
+    if (area === 'local' && changes.smartstoreLastResult) loadMarket();
+  });
+
+  /* ---------------- 스마트스토어 주문 수집 (v2.3.0) ---------------- */
+  var mktInfo = document.getElementById('mktInfo');
+  var mktCollect = document.getElementById('mktCollect');
+  var mktDownload = document.getElementById('mktDownload');
+  var mktOpen = document.getElementById('mktOpen');
+  var marketLast = null;
+
+  function marketStamp() {
+    var d = new Date();
+    var p2 = function (v) { return String(v).padStart(2, '0'); };
+    return d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '_' + p2(d.getHours()) + p2(d.getMinutes());
+  }
+
+  function loadMarket() {
+    chrome.storage.local.get({ smartstoreLastResult: null, smartstorePanelPos: null }, function (res) {
+      marketLast = res.smartstoreLastResult || null;
+      mktDownload.disabled = !marketLast;
+      if (!marketLast || !marketLast.summary) {
+        mktInfo.innerHTML = '스마트스토어센터 <b>주문·발송관리</b> 화면을 연 뒤 아래 버튼을 누르면 그 화면의 주문을 읽어 로이창고용 JSON으로 만듭니다.';
+        return;
+      }
+      var s = marketLast.summary || {};
+      var nm = (marketLast.store && marketLast.store.name) || '스토어명 없음';
+      mktInfo.innerHTML = '마지막 수집: <b>' + escapeHtml(nm) + '</b> · 주문 <b>' + (s.rows || 0) + '</b>건' +
+        ' · 신규 <b>' + (s.newOrders || 0) + '</b> · 발송대기 <b>' + (s.pending || 0) + '</b> · 기한임박 <b>' + (s.dueSoon || 0) + '</b>' +
+        '<br><span style="color:#9ca3af">' + escapeHtml(String(marketLast.collectedAt || '').slice(0, 16).replace('T', ' ')) + '</span>';
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  function collectFromTab() {
+    if (!chrome.tabs || !chrome.tabs.query) { flash('이 브라우저에서는 탭을 읽을 수 없습니다'); return; }
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      var tab = tabs && tabs[0];
+      if (!tab || tab.id === undefined) { flash('탭을 찾지 못했습니다'); return; }
+      var url = String(tab.url || '');
+      if (url.indexOf('sell.smartstore.naver.com') < 0) {
+        mktInfo.innerHTML = '지금 탭은 스마트스토어센터가 아닙니다. <b>스마트스토어센터 주문·발송관리</b> 화면을 연 뒤 다시 눌러 주세요.';
+        return;
+      }
+      chrome.tabs.sendMessage(tab.id, { type: 'LOI_SMARTSTORE_COLLECT' }, function (res) {
+        if (chrome.runtime.lastError || !res) {
+          mktInfo.innerHTML = '페이지와 연결하지 못했습니다. 스마트스토어센터 화면을 <b>F5로 새로고침</b>한 뒤 다시 눌러 주세요.';
+          return;
+        }
+        var r = res.result;
+        if (!r || !r.summary) { mktInfo.innerHTML = '주문을 읽지 못했습니다 — 주문 목록 화면인지 확인해 주세요.'; return; }
+        marketLast = r;
+        mktDownload.disabled = false;
+        var s = r.summary;
+        var nm2 = (r.store && r.store.name) || '';
+        if (!s.rows) {
+          mktInfo.innerHTML = '<b>' + escapeHtml(nm2 || '스토어') + '</b> — 이 화면에서 주문을 찾지 못했습니다.<br><span style="color:#9ca3af">주문·발송관리 목록을 열고 다시 누르거나, 페이지 안의 [🏪 스마트스토어 주문 수집] 패널에서 스토어명을 직접 적어 보세요.</span>';
+          return;
+        }
+        mktInfo.innerHTML = '<b>' + escapeHtml(nm2) + '</b> 주문 <b>' + s.rows + '</b>건 · 신규 <b>' + s.newOrders + '</b>' +
+          ' · 발송대기 <b>' + s.pending + '</b> · 기한임박 <b>' + s.dueSoon + '</b><br><span style="color:#9ca3af">[⬇ 마지막 수집 JSON]으로 저장한 뒤 로이창고 [📂 주문 현황 JSON 가져오기]로 넣으세요.</span>';
+        flash('주문 ' + s.rows + '건을 읽었습니다');
+      });
+    });
+  }
+
+  if (mktCollect) mktCollect.addEventListener('click', collectFromTab);
+  if (mktDownload) mktDownload.addEventListener('click', function () {
+    if (!marketLast) return;
+    var nm = (marketLast.store && marketLast.store.name) || '스마트스토어';
+    download('로이창고_주문현황_' + nm + '_' + marketStamp() + '.json', JSON.stringify(marketLast, null, 2), 'application/json;charset=utf-8');
+    flash('주문 현황 JSON을 내려받았습니다 — 로이창고 [📂 주문 현황 JSON 가져오기]로 여세요');
+  });
+  if (mktOpen) mktOpen.addEventListener('click', function () {
+    try { chrome.tabs.create({ url: 'https://sell.smartstore.naver.com' }); }
+    catch (e) { flash('주소를 직접 열어 주세요: sell.smartstore.naver.com'); }
   });
 
   load();
   loadBulk();
+  loadMarket();
 })();
