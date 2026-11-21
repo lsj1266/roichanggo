@@ -492,6 +492,51 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 .cautions,.caution{margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:var(--ink-2)}
 .caution li{margin-bottom:5px;word-break:keep-all}
 .caution b{color:var(--ink)}
+/* ---------- v2.5 주문·배송 관리 ---------- */
+.vtable.ord .vhead,.vtable.ord .vrow{grid-template-columns:60px minmax(122px,1fr) minmax(250px,1.8fr) 92px minmax(224px,1.5fr) minmax(206px,1.4fr) minmax(120px,.9fr) 74px}
+.vtable.ord{overflow-x:auto}
+.vtable.ord .vhead,.vtable.ord .vrow{min-width:1150px}
+.vtable.ord .vrow{align-items:start;padding:8px 9px}
+.vtable.ord input,.vtable.ord select{height:26px;font-size:11.5px}
+.vtable.ord input[type=date]{padding:0 3px}
+.ordcell{display:grid;gap:3px;min-width:0}
+.ordline{display:grid;gap:3px;min-width:0}
+.ordline.c2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.ordline.c3{grid-template-columns:52px minmax(0,1fr) minmax(0,0.9fr)}
+.ordmini{font-size:10.5px;color:var(--muted);line-height:1.35}
+.dday{display:inline-block;font-size:11px;font-weight:800;border-radius:6px;padding:1px 6px;background:#eef1f7;color:#5b6478;white-space:nowrap}
+.dday.ok{background:var(--ok-soft);color:#0b7f60}
+.dday.warn{background:var(--warn-soft);color:#a35c00}
+.dday.urgent{background:#ffe8e8;color:#c12f36}
+.dday.late{background:var(--danger);color:#fff}
+.dday.done{background:#e8f7f1;color:#0f9d76}
+.dday.none{background:#f1f3f9;color:#8590ab}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.cmp label{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:3px;font-size:10px;color:var(--muted);font-weight:700}
+.cmp input{min-width:0}
+.cmp input.best{border-color:var(--ok);background:#f3fdf9;font-weight:800;color:#0b7f60;box-shadow:0 0 0 2px rgba(15,157,118,.10)}
+.cmpout{font-size:10.5px;margin-top:3px;color:var(--ink-2);line-height:1.4}
+.cmpout b{font-size:11.5px}
+.cmpout.ok b{color:var(--ok)}
+.cmpout.bad b{color:var(--danger)}
+.stagepill{display:inline-block;font-size:10px;font-weight:800;border-radius:6px;padding:1px 5px;background:#eef1f7;color:#5b6478;white-space:nowrap}
+.stagepill.st-new{background:#fff4e0;color:#a35c00}
+.stagepill.st-order{background:#e9f0ff;color:#2b4fa0}
+.stagepill.st-wait{background:#eef0ff;color:#3f3fa8}
+.stagepill.st-ship{background:#e6f0ff;color:#1d5cc4}
+.stagepill.st-move{background:#e8f7f1;color:#0b7f60}
+.stagepill.st-done{background:#0f9d76;color:#fff}
+.stagepill.st-cancel{background:#f1f3f9;color:#8590ab}
+.ordtools{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 9px}
+.ordtools .sp{margin-left:auto}
+.ochip{height:27px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:11.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.ochip:hover{border-color:#cfd7ea;color:var(--ink)}
+.ochip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ochip .n{font-weight:800;opacity:.7;margin-left:3px}
+.ord-sum{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:9px;font-size:12px;color:var(--ink-2)}
+.ord-sum b{color:var(--ink)}
+.cspv{white-space:pre-wrap;font-size:12.5px;line-height:1.65;background:#fbfcff;border:1px solid var(--line);border-radius:10px;padding:10px;max-height:46vh;overflow:auto}
+.cshead{font-size:11.5px;color:var(--muted);margin-top:8px}
 @media (max-width:900px){
   .viewtabs{top:0;padding:7px 10px}
   .vtable{overflow-x:auto}
@@ -505,7 +550,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
   <div class="brand">
     <div class="logo">🛒</div>
     <div>
-      <h1>로이창고 <span class="ver">v2.4</span></h1>
+      <h1>로이창고 <span class="ver">v2.5</span></h1>
       <div class="sub">로이 전용 구매대행 상품 가공·업로드 작업실 · 중국/일본 소싱 → 스마트스토어·쿠팡·G마켓</div>
     </div>
   </div>
@@ -524,6 +569,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 
 <nav class="viewtabs" id="viewTabs" aria-label="화면 선택">
   <button type="button" class="vtab on" data-view="products">🛒 상품 작업</button>
+  <button type="button" class="vtab" data-view="orders">📦 주문·배송 관리</button>
   <button type="button" class="vtab" data-view="tz">📦 천조직구 신청서</button>
   <button type="button" class="vtab" data-view="domestic">🏠 국내 위탁</button>
   <button type="button" class="vtab" data-view="tax">🧾 세무 장부</button>
@@ -634,6 +680,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
 <input type="file" id="tzItemFile" accept=".xls,.csv,.html,.txt,text/html,text/csv" hidden>
 <input type="file" id="domesticFile" accept=".json,.csv,.xlsx,.xls,application/json,text/csv" hidden>
 <input type="file" id="taxFile" accept=".csv,.xlsx,.xls,.json,text/csv" hidden>
+<input type="file" id="orderFile" accept=".csv,.xlsx,.xls,.json,.html,.txt,application/json,text/csv" hidden>
 
 <script>
 (function(){
@@ -643,7 +690,7 @@ input.bad,textarea.bad{border-color:#eab6b8;background:#fffafa}
    1. 상수 · 금칙어 · 샘플 데이터
    ========================================================= */
 var STORAGE_KEY = "roi_changgo_v2";
-var APP_VERSION = 2.4;
+var APP_VERSION = 2.5;
 
 // 실제 확인된 퍼센티 / 스마트스토어 금칙어 20종 + 치환 제안
 var BANNED = [
@@ -772,8 +819,68 @@ var DEFAULT_SETTINGS = {
   // 천조직구 신청서 기본값 (접수·결제는 하지 않습니다)
   tzCenter: "위해", tzWay: "해운(인천)",
   // 개인용 천조직구 API 키 — 이 브라우저(localStorage)에만 저장, 저장소에는 절대 넣지 않음
-  tzApiKey: ""
+  tzApiKey: "",
+  // 주문·배송 관리 (v2.5) — 발송기한 기본값은 주문일 + 며칠
+  orderDueDays: 3, orderFee: 5.5,
+  // 배대지 계정 — 이 브라우저에만 저장 (공개 저장소에는 넣지 않습니다)
+  fwTzId: "", fwArakuBox: ""
 };
+
+/* ---------- v2.5: 주문·배송 관리 기준값 ---------- */
+// 주문이 지나는 단계 — 순서대로 [▶ 다음]을 누르면 넘어갑니다
+var ORDER_STAGES = ["신규주문", "해외/도매 발주완료", "배대지 입고대기", "배대지 결제/출고", "국내집화/배송중", "배송완료"];
+var ORDER_CANCEL = "취소·반품";
+var ORDER_DONE = "배송완료";
+var ORDER_STAGE_SHORT = {
+  "신규주문": "신규", "해외/도매 발주완료": "발주", "배대지 입고대기": "입고대기",
+  "배대지 결제/출고": "출고", "국내집화/배송중": "배송중", "배송완료": "완료", "취소·반품": "취소"
+};
+var ORDER_STAGE_CLASS = {
+  "신규주문": "st-new", "해외/도매 발주완료": "st-order", "배대지 입고대기": "st-wait",
+  "배대지 결제/출고": "st-ship", "국내집화/배송중": "st-move", "배송완료": "st-done", "취소·반품": "st-cancel"
+};
+// 성재님이 운영하는 스마트스토어 34곳 + 테무 (이름만 — 이메일·사업자번호·전화번호는 넣지 않습니다)
+var ORDER_MARKETS = [
+  "유유마켓", "유유스토어", "유진상사", "모던픽", "바이유", "솔리드픽", "스냅딜", "스타트픽",
+  "슬릭딜", "유글로벌", "유비즈", "트렌지오", "웰모", "드라빅스", "노제보", "크레피스",
+  "보르텔릭스", "줌보라", "플렉시보", "젯딜", "넥스트로바", "크레보닉스", "브리벨로", "드렉시코",
+  "짐보라", "클로브릭스", "웰바노", "트릭소바", "글렌픽스", "블루베노", "젤드록스", "옴니벡스",
+  "플롬벡스", "루벨릭스", "테무", "기타"
+];
+// 배대지 · 도매처 — 어디로 발주했는지 한 칸으로 고릅니다 (국내 위탁·테무도 여기서 구분)
+var ORDER_VENDORS = [
+  { v: "천조직구", label: "천조직구 (중국 배대지)", site: "https://tz1004.co.kr/", ch: "해외" },
+  { v: "아라쿠", label: "아라쿠 (일본 배대지)", site: "https://araku.co.kr/", ch: "해외" },
+  { v: "국내택배", label: "국내택배 (직배송)", site: "", ch: "해외" },
+  { v: "온채널", label: "온채널 (국내 위탁)", site: "https://www.onch.co.kr/", ch: "국내위탁" },
+  { v: "오너클랜", label: "오너클랜 (국내 위탁)", site: "https://ownerclan.com/", ch: "국내위탁" },
+  { v: "도매매", label: "도매매 (국내 위탁)", site: "https://domeme.domeggook.com/", ch: "국내위탁" },
+  { v: "테무", label: "테무", site: "https://www.temu.com/", ch: "테무" },
+  { v: "기타", label: "기타", site: "", ch: "해외" }
+];
+var ORDER_CHANNELS = ["해외", "국내위탁", "테무"];
+// 국내 택배사 — 송장번호로 바로 조회되는 주소
+var ORDER_COURIERS = [
+  { v: "CJ대한통운", label: "CJ대한통운", url: "https://trace.cjlogistics.com/next/tracking.html?wblNo=" },
+  { v: "우체국택배", label: "우체국택배", url: "https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?displayHeader=N&sid1=" },
+  { v: "한진택배", label: "한진택배", url: "https://www.hanjin.com/kor/CMS/DeliveryMgr/WaybillResult.do?mCode=MN038&schLang=KR&wblnumText2=" },
+  { v: "롯데택배", label: "롯데택배", url: "https://www.lotteglogis.com/open/tracking?InvNo=" },
+  { v: "로젠택배", label: "로젠택배", url: "https://www.ilogen.com/web/personal/trace/" },
+  { v: "경동택배", label: "경동택배", url: "https://kdexp.com/newDeliverySearch.kd?barcode=" },
+  { v: "편의점택배", label: "편의점택배(GS25)", url: "https://www.cvsnet.co.kr/invoice/tracking.do?invoice_no=" },
+  { v: "기타", label: "기타 (17TRACK)", url: "" }
+];
+// 현지(중국·일본) 트래킹은 17TRACK에서 한 번에 조회합니다
+var ORDER_LOCAL_TRACK = "https://t.17track.net/ko#nums=";
+// CS 문의 유형
+var CS_TYPES = [
+  { v: "ship-delay", label: "배송지연 · 선적지연 안내" },
+  { v: "soldout", label: "품절 · 재고부족 대안 안내" },
+  { v: "return", label: "단순변심 교환 · 반품 (왕복배송비)" },
+  { v: "customs", label: "개인통관고유부호 요청" },
+  { v: "broken", label: "파손 · 오배송 대응" },
+  { v: "general", label: "일반 문의" }
+];
 
 // 수집기 source 코드/한글 라벨 → 로이창고 표준 표기
 var SOURCE_MAP = {
@@ -1667,6 +1774,7 @@ function loadState(){
         s.domestic = (Array.isArray(s.domestic) ? s.domestic : []).map(normDomestic);
         s.tax = normTax(s.tax);
         s.tz = normTz(s.tz);
+        s.orders = (Array.isArray(s.orders) ? s.orders : []).map(normOrder);
         return s;
       }
     }
@@ -1684,7 +1792,8 @@ function makeInitialState(){
     products: [],
     domestic: [],
     tax: blankTax(),
-    tz: blankTz()
+    tz: blankTz(),
+    orders: []
   };
 }
 
@@ -5762,6 +5871,17 @@ function openSettings(){
     '</label>' +
     '<div class="friendly" style="margin-top:4px">이 키는 <b>이 브라우저(localStorage)에만</b> 저장되고 저장소·README·커밋에는 들어가지 않습니다. 지금 천조직구는 공개 API를 제공하지 않아 자동 접수에는 쓰이지 않으며, 신청서 채우기는 엑셀·확장 프로그램으로 합니다.</div>' +
 
+    '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">주문·배송 관리 (v2.5)</h4>' +
+    '<div class="g2">' +
+      numField("발송기한 기본 (주문일 + 며칠)", "setOrderDueDays", s.orderDueDays, "일", "1") +
+      numField("주문 기본 마켓 수수료", "setOrderFee", s.orderFee, "%", "0.1") +
+    '</div>' +
+    '<div class="g2" style="margin-top:8px">' +
+      txtField("천조직구 아이디 (선택)", "setFwTzId", s.fwTzId, "비워 두셔도 됩니다") +
+      txtField("아라쿠 사서함 번호 (선택)", "setFwArakuBox", s.fwArakuBox, "예: AK00000") +
+    '</div>' +
+    '<div class="friendly" style="margin-top:4px">발송기한은 <b>주문일 + 여기 적은 날짜</b>로 자동 계산되고, 주문마다 따로 고칠 수 있습니다. 배대지 아이디·사서함 번호는 <b>이 브라우저에만</b> 저장되고 저장소에는 들어가지 않습니다.</div>' +
+
     '<h4 style="margin:16px 0 8px;font-size:12.5px;color:#a33c0a">스마트스토어기본값</h4>' +
     '<div class="g2">' +
       txtField("수입사명", "setImporter", s.importer, "예: ○○커머스") +
@@ -5834,6 +5954,10 @@ function openSettings(){
     state.settings.tzCenter = str(v("setTzCenter")) || "위해";
     state.settings.tzWay = str(v("setTzWay")) || "해운(인천)";
     state.settings.tzApiKey = str(v("setTzApiKey")).trim();
+    state.settings.orderDueDays = Math.max(0, Math.round(num(v("setOrderDueDays"), 3)));
+    state.settings.orderFee = num(v("setOrderFee"), 5.5);
+    state.settings.fwTzId = str(v("setFwTzId")).trim();
+    state.settings.fwArakuBox = str(v("setFwArakuBox")).trim();
   }
 
   var ct = document.getElementById("clearTrans");
@@ -5873,6 +5997,7 @@ function closeModal(){ document.getElementById("overlay").classList.remove("on")
 function renderAll(){
   if(!hasDOM()) return;
   syncViewChrome();
+  if(uiView === "orders"){ renderOrdersView(); return; }
   if(uiView === "tz"){ renderTzView(); return; }
   if(uiView === "domestic"){ renderDomesticView(); return; }
   if(uiView === "tax"){ renderTaxView(); return; }
@@ -5902,7 +6027,7 @@ function init(){
    12-5. v2.4 — 화면 전환 (상품 작업 · 천조직구 신청서 · 국내 위탁 · 세무 장부)
    ========================================================= */
 function setView(v){
-  if(["products", "tz", "domestic", "tax"].indexOf(v) < 0) v = "products";
+  if(["products", "orders", "tz", "domestic", "tax"].indexOf(v) < 0) v = "products";
   uiView = v;
   renderAll();
   try{ if(typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0); }catch(e){}
@@ -6954,6 +7079,7 @@ function renderTaxView(){
       '</div></div>' +
       '<div class="acts">' +
         '<button class="btn sm" data-act="taxAdd">＋ 주문 추가</button>' +
+        '<button class="btn sm" data-act="orderTaxPull" title="주문·배송 관리의 배송완료 주문을 장부로 가져옵니다">📦 주문관리 완료 건 가져오기</button>' +
         '<button class="btn sm" data-act="taxFromProducts" title="지금 상품 목록의 판매가·원가·배송비로 예상 장부를 만듭니다">현재 상품으로 예상 장부</button>' +
         '<button class="btn sm primary" data-act="taxExportCsv">⬇ 홈택스 정산 CSV</button>' +
         '<button class="btn sm" data-act="taxExportExcel">⬇ 엑셀</button>' +
@@ -7350,6 +7476,21 @@ function v24Action(act, el, ev){
     case "taxImport": { var tf = document.getElementById("taxFile"); if(tf) tf.click(); return true; }
     case "taxExportCsv": taxExport("csv"); return true;
     case "taxExportExcel": taxExport("xlsx"); return true;
+    case "orderAdd": orderAdd(); return true;
+    case "orderDel": orderDel(idx); return true;
+    case "orderNext": orderNext(idx); return true;
+    case "orderToTax": { orderToTax(idx); renderOrdersView(); return true; }
+    case "ordersToTax": { ordersToTaxAll(); renderOrdersView(); return true; }
+    case "orderTaxPull": { ordersToTaxAll(); renderTaxView(); return true; }
+    case "orderToTz": orderToTz(idx); return true;
+    case "orderTrack": orderTrack(idx, el && el.dataset ? el.dataset.kind : ""); return true;
+    case "orderCs": orderCsOpen(idx); return true;
+    case "orderInvoice": orderInvoiceSheet(); return true;
+    case "orderFilter": ordFilter = (el && el.dataset && el.dataset.f) ? el.dataset.f : "all"; renderOrdersView(); return true;
+    case "orderImport": { var of = document.getElementById("orderFile"); if(of) of.click(); return true; }
+    case "orderCsv": orderExportCsv(); return true;
+    case "orderJson": orderExportJson(); return true;
+    case "orderTemplate": orderTemplate(); return true;
     default: return false;
   }
 }
@@ -7374,6 +7515,12 @@ function bindV24(){
       var ti = parseInt(t.dataset.taxi, 10);
       taxSet(ti, t.dataset.taxf, t.value);
       taxRefreshRow(ti);
+      return;
+    }
+    if(t.dataset.ordf !== undefined && t.dataset.ordi !== undefined){
+      var oi = parseInt(t.dataset.ordi, 10);
+      orderSet(oi, t.dataset.ordf, t.value);
+      orderRefreshRow(oi);
       return;
     }
   });
@@ -7404,6 +7551,34 @@ function bindV24(){
     if(t.dataset.domf !== undefined && t.dataset.domi !== undefined){
       domesticSet(parseInt(t.dataset.domi, 10), t.dataset.domf, t.value);
       renderDomesticView();
+      return;
+    }
+    if(t.dataset.ordf !== undefined && t.dataset.ordi !== undefined){
+      var oi2 = parseInt(t.dataset.ordi, 10);
+      orderSet(oi2, t.dataset.ordf, t.value);
+      if(t.dataset.ordf === "stage" || t.dataset.ordf === "market" || t.dataset.ordf === "forwarder"){ renderOrdersView(); return; }
+      orderRefreshRow(oi2);
+      return;
+    }
+    if(t.id === "orderFile" && t.files && t.files[0]){
+      var f5 = t.files[0];
+      if(/\.json$/i.test(f5.name || "")){
+        var rd5 = new FileReader();
+        rd5.onload = function(){ orderImportJsonText(String(rd5.result || ""), f5.name); t.value = ""; };
+        rd5.onerror = function(){ toast("파일을 읽지 못했습니다", "bad"); t.value = ""; };
+        rd5.readAsText(f5, "utf-8");
+      }else{
+        readTableFile(f5).then(function(rows){
+          orderImportRows(rows, f5.name);
+          t.value = "";
+        }, function(e){
+          var msg = String(e && e.message);
+          toast(msg === "old-xls" ? "옛 엑셀(.xls) 형식입니다 — 엑셀에서 .xlsx나 CSV로 저장해 불러와 주세요"
+            : (/inflate/.test(msg) ? "이 브라우저에서는 엑셀 압축을 풀지 못했습니다 — CSV로 저장해 불러와 주세요"
+            : "파일을 읽지 못했습니다 — 엑셀에서 CSV로 저장해 불러와 주세요"), "bad");
+          t.value = "";
+        });
+      }
       return;
     }
     if(t.id === "tzItemFile" && t.files && t.files[0]){
@@ -7455,6 +7630,926 @@ function bindV24(){
     var tab = e.target && e.target.closest ? e.target.closest("[data-view]") : null;
     if(tab){ setView(tab.getAttribute("data-view")); }
   });
+}
+
+/* =========================================================
+   12-10. v2.5 — 주문·배송 관리 (계산)
+   ========================================================= */
+var ordFilter = "all";
+
+function todayYmd(d){
+  d = d || new Date();
+  return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate());
+}
+function ymdToMs(s){
+  var m = str(s).match(/(\d{4})\s*[-.\/년]\s*(\d{1,2})\s*[-.\/월]\s*(\d{1,2})/);
+  if(!m) return NaN;
+  return new Date(num(m[1], 0), num(m[2], 1) - 1, num(m[3], 1)).getTime();
+}
+function addDaysYmd(s, n){
+  var ms = ymdToMs(s);
+  if(!isFinite(ms)) return "";
+  var d = new Date(ms);
+  d.setDate(d.getDate() + Math.round(num(n, 0)));
+  return todayYmd(d);
+}
+function normYmd(v){
+  var s = str(v).trim();
+  if(!s) return "";
+  if(/^\d{8}$/.test(s)) return s.slice(0,4) + "-" + s.slice(4,6) + "-" + s.slice(6,8);
+  // 엑셀 날짜 일련번호 (예: 45678)
+  if(/^\d{5}$/.test(s)){
+    var n = parseInt(s, 10);
+    if(n > 20000 && n < 80000){
+      var d0 = new Date(Date.UTC(1899, 11, 30) + n * 86400000);
+      return d0.getUTCFullYear() + "-" + pad(d0.getUTCMonth()+1) + "-" + pad(d0.getUTCDate());
+    }
+  }
+  var ms = ymdToMs(s);
+  if(!isFinite(ms)) return "";
+  return todayYmd(new Date(ms));
+}
+function orderDueDays(){
+  return Math.max(0, Math.round(num(state && state.settings ? state.settings.orderDueDays : 3, 3)));
+}
+function moneyOf(v){
+  var s = str(v).replace(/[^\d.\-]/g, "");
+  return Math.max(0, Math.round(num(s, 0)));
+}
+
+function blankOrder(){
+  return {
+    id: uid(), orderDate: todayYmd(), market: "", orderNo: "", name: "", qty: 1,
+    receiver: "", phone: "", personNo: "", addr: "",
+    sale: 0, due: "", stage: ORDER_STAGES[0],
+    pTaobao: 0, p1688: 0, pSuper: 0, pDomestic: 0,
+    intlShip: 0, domShip: 0,
+    feeRate: num(state && state.settings ? state.settings.orderFee : 5.5, 5.5),
+    forwarder: "", fwOrderNo: "", localTracking: "",
+    courier: "", tracking: "",
+    memo: "", taxDone: false, taxRowId: "", doneDate: "",
+    csType: "", csText: "", csDraft: "", csAt: 0,
+    updatedAt: Date.now()
+  };
+}
+function normOrder(raw){
+  var o = Object.assign(blankOrder(), raw || {});
+  var stages = (typeof ORDER_STAGES !== "undefined" && ORDER_STAGES.length) ? ORDER_STAGES : ["신규주문"];
+  o.id = str(o.id) || uid();
+  o.orderDate = normYmd(o.orderDate);
+  o.due = normYmd(o.due);
+  o.doneDate = normYmd(o.doneDate);
+  ["market","orderNo","name","receiver","phone","personNo","addr",
+   "forwarder","fwOrderNo","localTracking","courier","tracking","memo",
+   "taxRowId","csType","csText","csDraft"].forEach(function(k){ o[k] = str(o[k]); });
+  o.qty = Math.max(1, Math.round(num(o.qty, 1)));
+  ["sale","pTaobao","p1688","pSuper","pDomestic","intlShip","domShip"].forEach(function(k){
+    o[k] = Math.max(0, Math.round(num(o[k], 0)));
+  });
+  o.feeRate = Math.max(0, num(o.feeRate, 5.5));
+  o.stage = (stages.indexOf(str(o.stage)) >= 0 || str(o.stage) === ORDER_CANCEL) ? str(o.stage) : stages[0];
+  o.taxDone = !!o.taxDone;
+  o.csAt = num(o.csAt, 0);
+  o.updatedAt = num(o.updatedAt, Date.now());
+  return o;
+}
+function orderChannel(o){
+  var f = str(o.forwarder);
+  if(f === "테무") return "테무";
+  if(f === "온채널" || f === "오너클랜" || f === "도매매") return "국내위탁";
+  return "해외";
+}
+function orderCandidates(o){
+  return [
+    { k: "pTaobao", label: "타오바오", v: num(o.pTaobao, 0) },
+    { k: "p1688", label: "1688", v: num(o.p1688, 0) },
+    { k: "pSuper", label: "슈퍼딜리버리", v: num(o.pSuper, 0) },
+    { k: "pDomestic", label: "국내위탁", v: num(o.pDomestic, 0) }
+  ];
+}
+/* 실결제가 네 곳 중 가장 싼 곳 (없으면 null) */
+function orderBest(o){
+  var best = null;
+  orderCandidates(o).forEach(function(c){
+    if(c.v > 0 && (!best || c.v < best.v)) best = c;
+  });
+  return best;
+}
+function orderFeeAmt(o){ return Math.round(num(o.sale, 0) * num(o.feeRate, 0) / 100); }
+function orderCost(o){
+  var b = orderBest(o);
+  if(!b) return 0;
+  return b.v + num(o.intlShip, 0) + num(o.domShip, 0);
+}
+function orderNet(o){
+  if(!num(o.sale, 0)) return orderBest(o) ? -orderCost(o) : 0;
+  return Math.round(num(o.sale, 0) - orderCost(o) - orderFeeAmt(o));
+}
+function orderMarginPct(o){
+  var s = num(o.sale, 0);
+  return s > 0 ? Math.round(orderNet(o) / s * 1000) / 10 : 0;
+}
+/* 발송기한 — 직접 넣은 날짜가 없으면 주문일 + 설정값(기본 3일) */
+function orderDue(o){
+  if(str(o.due)) return str(o.due);
+  if(str(o.orderDate)) return addDaysYmd(o.orderDate, orderDueDays());
+  return "";
+}
+function orderDday(o, today){
+  today = today || todayYmd();
+  if(o.stage === ORDER_DONE) return { label: "완료", cls: "done", days: null };
+  if(o.stage === ORDER_CANCEL) return { label: "취소", cls: "none", days: null };
+  var due = orderDue(o);
+  var dueMs = ymdToMs(due), todayMs = ymdToMs(today);
+  if(!isFinite(dueMs) || !isFinite(todayMs)) return { label: "기한 없음", cls: "none", days: null };
+  var days = Math.round((dueMs - todayMs) / 86400000);
+  if(days < 0) return { label: "지연 " + (-days) + "일", cls: "late", days: days };
+  if(days === 0) return { label: "오늘 발송", cls: "urgent", days: 0 };
+  return { label: "D-" + days, cls: (days <= 1 ? "urgent" : (days <= 3 ? "warn" : "ok")), days: days };
+}
+function orderStats(list){
+  var s = { n: 0, delayed: 0, today: 0, done: 0, moving: 0, noPrice: 0, noTax: 0, saleSum: 0, netSum: 0, stage: {} };
+  var todayS = todayYmd();
+  (list || []).forEach(function(o){
+    s.n++;
+    s.stage[o.stage] = (s.stage[o.stage] || 0) + 1;
+    if(o.stage === ORDER_DONE) s.done++;
+    if(o.stage !== ORDER_DONE && o.stage !== ORDER_CANCEL) s.moving++;
+    var d = orderDday(o, todayS);
+    if(d.cls === "late") s.delayed++;
+    if(d.days === 0 && o.stage !== ORDER_DONE && o.stage !== ORDER_CANCEL) s.today++;
+    if(!orderBest(o)) s.noPrice++;
+    if(o.stage === ORDER_DONE && !o.taxDone) s.noTax++;
+    s.saleSum += num(o.sale, 0);
+    s.netSum += orderNet(o);
+  });
+  return s;
+}
+function orderFilterMatch(o, f){
+  if(!f || f === "all") return true;
+  if(f.indexOf("stage:") === 0) return o.stage === f.slice(6);
+  if(f.indexOf("ch:") === 0) return orderChannel(o) === f.slice(3);
+  var d = orderDday(o);
+  if(f === "late") return d.cls === "late";
+  if(f === "today") return d.days === 0 && o.stage !== ORDER_DONE && o.stage !== ORDER_CANCEL;
+  if(f === "noprice") return !orderBest(o);
+  if(f === "notax") return o.stage === ORDER_DONE && !o.taxDone;
+  return true;
+}
+
+/* =========================================================
+   12-11. v2.5 — 주문·배송 관리 (화면)
+   ========================================================= */
+function ordMarginText(o){
+  var b = orderBest(o);
+  if(!b) return "발주가를 넣으면 최저가·순마진을 계산합니다";
+  var net = orderNet(o), pct = orderMarginPct(o);
+  return "최저 <b>" + esc(b.label) + "</b> " + won(b.v) + " · 순마진 <b>" + won(net) + "</b> (" + pct.toFixed(1) + "%)";
+}
+function ordOptions(list, cur, blankLabel){
+  var html = (blankLabel === null) ? "" : ('<option value="">' + esc(blankLabel || "—") + '</option>');
+  var hit = false;
+  (list || []).forEach(function(x){
+    var v = (typeof x === "string") ? x : x.v;
+    var lb = (typeof x === "string") ? x : x.label;
+    if(v === cur) hit = true;
+    html += '<option value="' + esc(v) + '"' + (v === cur ? " selected" : "") + '>' + esc(lb) + '</option>';
+  });
+  if(!hit && str(cur)) html += '<option value="' + esc(cur) + '" selected>' + esc(cur) + '</option>';
+  return html;
+}
+function renderOrdersView(){
+  if(!hasDOM()) return;
+  var ws = document.getElementById("workspace");
+  if(!ws) return;
+  var all = state.orders || [];
+  var st = orderStats(all);
+  var list = all.filter(function(o){ return orderFilterMatch(o, ordFilter); });
+  var html = '';
+  html += '<div class="phead"><div class="ttl">' +
+      '<h2>📦 주문·배송 관리</h2>' +
+      '<div class="sub"><span>주문 → 발주 → 배대지/도매처 → 국내배송 → 완료까지 한 화면</span>' +
+        '<span>전체 ' + st.n + '건 · 진행중 ' + st.moving + ' · 배송완료 ' + st.done + '</span>' +
+        (st.delayed ? '<span class="mini-badge mb-risk">발송 지연 ' + st.delayed + '</span>' : '') +
+        (st.today ? '<span class="mini-badge mb-warn">오늘 발송 ' + st.today + '</span>' : '') +
+        (st.noPrice ? '<span class="mini-badge mb-warn">발주가 없음 ' + st.noPrice + '</span>' : '') +
+      '</div></div>' +
+      '<div class="acts">' +
+        '<button class="btn sm" data-act="orderAdd">＋ 주문 추가</button>' +
+        '<button class="btn sm" data-act="orderInvoice">📋 송장 일괄 정리</button>' +
+        '<button class="btn sm primary" data-act="orderImport">⬆ 주문 불러오기 (CSV·엑셀·JSON)</button>' +
+      '</div></div>';
+
+  /* 단계 칩 */
+  html += '<div class="card"><div class="card-head"><div class="ico">🔎</div><h3>보기</h3>' +
+    '<span class="hint">칸을 고치면 바로 저장됩니다 — 자동 저장</span></div>';
+  html += '<div class="ordtools">' +
+    '<button class="ochip' + (ordFilter === "all" ? " on" : "") + '" data-act="orderFilter" data-f="all">전체<span class="n">' + st.n + '</span></button>' +
+    ORDER_STAGES.map(function(s){
+      return '<button class="ochip' + (ordFilter === ("stage:" + s) ? " on" : "") + '" data-act="orderFilter" data-f="stage:' + esc(s) + '">' + esc(ORDER_STAGE_SHORT[s]) + '<span class="n">' + (st.stage[s] || 0) + '</span></button>';
+    }).join("") +
+    '<button class="ochip' + (ordFilter === ("stage:" + ORDER_CANCEL) ? " on" : "") + '" data-act="orderFilter" data-f="stage:' + esc(ORDER_CANCEL) + '">취소<span class="n">' + (st.stage[ORDER_CANCEL] || 0) + '</span></button>' +
+  '</div>';
+  html += '<div class="ordtools">' +
+    '<span class="ordmini" style="font-weight:800;color:var(--ink-2)">구분</span>' +
+    ORDER_CHANNELS.map(function(c){
+      var n = all.filter(function(o){ return orderChannel(o) === c; }).length;
+      return '<button class="ochip' + (ordFilter === ("ch:" + c) ? " on" : "") + '" data-act="orderFilter" data-f="ch:' + esc(c) + '">' + esc(c) + '<span class="n">' + n + '</span></button>';
+    }).join("") +
+    '<span class="ordmini" style="margin-left:8px">|</span>' +
+    '<button class="ochip' + (ordFilter === "late" ? " on" : "") + '" data-act="orderFilter" data-f="late">⏰ 지연<span class="n">' + st.delayed + '</span></button>' +
+    '<button class="ochip' + (ordFilter === "today" ? " on" : "") + '" data-act="orderFilter" data-f="today">오늘 발송<span class="n">' + st.today + '</span></button>' +
+    '<button class="ochip' + (ordFilter === "noprice" ? " on" : "") + '" data-act="orderFilter" data-f="noprice">발주가 없음<span class="n">' + st.noPrice + '</span></button>' +
+    '<button class="ochip' + (ordFilter === "notax" ? " on" : "") + '" data-act="orderFilter" data-f="notax">세무 미전송<span class="n">' + st.noTax + '</span></button>' +
+  '</div>';
+  html += '<div class="ordtools">' +
+    '<button class="btn tiny" data-act="orderCsv">⬇ 주문 CSV</button>' +
+    '<button class="btn tiny" data-act="orderJson">⬇ JSON 백업</button>' +
+    '<button class="btn tiny" data-act="orderTemplate">빈 양식</button>' +
+    '<button class="btn tiny" data-act="ordersToTax" title="배송완료 건을 세무 장부(홈택스 정산)로 넘깁니다">🧾 완료 건 세무장부로</button>' +
+    '<span class="ordmini" style="margin-left:auto">발송기한 = 주문일 + ' + orderDueDays() + '일 (⚙ 설정에서 변경)</span>' +
+  '</div>';
+
+  if(!list.length){
+    html += '<div class="empty" style="border:0;background:transparent"><div class="big">📦</div>' +
+      '<div style="font-weight:700;color:#4b5573">' + (all.length ? "이 조건에 맞는 주문이 없습니다" : "아직 주문이 없습니다") + '</div>' +
+      '<div class="tiny">[＋ 주문 추가]로 하나씩 넣거나, 마켓 주문 목록 CSV·엑셀을 [주문 불러오기]로 넣으면 한 번에 채워집니다.</div></div>';
+  }else{
+    html += '<div class="vtable ord"><div class="vhead">' +
+      '<div>D-day</div><div>마켓 · 주문번호</div><div>상품 · 받는사람</div><div>결제</div>' +
+      '<div>발주 비교 (실결제가)</div><div>배대지·도매처 · 송장</div><div>상태</div><div></div></div>';
+    list.forEach(function(o){
+      var i = all.indexOf(o);
+      var d = orderDday(o);
+      var best = orderBest(o);
+      var net = orderNet(o);
+      var ch = orderChannel(o);
+      var nxt = orderNextStage(o);
+      html += '<div class="vrow">' +
+        '<div><span class="dday ' + d.cls + '" id="ordday-' + i + '">' + esc(d.label) + '</span>' +
+          '<div class="ordmini">' + esc(o.orderDate || "—") + '</div>' +
+          (ch !== "해외" ? '<div class="ordmini"><b>' + esc(ch) + '</b></div>' : '') + '</div>' +
+        '<div class="ordcell">' +
+          '<select data-ordi="' + i + '" data-ordf="market">' + ordOptions(ORDER_MARKETS, o.market, "— 마켓 —") + '</select>' +
+          '<input type="text" data-ordi="' + i + '" data-ordf="orderNo" value="' + esc(o.orderNo) + '" placeholder="주문번호">' +
+        '</div>' +
+        '<div class="ordcell">' +
+          '<input type="text" data-ordi="' + i + '" data-ordf="name" value="' + esc(o.name) + '" placeholder="상품명">' +
+          '<div class="ordline c3">' +
+            '<input type="number" min="1" step="1" data-ordi="' + i + '" data-ordf="qty" value="' + num(o.qty, 1) + '" title="수량">' +
+            '<input type="text" data-ordi="' + i + '" data-ordf="receiver" value="' + esc(o.receiver) + '" placeholder="수취인">' +
+            '<input type="text" data-ordi="' + i + '" data-ordf="phone" value="' + esc(o.phone) + '" placeholder="연락처">' +
+          '</div>' +
+          '<div class="ordline c2">' +
+            '<input type="text" data-ordi="' + i + '" data-ordf="personNo" value="' + esc(o.personNo) + '" placeholder="개인통관고유부호">' +
+            '<input type="text" data-ordi="' + i + '" data-ordf="addr" value="' + esc(o.addr) + '" placeholder="주소">' +
+          '</div>' +
+        '</div>' +
+        '<div class="ordcell">' +
+          '<input type="number" min="0" step="100" data-ordi="' + i + '" data-ordf="sale" value="' + (num(o.sale,0) || "") + '" placeholder="결제금액">' +
+          '<div class="ordline c2">' +
+            '<input type="number" min="0" max="30" step="0.1" data-ordi="' + i + '" data-ordf="feeRate" value="' + num(o.feeRate, 0) + '" title="마켓 수수료 %">' +
+            '<div class="ordmini" id="ordfee-' + i + '" style="padding-top:5px">수수료 ' + won(orderFeeAmt(o)) + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ordcell">' +
+          '<div class="cmp">' + orderCandidates(o).map(function(c){
+            return '<label>' + esc(c.label) + '<input type="number" min="0" step="100" data-ordi="' + i + '" data-ordf="' + c.k + '" id="ordcmp-' + i + '-' + c.k + '" class="' + (best && best.k === c.k ? "best" : "") + '" value="' + (c.v || "") + '" placeholder="0"></label>';
+          }).join("") + '</div>' +
+          '<div class="cmpout ' + (best ? (net > 0 ? "ok" : "bad") : "") + '" id="ordnet-' + i + '">' + ordMarginText(o) + '</div>' +
+          '<div class="ordline c2">' +
+            '<input type="number" min="0" step="100" data-ordi="' + i + '" data-ordf="intlShip" value="' + (num(o.intlShip,0) || "") + '" placeholder="국제배송비">' +
+            '<input type="number" min="0" step="100" data-ordi="' + i + '" data-ordf="domShip" value="' + (num(o.domShip,0) || "") + '" placeholder="국내택배비">' +
+          '</div>' +
+        '</div>' +
+        '<div class="ordcell">' +
+          '<select data-ordi="' + i + '" data-ordf="forwarder">' + ordOptions(ORDER_VENDORS, o.forwarder, "— 배대지·도매처 —") + '</select>' +
+          '<input type="text" data-ordi="' + i + '" data-ordf="fwOrderNo" value="' + esc(o.fwOrderNo) + '" placeholder="배대지·도매처 주문번호">' +
+          '<input type="text" data-ordi="' + i + '" data-ordf="localTracking" value="' + esc(o.localTracking) + '" placeholder="현지 트래킹번호">' +
+          '<div class="ordline c2">' +
+            '<select data-ordi="' + i + '" data-ordf="courier">' + ordOptions(ORDER_COURIERS, o.courier, "— 택배사 —") + '</select>' +
+            '<input type="text" data-ordi="' + i + '" data-ordf="tracking" value="' + esc(o.tracking) + '" placeholder="송장번호">' +
+          '</div>' +
+          '<div class="ordline" style="grid-template-columns:1fr 1fr 1fr">' +
+            '<button class="btn tiny" data-act="orderTrack" data-idx="' + i + '" data-kind="fw" title="배대지·도매처 사이트 열기">배대지</button>' +
+            '<button class="btn tiny" data-act="orderTrack" data-idx="' + i + '" data-kind="local" title="현지 트래킹 조회">현지</button>' +
+            '<button class="btn tiny" data-act="orderTrack" data-idx="' + i + '" data-kind="dom" title="국내 배송조회">국내</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="ordcell">' +
+          '<select data-ordi="' + i + '" data-ordf="stage">' + ordOptions(ORDER_STAGES.concat([ORDER_CANCEL]), o.stage, null) + '</select>' +
+          '<span class="stagepill ' + (ORDER_STAGE_CLASS[o.stage] || "") + '">' + esc(ORDER_STAGE_SHORT[o.stage] || o.stage) + '</span>' +
+          (nxt ? '<button class="btn tiny primary" data-act="orderNext" data-idx="' + i + '" title="다음 단계로">▶ ' + esc(ORDER_STAGE_SHORT[nxt]) + '</button>' : '') +
+          (o.taxDone ? '<span class="mini-badge mb-ok">세무 완료</span>' : '') +
+        '</div>' +
+        '<div class="vacts">' +
+          '<button class="btn tiny" data-act="orderCs" data-idx="' + i + '" title="CS 답변 도우미">💬 CS</button>' +
+          '<button class="btn tiny" data-act="orderToTax" data-idx="' + i + '" title="세무 장부로 넘기기"' + (o.taxDone ? " disabled" : "") + '>🧾</button>' +
+          '<button class="btn tiny" data-act="orderToTz" data-idx="' + i + '" title="천조직구 신청서로 넘기기">📦</button>' +
+          '<button class="btn tiny danger" data-act="orderDel" data-idx="' + i + '">삭제</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    html += '<div class="ord-sum">결제금액 합계 <b>' + won(list.reduce(function(a, o){ return a + num(o.sale, 0); }, 0)) + '</b>' +
+      ' · 예상 순마진 합계 <b>' + won(list.reduce(function(a, o){ return a + orderNet(o); }, 0)) + '</b>' +
+      ' · 보이는 주문 <b>' + list.length + '</b>건</div>';
+  }
+  html += '</div>';
+
+  /* 처리 순서 안내 */
+  html += '<section class="card"><div class="card-head"><div class="ico">🧭</div><h3>주문이 들어오면 이 순서로</h3>' +
+    '<span class="hint">상태 칸의 [▶ 다음]만 눌러도 한 단계씩 넘어갑니다</span></div>' +
+    '<ul class="caution">' +
+      '<li><b>1) 신규주문</b> — 주문을 넣고 <b>발송기한(D-day)</b>을 확인합니다. 빨간 [지연]은 이미 늦은 주문입니다.</li>' +
+      '<li><b>2) 발주 비교</b> — 타오바오·1688·슈퍼딜리버리·국내위탁(<b>테무 포함</b>) 실결제가를 넣으면 <b>가장 싼 곳이 초록색</b>으로 표시되고 예상 순마진이 계산됩니다. 순마진이 0원 이하면 그 주문은 손해입니다.</li>' +
+      '<li><b>3) 해외/도매 발주완료</b> — 산 곳과 배대지·도매처 주문번호를 적습니다. 국내 위탁(온채널·오너클랜·도매매)·테무는 배대지 대신 <b>도매처 주문번호</b>를 같은 칸에 넣으면 됩니다.</li>' +
+      '<li><b>4) 배대지 입고대기 → 결제/출고</b> — 현지 트래킹번호를 넣고 [현지]로 도착을 확인합니다. 결제·출고하면 [▶ 출고]를 누릅니다.</li>' +
+      '<li><b>5) 국내집화/배송중</b> — 국내 택배사와 송장번호를 넣고 [국내]로 조회합니다. 마켓 발송처리에 넣을 송장은 [📋 송장 일괄 정리]에서 한 번에 복사합니다.</li>' +
+      '<li><b>6) 배송완료</b> — [🧾]를 누르면 세무 장부(홈택스 정산)로 그대로 넘어갑니다. 중복은 자동으로 걸러냅니다.</li>' +
+    '</ul>' +
+    '<div class="friendly" style="margin-top:8px">💬 <b>CS</b> 를 누르면 문의 유형(배송지연·품절·교환반품·통관부호·파손·일반)만 고르고 고객 글을 붙여넣어도 정중한 답변 초안이 나옵니다. Gemini 키가 있으면 손님 문의에 맞춰 쓰고, 없으면 상황별 기본 문안을 바로 씁니다. <b>보내는 것은 직접</b> 하세요.</div>' +
+    '<div class="friendly" style="margin-top:6px">개인통관고유부호·연락처·주소는 이 브라우저(localStorage)에만 저장되고 어디로도 전송되지 않습니다. 주문 JSON·CSV 백업은 [⬇ 주문 CSV]·[⬇ JSON 백업]으로 받아 두세요.</div>' +
+  '</section>';
+  ws.innerHTML = html;
+  ws.setAttribute("data-view-rendered", "orders");
+}
+function orderRefreshRow(i){
+  var o = (state.orders || [])[i];
+  if(!o || !hasDOM()) return;
+  var best = orderBest(o);
+  orderCandidates(o).forEach(function(c){
+    var el = document.getElementById("ordcmp-" + i + "-" + c.k);
+    if(el) el.className = (best && best.k === c.k) ? "best" : "";
+  });
+  var out = document.getElementById("ordnet-" + i);
+  if(out){
+    var net = orderNet(o);
+    out.className = "cmpout " + (best ? (net > 0 ? "ok" : "bad") : "");
+    out.innerHTML = ordMarginText(o);
+  }
+  var fee = document.getElementById("ordfee-" + i);
+  if(fee) fee.textContent = "수수료 " + won(orderFeeAmt(o));
+  var day = document.getElementById("ordday-" + i);
+  if(day){ var d = orderDday(o); day.className = "dday " + d.cls; day.textContent = d.label; }
+}
+function orderSet(i, key, val){
+  var o = (state.orders || [])[i];
+  if(!o) return;
+  if(key === "qty") o.qty = Math.max(1, Math.round(num(val, 1)));
+  else if(["sale","pTaobao","p1688","pSuper","pDomestic","intlShip","domShip"].indexOf(key) >= 0) o[key] = Math.max(0, Math.round(num(val, 0)));
+  else if(key === "feeRate") o.feeRate = Math.max(0, num(val, 0));
+  else if(key === "orderDate" || key === "due") o[key] = normYmd(val);
+  else if(key === "stage"){
+    if(!str(val).trim()) return;   // 빈 상태 선택은 무시
+    o.stage = str(val);
+    // 배송완료로 바꾸면 정산 기준일(완료일)을 오늘로 적어 둡니다
+    if(o.stage === ORDER_DONE){ if(!str(o.doneDate)) o.doneDate = todayYmd(); }
+    else o.doneDate = "";
+  }
+  else o[key] = str(val);
+  o.updatedAt = Date.now();
+  save();
+}
+function orderAdd(){
+  state.orders = state.orders || [];
+  var o = blankOrder();
+  state.orders.unshift(o);
+  ordFilter = "all";
+  save();
+  renderOrdersView();
+  toast("새 주문을 넣었습니다 — 마켓·상품명·결제금액을 채워 주세요", "ok");
+  return o;
+}
+function orderDel(i){
+  var o = (state.orders || [])[i];
+  if(!o) return;
+  if(!confirm("'" + (o.name || o.orderNo || "이 주문") + "'을(를) 지울까요? 되돌릴 수 없습니다.")) return;
+  state.orders.splice(i, 1);
+  save();
+  renderOrdersView();
+  toast("주문을 지웠습니다");
+}
+function orderNextStage(o){
+  var idx = ORDER_STAGES.indexOf(str(o && o.stage));
+  if(idx < 0 || idx >= ORDER_STAGES.length - 1) return "";
+  return ORDER_STAGES[idx + 1];
+}
+function orderNext(i){
+  var o = (state.orders || [])[i];
+  if(!o) return;
+  var idx = ORDER_STAGES.indexOf(o.stage);
+  if(idx < 0 || idx >= ORDER_STAGES.length - 1){ toast("이미 마지막 단계입니다", "bad"); return; }
+  o.stage = ORDER_STAGES[idx + 1];
+  if(o.stage === ORDER_DONE) o.doneDate = todayYmd();
+  o.updatedAt = Date.now();
+  save();
+  renderOrdersView();
+  toast("상태: " + o.stage, "ok");
+}
+
+/* =========================================================
+   12-12. v2.5 — 세무 장부 · 천조직구 신청서 · 조회 링크
+   ========================================================= */
+function orderTaxRow(o){
+  var b = orderBest(o);
+  return normTaxRow({
+    id: uid(),
+    date: o.doneDate || orderDue(o) || o.orderDate || todayYmd(),
+    market: o.market || "스마트스토어",
+    orderNo: o.orderNo || "",
+    name: o.name || "",
+    sale: num(o.sale, 0),
+    cost: (b ? b.v : 0) + num(o.intlShip, 0),
+    ship: num(o.domShip, 0),
+    fee: orderFeeAmt(o),
+    etc: 0,
+    memo: "로이창고 주문관리" + (b ? (" · 최저 " + b.label) : " · 발주가 미입력")
+  });
+}
+function taxHasOrder(o){
+  var rows = (state.tax && state.tax.rows) || [];
+  // 주문관리에서 넘긴 장부 줄은 id로 기억합니다 (주문번호가 없는 주문도 중복으로 걸러냅니다)
+  var rid = str(o.taxRowId).trim();
+  if(rid){
+    for(var i = 0; i < rows.length; i++){ if(str(rows[i].id) === rid) return true; }
+  }
+  var no = str(o.orderNo).trim();
+  if(!no) return false;
+  for(var k = 0; k < rows.length; k++){
+    var r = rows[k];
+    if(str(r.orderNo).trim() === no && (!o.market || !r.market || r.market === o.market)) return true;
+  }
+  return false;
+}
+function orderToTax(i){
+  var o = (state.orders || [])[i];
+  if(!o) return 0;
+  state.tax = state.tax || blankTax();
+  if(taxHasOrder(o)){
+    o.taxDone = true; save();
+    toast("이미 세무 장부에 있는 주문입니다 (" + (o.orderNo || "주문번호 없음") + ")", "bad");
+    return 0;
+  }
+  var row = orderTaxRow(o);
+  state.tax.rows.push(row);
+  o.taxDone = true;
+  o.taxRowId = row.id;
+  o.updatedAt = Date.now();
+  save();
+  toast("세무 장부로 넘겼습니다 — " + (o.name || o.orderNo || "주문"), "ok");
+  return 1;
+}
+function ordersToTaxAll(){
+  var sent = 0, dup = 0, ready = 0;
+  state.tax = state.tax || blankTax();
+  (state.orders || []).forEach(function(o){
+    if(o.stage !== ORDER_DONE) return;
+    ready++;
+    if(taxHasOrder(o)){ o.taxDone = true; dup++; return; }
+    var row = orderTaxRow(o);
+    state.tax.rows.push(row);
+    o.taxDone = true;
+    o.taxRowId = row.id;
+    sent++;
+  });
+  save();
+  var msg = sent
+    ? ("배송완료 " + sent + "건을 세무 장부로 넘겼습니다" + (dup ? (" (이미 있던 " + dup + "건은 건너뜀)") : ""))
+    : (dup ? ("이미 모두 세무 장부에 있습니다 (" + dup + "건)") : "배송완료(정산 대상) 주문이 없습니다");
+  toast(msg, sent ? "ok" : "bad");
+  return { sent: sent, dup: dup, ready: ready };
+}
+function orderToTz(i){
+  var o = (state.orders || [])[i];
+  if(!o) return;
+  var t = state.tz || blankTz();
+  if(o.receiver) t.consKr = o.receiver;
+  if(o.phone) t.phone = o.phone;
+  if(o.addr) t.addr = o.addr;
+  if(o.personNo) t.personNo = o.personNo;
+  t.items = [normTzItem({
+    itemName: o.name, proNm: o.name, qty: o.qty,
+    amt: 0, marketNm: o.market, marketOrderNo: o.orderNo
+  })];
+  state.tz = t;
+  save();
+  setView("tz");
+  toast("천조직구 신청서로 넘겼습니다 — 상품 단가(￥)·이미지 주소를 채우고 엑셀로 내려받으세요", "ok");
+}
+function openUrlSafe(u){
+  if(!u) return;
+  try{ window.open(u, "_blank", "noopener"); }catch(e){}
+}
+function orderTrack(i, kind){
+  var o = (state.orders || [])[i];
+  if(!o) return;
+  if(kind === "fw"){
+    var fw = null;
+    ORDER_VENDORS.forEach(function(f){ if(f.v === o.forwarder) fw = f; });
+    if(fw && fw.site){ openUrlSafe(fw.site); return; }
+    toast("배대지·도매처를 먼저 고르세요 (천조직구·아라쿠·온채널 등)", "bad");
+    return;
+  }
+  if(kind === "local"){
+    var ln = str(o.localTracking).trim();
+    if(!ln){ toast("현지 트래킹번호를 먼저 넣으세요", "bad"); return; }
+    openUrlSafe(ORDER_LOCAL_TRACK + encodeURIComponent(ln));
+    return;
+  }
+  var tk = str(o.tracking).trim();
+  if(!tk){ toast("국내 송장번호를 먼저 넣으세요", "bad"); return; }
+  var c = null;
+  ORDER_COURIERS.forEach(function(x){ if(x.v === o.courier) c = x; });
+  if(c && c.url){ openUrlSafe(c.url + encodeURIComponent(tk)); return; }
+  openUrlSafe(ORDER_LOCAL_TRACK + encodeURIComponent(tk));
+}
+
+/* =========================================================
+   12-13. v2.5 — 주문 불러오기 · 내보내기
+   ========================================================= */
+var ORD_HEAD = ["주문일","마켓","주문번호","상품명","수량","수취인","연락처","통관고유부호","주소",
+  "결제금액","수수료%","발송기한","상태","타오바오","1688","슈퍼딜리버리","국내위탁",
+  "국제배송비","국내택배비","예상순마진","배대지","배대지주문번호","현지트래킹","택배사","송장번호","메모"];
+function ordRow(o){
+  return [o.orderDate, o.market, o.orderNo, o.name, num(o.qty, 1), o.receiver, o.phone, o.personNo, o.addr,
+    Math.round(num(o.sale, 0)), num(o.feeRate, 0), orderDue(o), o.stage,
+    Math.round(num(o.pTaobao, 0)), Math.round(num(o.p1688, 0)), Math.round(num(o.pSuper, 0)), Math.round(num(o.pDomestic, 0)),
+    Math.round(num(o.intlShip, 0)), Math.round(num(o.domShip, 0)), orderNet(o),
+    o.forwarder, o.fwOrderNo, o.localTracking, o.courier, o.tracking, o.memo];
+}
+function orderCsvText(list){
+  list = list || state.orders || [];
+  return buildTableCsv(ORD_HEAD, list.map(ordRow));
+}
+function orderExportCsv(){
+  var list = state.orders || [];
+  if(!list.length){ toast("내보낼 주문이 없습니다", "bad"); return; }
+  download(orderCsvText(list), "로이창고_주문_" + stamp() + ".csv", "text/csv;charset=utf-8");
+  toast("주문 " + list.length + "건을 CSV로 내려받았습니다", "ok");
+}
+function orderExportJson(){
+  var list = state.orders || [];
+  if(!list.length){ toast("백업할 주문이 없습니다", "bad"); return; }
+  var payload = { app: "로이창고", version: APP_VERSION, kind: "orders", exportedAt: new Date().toISOString(), orders: list };
+  download(JSON.stringify(payload, null, 2), "로이창고_주문_" + stamp() + ".json", "application/json;charset=utf-8");
+  toast("주문 " + list.length + "건을 JSON으로 백업했습니다", "ok");
+}
+function orderTemplate(){
+  download(buildTableCsv(ORD_HEAD, []), "로이창고_주문_빈양식.csv", "text/csv;charset=utf-8");
+  toast("주문 빈 양식(제목 줄만)을 내려받았습니다", "ok");
+}
+function orderRowsToItems(rows){
+  if(!rows || rows.length < 2) return [];
+  var head = rows[0].map(normKey);
+  function col(){
+    for(var a = 0; a < arguments.length; a++){
+      var idx = head.indexOf(normKey(arguments[a]));
+      if(idx >= 0) return idx;
+    }
+    return -1;
+  }
+  var ic = {
+    orderNo: col("주문번호","상품주문번호","마켓주문번호","주문번호(마켓)","orderno","orderid","주문id"),
+    market: col("마켓","마켓명","스토어","스토어명","판매처","채널","쇼핑몰"),
+    name: col("상품명","상품명(옵션)","상품","품명","상품이름"),
+    qty: col("수량","주문수량","개수","qty","quantity"),
+    receiver: col("수취인","수취인이름","받는사람","받는분","수령인","배송지명","받는사람명"),
+    phone: col("연락처","수취인연락처","수취인연락처1","휴대폰","휴대폰번호","전화번호","phone","수취인전화번호"),
+    personNo: col("통관고유부호","개인통관고유부호","개인통관번호","통관번호","개인통관고유번호"),
+    addr: col("주소","배송지","배송지주소","수취인주소","받는주소","address"),
+    sale: col("결제금액","총결제금액","주문금액","판매금액","결제금액(원)","결제액"),
+    orderDate: col("주문일","주문일시","주문일자","결제일","주문날짜","주문시간"),
+    due: col("발송기한","출고기한","발송예정일","출고예정일","배송기한"),
+    stage: col("상태","배송상태","진행상태","단계"),
+    pTaobao: col("타오바오","타오바오가","타오바오실결제가"),
+    p1688: col("1688","1688가","1688실결제가"),
+    pSuper: col("슈퍼딜리버리","슈퍼딜리버리가","슈퍼딜리버리실결제가"),
+    pDomestic: col("국내위탁","국내위탁가","국내도매가"),
+    intlShip: col("국제배송비","배대지배송비","해외배송비"),
+    domShip: col("국내택배비","국내배송비","택배비"),
+    feeRate: col("수수료","수수료율","마켓수수료","수수료율(%)"),
+    forwarder: col("배대지","도매처","공급사","발주처"),
+    fwOrderNo: col("배대지주문번호","도매처주문번호","공급사주문번호","발주번호"),
+    localTracking: col("현지트래킹","현지트래킹번호","해외송장","현지송장"),
+    courier: col("택배사","국내택배사","배송사"),
+    tracking: col("송장번호","운송장번호","국내송장","송장"),
+    memo: col("메모","비고","memo")
+  };
+  if(ic.name < 0 && ic.orderNo < 0) return null;
+  var out = [];
+  // 빈 칸은 아예 담지 않습니다 — 다시 불러올 때 기존 값을 지우지 않도록
+  rows.slice(1).forEach(function(r){
+    function g(k){ return ic[k] >= 0 ? str(r[ic[k]]).trim() : ""; }
+    var nm = g("name"), no = g("orderNo");
+    if(!nm && !no) return;
+    var it = { orderNo: no, name: nm };
+    ["market","receiver","phone","personNo","addr","orderDate","due","stage",
+     "forwarder","fwOrderNo","localTracking","courier","tracking","memo"].forEach(function(k){
+      var v = g(k);
+      if(v) it[k] = v;
+    });
+    ["qty","sale","pTaobao","p1688","pSuper","pDomestic","intlShip","domShip"].forEach(function(k){
+      var v = moneyOf(g(k));
+      if(v > 0) it[k] = v;
+    });
+    var fr = g("feeRate");
+    if(fr && num(fr, 0) > 0) it.feeRate = num(fr, 0);
+    out.push(it);
+  });
+  return out;
+}
+function orderMerge(list){
+  if(!list || !list.length) return 0;
+  state.orders = state.orders || [];
+  var added = 0, updated = 0;
+  list.forEach(function(o){
+    var hit = null;
+    for(var i = 0; i < state.orders.length; i++){
+      var q = state.orders[i];
+      if(o.orderNo && q.orderNo === o.orderNo && (!o.market || !q.market || q.market === o.market)){ hit = q; break; }
+      if(!o.orderNo && o.name && q.name === o.name && q.orderDate === o.orderDate){ hit = q; break; }
+    }
+    if(hit){
+      var merged = Object.assign({}, hit);
+      Object.keys(o).forEach(function(k){
+        if(k === "id") return;
+        var v = o[k];
+        if(v === "" || v === 0 || v === false) return;   // 빈 값은 기존 것을 유지
+        merged[k] = v;
+      });
+      merged.id = hit.id;
+      state.orders[state.orders.indexOf(hit)] = normOrder(merged);
+      updated++;
+    }else{
+      state.orders.push(normOrder(o));
+      added++;
+    }
+  });
+  save();
+  renderOrdersView();
+  toast("주문 " + list.length + "건을 불러왔습니다 (새 주문 " + added + " · 갱신 " + updated + ")", "ok");
+  return list.length;
+}
+function orderImportRows(rows, sourceName){
+  var list = orderRowsToItems(rows);
+  if(list === null){
+    toast("주문번호·상품명 열을 찾지 못했습니다 — 첫 줄에 그 열이 있어야 합니다", "bad");
+    return 0;
+  }
+  if(!list.length){ toast("넣을 주문이 없습니다 — " + (sourceName || "파일") + "을 확인해 주세요", "bad"); return 0; }
+  return orderMerge(list);
+}
+function orderImportJsonText(text, sourceName){
+  var data = null;
+  try{ data = JSON.parse(String(text || "")); }catch(e){ data = null; }
+  if(!data){ toast("JSON을 읽지 못했습니다 — 파일을 확인해 주세요", "bad"); return 0; }
+  var arr = Array.isArray(data) ? data : (Array.isArray(data.orders) ? data.orders : null);
+  if(!arr){ toast("주문 JSON 형식이 아닙니다 (orders 목록이 없습니다)", "bad"); return 0; }
+  var list = arr.map(normOrder).filter(function(o){ return o.name || o.orderNo; });
+  if(!list.length){ toast("넣을 주문이 없습니다", "bad"); return 0; }
+  return orderMerge(list);
+}
+function orderImportText(text, filename){
+  var s = String(text || "").replace(/^\uFEFF/, "").trim();
+  if(!s) return 0;
+  if(/\.json$/i.test(str(filename)) || /^[\[{]/.test(s)) return orderImportJsonText(s, filename);
+  if(/<table|<tr[\s>]/i.test(s)) return orderImportRows(htmlTableRows(s), filename);
+  return orderImportRows(parseCsv(s), filename);
+}
+
+/* =========================================================
+   12-14. v2.5 — 송장 일괄 정리 (마켓 발송처리 · 도매처 정산용)
+   ========================================================= */
+function orderInvoiceList(){
+  return (state.orders || []).filter(function(o){
+    return !!str(o.tracking).trim() || !!str(o.fwOrderNo).trim();
+  });
+}
+function orderInvoiceTsv(list){
+  var head = ["주문일","마켓","주문번호","상품명","수량","수취인","연락처","구분","배대지·도매처","배대지주문번호","택배사","송장번호"];
+  var lines = [head.join("\t")];
+  (list || []).forEach(function(o){
+    lines.push([o.orderDate, o.market, o.orderNo, o.name, num(o.qty, 1), o.receiver, o.phone,
+      orderChannel(o), o.forwarder, o.fwOrderNo, o.courier, o.tracking].join("\t"));
+  });
+  return lines.join("\n");
+}
+function orderInvoiceSheet(){
+  if(!hasDOM()) return;
+  var all = state.orders || [];
+  var list = orderInvoiceList();
+  var noTrack = all.filter(function(o){ return !str(o.tracking).trim(); }).length;
+  var rows = list.map(function(o){
+    return '<div class="vrow" style="grid-template-columns:86px minmax(90px,1fr) minmax(110px,1.1fr) minmax(140px,1.6fr) 46px minmax(80px,.8fr) minmax(100px,.9fr) minmax(120px,1.1fr) minmax(110px,1fr) 84px">' +
+      '<div>' + esc(o.orderDate || "—") + '</div>' +
+      '<div>' + esc(o.market || "—") + '</div>' +
+      '<div>' + esc(o.orderNo || "—") + '</div>' +
+      '<div>' + esc(o.name || "—") + '</div>' +
+      '<div>' + num(o.qty, 1) + '</div>' +
+      '<div>' + esc(o.receiver || "—") + '</div>' +
+      '<div>' + esc(o.phone || "—") + '</div>' +
+      '<div><b>' + esc(o.courier || "택배사 미정") + '</b><div class="ordmini">' + esc(orderChannel(o)) + (o.forwarder ? (" · " + esc(o.forwarder)) : "") + '</div></div>' +
+      '<div><b>' + esc(o.tracking || "—") + '</b><div class="ordmini">' + esc(o.fwOrderNo || "") + '</div></div>' +
+      '<div class="vacts"><button class="btn tiny" data-act="orderTrack" data-idx="' + all.indexOf(o) + '" data-kind="dom">조회</button></div>' +
+    '</div>';
+  }).join("");
+  document.getElementById("modal").innerHTML =
+    '<h3>📋 송장 일괄 정리</h3>' +
+    '<div class="sub">송장·도매처 주문번호가 있는 주문 ' + list.length + '건' + (noTrack ? (" · 송장 미입력 " + noTrack + "건") : "") + ' — 마켓 발송처리나 도매처 정산에 그대로 붙여넣으세요.</div>' +
+    (list.length
+      ? '<div class="vtable" style="max-height:52vh;overflow:auto">' +
+        '<div class="vhead" style="grid-template-columns:86px minmax(90px,1fr) minmax(110px,1.1fr) minmax(140px,1.6fr) 46px minmax(80px,.8fr) minmax(100px,.9fr) minmax(120px,1.1fr) minmax(110px,1fr) 84px">' +
+        '<div>주문일</div><div>마켓</div><div>주문번호</div><div>상품명</div><div>수량</div><div>수취인</div><div>연락처</div><div>구분·택배사</div><div>송장번호</div><div></div></div>' +
+        rows + '</div>'
+      : '<div class="friendly">아직 송장번호가 들어간 주문이 없습니다. 주문 표의 배대지·송장 칸에 송장번호를 넣으면 여기에 모입니다.</div>') +
+    '<div class="foot">' +
+      '<button class="btn" id="invCopy">📋 전체 복사</button>' +
+      '<button class="btn" id="invCsv">⬇ CSV</button>' +
+      '<button class="btn primary" data-modal-close>닫기</button>' +
+    '</div>';
+  document.getElementById("overlay").classList.add("on");
+  var cp = document.getElementById("invCopy");
+  if(cp) cp.onclick = function(){ copyText(orderInvoiceTsv(list), function(ok){ toast(ok ? "송장 목록을 복사했습니다 — 엑셀에 붙여넣으세요" : "복사하지 못했습니다", ok ? "ok" : "bad"); }); };
+  var cv = document.getElementById("invCsv");
+  if(cv) cv.onclick = function(){
+    download("\ufeff" + orderInvoiceTsv(list).replace(/\t/g, ","), "로이창고_송장정리_" + stamp() + ".csv", "text/csv;charset=utf-8");
+    toast("송장 정리 CSV를 내려받았습니다", "ok");
+  };
+}
+
+/* =========================================================
+   12-15. v2.5 — CS 자동 응대 도우미 (Gemini + 기본 문안)
+   ========================================================= */
+var ORD_CS_BUSY = false;
+function csTypeLabel(v){
+  var out = "일반 문의";
+  CS_TYPES.forEach(function(t){ if(t.v === v) out = t.label; });
+  return out;
+}
+function csOrderLines(o){
+  var d = orderDday(o);
+  var lines = [];
+  lines.push("마켓: " + (o.market || "—"));
+  lines.push("주문번호: " + (o.orderNo || "—"));
+  lines.push("상품명: " + (o.name || "—") + " / 수량 " + num(o.qty, 1) + "개");
+  lines.push("주문일: " + (o.orderDate || "—") + " / 발송기한: " + (orderDue(o) || "—"));
+  lines.push("현재 상태: " + (o.stage || "—") + (d.cls !== "none" ? (" (" + d.label + ")") : ""));
+  if(o.forwarder) lines.push("발주처: " + o.forwarder + (o.fwOrderNo ? (" / 주문번호 " + o.fwOrderNo) : ""));
+  // 송장번호·수취인·연락처·주소·통관부호는 밖으로 보내지 않습니다 (등록 여부만)
+  if(o.courier || o.tracking) lines.push("국내 배송: " + (o.courier || "택배사 미정") + (o.tracking ? " (송장 등록됨)" : " (송장 미등록)"));
+  if(num(o.sale, 0)) lines.push("결제금액: " + num(o.sale, 0) + "원");
+  return lines;
+}
+/* API 키·인터넷이 없어도 바로 쓸 수 있는 상황별 기본 문안 */
+function csTemplate(o, type){
+  var mk = o.market || "판매자";
+  var nm = o.name || "주문하신 상품";
+  var dueLine = orderDue(o) ? ("현재 확인된 발송기한은 " + orderDue(o) + "입니다. ") : "";
+  var head = "안녕하세요, " + mk + "입니다.\n";
+  var tail = "\n\n감사합니다.\n" + mk + " 드림";
+  if(type === "ship-delay"){
+    return head + "문의해 주셔서 감사합니다. 주문하신 '" + nm + "' 건은 현재 '" + o.stage + "' 상태로 확인됩니다.\n\n" +
+      "해외 구매대행 상품은 현지 발송 → 배대지 입고 → 국내 통관·집화 순서로 진행되어 국내 상품보다 1~2주 더 걸릴 수 있습니다. " + dueLine +
+      "진행 상황은 저희가 계속 확인하고 있으며, 국내 택배로 넘어오는 즉시 송장번호를 안내드리겠습니다.\n\n" +
+      "기다려 주시면 최대한 빠르게 받으실 수 있도록 챙기겠습니다. 도착 예정일이 궁금하시면 언제든 다시 문의해 주세요." + tail;
+  }
+  if(type === "soldout"){
+    return head + "주문하신 '" + nm + "' 상품이 현지 사정으로 품절되어 부득이 안내드립니다.\n\n" +
+      "같은 상품의 다른 색상·사이즈로 대체가 가능한지 지금 확인하고 있습니다. 원하시는 대안(색상·사이즈·비슷한 상품)이 있으시면 편하게 알려 주세요. " +
+      "대안이 없거나 원하지 않으시면 주문을 취소하고 결제 금액 전액을 환불해 드리겠습니다.\n\n" +
+      "불편을 드려 죄송합니다. 원하시는 방향으로 바로 처리하겠습니다." + tail;
+  }
+  if(type === "return"){
+    return head + "'" + nm + "' 교환·반품 문의 감사합니다.\n\n" +
+      "단순변심에 의한 교환·반품은 상품 수령 후 7일 이내에 신청하실 수 있으며, 왕복 배송비는 고객님 부담입니다. " +
+      "해외 구매대행 상품은 현지로 다시 보내는 국제 반품이 어려워, 반품 상품은 국내 반품 주소로 보내 주시면 검수 후 환불해 드립니다.\n\n" +
+      "상품 상태(개봉·사용 여부)와 회수 받으실 주소를 알려 주시면 반품 주소와 절차를 바로 안내드리겠습니다." + tail;
+  }
+  if(type === "customs"){
+    return head + "'" + nm + "' 주문 발송을 위해 개인통관고유부호가 필요합니다.\n\n" +
+      "개인통관고유부호는 관세청 유니패스(unipass.customs.go.kr)에서 본인 인증 후 바로 발급받으실 수 있고, P로 시작하는 13자리 번호입니다. " +
+      "번호를 채팅으로 보내 주시면 확인 후 바로 발송을 진행하겠습니다.\n\n" +
+      "번호는 통관 목적으로만 사용하며 다른 곳에 쓰지 않습니다. 감사합니다." + tail;
+  }
+  if(type === "broken"){
+    return head + "상품이 파손된 상태로 도착했다니 정말 죄송합니다.\n\n" +
+      "바로 처리해 드리기 위해 ① 박스 외부 상태 ② 박스 안 포장 상태 ③ 파손된 상품 전체 ④ 파손 부위를 가까이 찍은 사진을 보내 주시면 확인 후 교환 또는 환불로 안내드리겠습니다. " +
+      "가능하시면 운송장 사진도 함께 보내 주세요.\n\n" +
+      "사진을 확인하는 대로 바로 처리하겠습니다. 불편을 드려 다시 한 번 사과드립니다." + tail;
+  }
+  return head + "남겨 주신 문의 잘 확인했습니다.\n\n" +
+    "문의하신 내용은 '" + nm + "' 주문 건과 관련해 확인 중이며, 확인되는 대로 이 채팅으로 바로 안내드리겠습니다. " + dueLine +
+    "급하게 확인이 필요하신 부분이 있으시면 말씀해 주세요.\n\n" +
+    "기다려 주셔서 감사합니다." + tail;
+}
+function csPrompt(o, type, text){
+  return [
+    "너는 한국 온라인 스토어의 고객 응대 담당자다. 아래 주문 정보와 고객 문의를 보고, 그대로 복사해 보낼 수 있는 한국어 CS 답변을 써라.",
+    "조건:",
+    "1) 정중한 존댓말로 3~5문장 또는 3문단 이내로 짧게.",
+    "2) 주어진 정보에 없는 사실(정확한 도착일, 환불 금액, 재고 수량)은 절대 지어내지 말고 '확인 후 안내드리겠습니다'로 쓴다.",
+    "3) 이모지·과장·광고 문구는 넣지 않는다.",
+    "4) 고객 문의에 여러 가지가 섞여 있으면 핵심부터 차례로 답한다.",
+    "5) 마지막 줄에 '" + (o.market || "판매자") + " 드림'으로 서명한다.",
+    "6) 답변 본문만 쓰고 제목·설명·따옴표는 붙이지 않는다.",
+    "",
+    "[주문 정보]",
+    csOrderLines(o).join("\n"),
+    "",
+    "[문의 유형] " + csTypeLabel(type),
+    "[고객 문의] " + (str(text).trim() || "(고객이 쓴 글이 없음 — 유형에 맞는 안내문을 작성)")
+  ].join("\n");
+}
+function orderCsOpen(i){
+  if(!hasDOM()) return;
+  var o = (state.orders || [])[i];
+  if(!o){ toast("주문을 찾지 못했습니다", "bad"); return; }
+  var opts = CS_TYPES.map(function(t){
+    return '<option value="' + t.v + '"' + ((o.csType || "") === t.v ? " selected" : "") + '>' + esc(t.label) + '</option>';
+  }).join("");
+  var ai = hasGemini();
+  document.getElementById("modal").innerHTML =
+    '<h3>💬 CS 답변 도우미</h3>' +
+    '<div class="sub">' + esc(o.market || "마켓") + ' · ' + esc(o.orderNo || "주문번호 없음") + ' · ' + esc(o.name || "상품명 없음") + ' · ' + esc(o.stage) + ' (' + esc(orderDday(o).label) + ')</div>' +
+    '<div class="g2">' +
+      '<label class="field">문의 유형<select id="csType">' + opts + '</select></label>' +
+      '<label class="field">답변 방식' +
+        '<select id="csMode">' +
+          '<option value="ai"' + (ai ? " selected" : "") + '>AI가 손님 문의에 맞춰 쓰기' + (ai ? "" : " (키 없음 → 기본 문안)") + '</option>' +
+          '<option value="base"' + (ai ? "" : " selected") + '>상황별 기본 문안 바로 쓰기</option>' +
+        '</select></label>' +
+    '</div>' +
+    '<label class="field" style="margin-top:10px">고객이 보낸 문의 (그대로 붙여넣기)' +
+      '<textarea id="csText" rows="4" placeholder="예: 주문한 지 일주일이 넘었는데 아직 받지 못했어요. 언제쯤 올까요?">' + esc(str(o.csText)) + '</textarea></label>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">' +
+      '<button class="btn primary" id="csMake">✨ 답변 만들기</button>' +
+      '<button class="btn" id="csCopy">📋 복사</button>' +
+      '<span class="ordmini" id="csNote" style="align-self:center">' + (ai ? "Gemini 키 " + geminiKeys().length + "개로 씁니다" : "Gemini 키가 없어 상황별 기본 문안으로 씁니다") + '</span>' +
+    '</div>' +
+    '<label class="field" style="margin-top:8px">답변 초안 (고쳐서 보내세요)' +
+      '<textarea id="csDraft" rows="10">' + esc(str(o.csDraft)) + '</textarea></label>' +
+    '<div class="foot">' +
+      '<button class="btn" data-modal-close>닫기</button>' +
+      '<button class="btn primary" id="csSave">저장</button>' +
+    '</div>';
+  document.getElementById("overlay").classList.add("on");
+  var mkBtn = document.getElementById("csMake");
+  if(mkBtn) mkBtn.onclick = function(){
+    var mode = (document.getElementById("csMode") || {}).value || "ai";
+    mkBtn.disabled = true;
+    var note = document.getElementById("csNote");
+    if(note && mode === "ai") note.textContent = "답변을 쓰고 있습니다...";
+    csGenerate(i, mode === "ai").then(function(){ mkBtn.disabled = false; }, function(){ mkBtn.disabled = false; });
+  };
+  var cpBtn = document.getElementById("csCopy");
+  if(cpBtn) cpBtn.onclick = function(){
+    var el = document.getElementById("csDraft");
+    copyText(el ? el.value : "", function(ok){ toast(ok ? "답변을 복사했습니다 — 마켓 채팅에 붙여넣으세요" : "복사하지 못했습니다", ok ? "ok" : "bad"); });
+  };
+  var svBtn = document.getElementById("csSave");
+  if(svBtn) svBtn.onclick = function(){
+    o.csType = str((document.getElementById("csType") || {}).value || "");
+    o.csText = str((document.getElementById("csText") || {}).value || "");
+    o.csDraft = str((document.getElementById("csDraft") || {}).value || "");
+    o.csAt = Date.now();
+    o.updatedAt = Date.now();
+    save();
+    closeModal();
+    renderOrdersView();
+    toast("CS 답변을 주문에 저장했습니다", "ok");
+  };
+}
+function csGenerate(i, useAI){
+  var o = (state.orders || [])[i];
+  if(!o) return Promise.resolve("");
+  var type = str((document.getElementById("csType") || {}).value || o.csType || "general");
+  var text = str((document.getElementById("csText") || {}).value || "");
+  var base = csTemplate(o, type);
+  var draftEl = document.getElementById("csDraft");
+  var noteEl = document.getElementById("csNote");
+  function put(v){ if(draftEl) draftEl.value = v; }
+  o.csType = type;
+  o.csText = text;
+  save();
+  if(!useAI || !hasGemini()){
+    put(base);
+    if(noteEl) noteEl.textContent = useAI ? "Gemini 키가 없어 기본 문안으로 만들었습니다 (설정에서 키를 넣으면 문의에 맞춰 다듬습니다)" : "상황별 기본 문안입니다 — 필요한 부분만 고쳐 보내세요";
+    return Promise.resolve(base);
+  }
+  return geminiAsk(csPrompt(o, type, text), { temperature: 0.45, maxOutputTokens: 900 }, { ms: 45000 })
+    .then(function(txt){
+      var out = str(txt).replace(/^```[a-z]*\s*/i, "").replace(/\s*```$/, "").trim();
+      put(out || base);
+      if(noteEl) noteEl.textContent = "AI가 쓴 초안입니다 — 보내기 전에 한 번 읽어 보세요";
+      return out || base;
+    })
+    .catch(function(err){
+      put(base);
+      var why = (err && err.quota) ? "Gemini 한도·권한" : ((err && err.message) ? err.message : "Gemini 연결");
+      if(noteEl) noteEl.textContent = why + " 문제로 기본 문안으로 만들었습니다 — 그대로 보내도 됩니다";
+      return base;
+    });
 }
 
 /* =========================================================
@@ -7579,7 +8674,52 @@ var RoiChanggoCore = {
   buildXlsx: buildXlsx,
   crc32: crc32,
   utf8Bytes: utf8Bytes,
-  v24Action: v24Action
+  v24Action: v24Action,
+  // v2.5 — 주문·배송 관리 · CS
+  state_orders: function(){ return state.orders; },
+  ORDER_STAGES: ORDER_STAGES,
+  ORDER_CANCEL: ORDER_CANCEL,
+  ORDER_MARKETS: ORDER_MARKETS,
+  ORDER_VENDORS: ORDER_VENDORS,
+  ORDER_COURIERS: ORDER_COURIERS,
+  CS_TYPES: CS_TYPES,
+  ORD_HEAD: ORD_HEAD,
+  blankOrder: blankOrder,
+  normOrder: normOrder,
+  orderChannel: orderChannel,
+  orderBest: orderBest,
+  orderCost: orderCost,
+  orderNet: orderNet,
+  orderMarginPct: orderMarginPct,
+  orderFeeAmt: orderFeeAmt,
+  orderDue: orderDue,
+  orderDday: orderDday,
+  orderStats: orderStats,
+  orderFilterMatch: orderFilterMatch,
+  orderSet: orderSet,
+  orderAdd: orderAdd,
+  orderDel: orderDel,
+  orderNext: orderNext,
+  orderNextStage: orderNextStage,
+  orderMerge: orderMerge,
+  orderRowsToItems: orderRowsToItems,
+  orderImportText: orderImportText,
+  orderImportRows: orderImportRows,
+  orderImportJsonText: orderImportJsonText,
+  orderCsvText: orderCsvText,
+  ordRow: ordRow,
+  orderTaxRow: orderTaxRow,
+  orderToTax: orderToTax,
+  ordersToTaxAll: ordersToTaxAll,
+  orderToTz: orderToTz,
+  orderTrack: orderTrack,
+  orderInvoiceList: orderInvoiceList,
+  orderInvoiceTsv: orderInvoiceTsv,
+  csTemplate: csTemplate,
+  csPrompt: csPrompt,
+  csOrderLines: csOrderLines,
+  renderOrdersView: renderOrdersView,
+  orderRefreshRow: orderRefreshRow
 };
 try{
   if(typeof globalThis !== "undefined") globalThis.RoiChanggoCore = RoiChanggoCore;
