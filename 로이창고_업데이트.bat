@@ -54,18 +54,21 @@ if not defined SRC goto FAIL
 if not exist "%SRC%\로이창고.html" goto FAIL
 
 echo [3/4] 파일 갱신 중...
-%PS% "$ErrorActionPreference='Stop'; $s='%SRC%'; $d='%DEST%'; Copy-Item -Path (Join-Path $s '로이창고.html') -Destination (Join-Path $d '로이창고.html') -Force; $ext = Join-Path $d '로이창고_수집기'; New-Item -ItemType Directory -Force -Path $ext | Out-Null; Copy-Item -Path (Join-Path $s '로이창고_수집기\*') -Destination $ext -Recurse -Force; if (Test-Path (Join-Path $s 'README.md')) { Copy-Item -Path (Join-Path $s 'README.md') -Destination $d -Force }; if (Test-Path (Join-Path $s '로이창고_업데이트.bat')) { Copy-Item -Path (Join-Path $s '로이창고_업데이트.bat') -Destination $d -Force }"
+%PS% "$ErrorActionPreference='Stop'; $s='%SRC%'; $d='%DEST%'; Copy-Item -Path (Join-Path $s '로이창고.html') -Destination (Join-Path $d '로이창고.html') -Force; $ext = Join-Path $d '로이창고_수집기'; New-Item -ItemType Directory -Force -Path $ext | Out-Null; Copy-Item -Path (Join-Path $s '로이창고_수집기\*') -Destination $ext -Recurse -Force; if (Test-Path (Join-Path $s 'README.md')) { Copy-Item -Path (Join-Path $s 'README.md') -Destination $d -Force }; if (Test-Path (Join-Path $s '로이창고_업데이트.bat')) { Copy-Item -Path (Join-Path $s '로이창고_업데이트.bat') -Destination $d -Force }; try { if (Test-Path (Join-Path $s '로이창고.ico')) { Copy-Item -Path (Join-Path $s '로이창고.ico') -Destination (Join-Path $d '로이창고.ico') -Force } } catch {}"
 if errorlevel 1 goto FAIL
 if not exist "%DEST%\로이창고.html" goto FAIL
 if not exist "%DEST%\로이창고_수집기\manifest.json" goto FAIL
 
 echo [4/4] 바탕화면 아이콘 만들기...
 rem 한글 파일명은 코드값으로 만들어 인코딩 문제를 피합니다 (로이창고 = B85C C774 CC3D ACE0)
-%PS% "$ErrorActionPreference='SilentlyContinue'; $ro=[string][char]0xB85C+[string][char]0xC774+[string][char]0xCC3D+[string][char]0xACE0; $dest='%DEST%'; $html=Join-Path $dest ($ro+'.html'); if(-not (Test-Path $html)){ exit 2 }; $reg=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -Name Desktop -ErrorAction SilentlyContinue).Desktop; $desk=[Environment]::ExpandEnvironmentVariables([string]$reg); if(-not $desk -or -not (Test-Path $desk)){ $desk=[Environment]::GetFolderPath('Desktop') }; if(-not $desk -or -not (Test-Path $desk)){ $desk=Join-Path $env:USERPROFILE 'Desktop' }; if(-not (Test-Path $desk)){ New-Item -ItemType Directory -Force -Path $desk | Out-Null }; $ws=New-Object -ComObject WScript.Shell; $lnk=Join-Path $desk ($ro+'.lnk'); $sc=$ws.CreateShortcut($lnk); $q=[string][char]34; $sc.TargetPath=$html; $sc.Arguments=''; $chrome=[string]$env:CHROME; if($chrome -ne '' -and (Test-Path $chrome)){ $sc.TargetPath=$chrome; $sc.Arguments=($q+$html+$q); $sc.IconLocation=($chrome+',0') } else { $edge=Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'; if(Test-Path $edge){ $sc.IconLocation=($edge+',0') } }; $sc.WorkingDirectory=$dest; $sc.Description=$ro; $sc.Save(); if(Test-Path $lnk){ exit 0 } else { exit 1 }"
+rem 아이콘은 로이창고 전용 .ico(초록 배지 + 택배 박스)를 씁니다 - 크롬 아이콘과 겹치지 않습니다.
+rem 그 파일이 없을 때만 예전처럼 크롬(또는 엣지) 아이콘으로 대신합니다.
+%PS% "$ErrorActionPreference='SilentlyContinue'; $ro=[string][char]0xB85C+[string][char]0xC774+[string][char]0xCC3D+[string][char]0xACE0; $dest='%DEST%'; $html=Join-Path $dest ($ro+'.html'); if(-not (Test-Path $html)){ exit 2 }; $ico=Join-Path $dest ($ro+'.ico'); if(-not (Test-Path $ico)){ $ico='' }; $reg=(Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders' -Name Desktop -ErrorAction SilentlyContinue).Desktop; $desk=[Environment]::ExpandEnvironmentVariables([string]$reg); if(-not $desk -or -not (Test-Path $desk)){ $desk=[Environment]::GetFolderPath('Desktop') }; if(-not $desk -or -not (Test-Path $desk)){ $desk=Join-Path $env:USERPROFILE 'Desktop' }; if(-not (Test-Path $desk)){ New-Item -ItemType Directory -Force -Path $desk | Out-Null }; $ws=New-Object -ComObject WScript.Shell; $lnk=Join-Path $desk ($ro+'.lnk'); $sc=$ws.CreateShortcut($lnk); $q=[string][char]34; $sc.TargetPath=$html; $sc.Arguments=''; $chrome=[string]$env:CHROME; if($chrome -ne '' -and (Test-Path $chrome)){ $sc.TargetPath=$chrome; $sc.Arguments=($q+$html+$q); if($ico -ne ''){ $sc.IconLocation=($ico+',0') } else { $sc.IconLocation=($chrome+',0') } } else { $edge=Join-Path ${env:ProgramFiles(x86)} 'Microsoft\Edge\Application\msedge.exe'; if($ico -ne ''){ $sc.IconLocation=($ico+',0') } elseif(Test-Path $edge){ $sc.IconLocation=($edge+',0') } }; $sc.WorkingDirectory=$dest; $sc.Description=$ro; $sc.Save(); if(Test-Path $lnk){ exit 0 } else { exit 1 }"
 if errorlevel 1 (
   echo   바탕화면 아이콘은 만들지 못했습니다 ^(앱은 정상 설치되었습니다^)
 ) else (
   echo   바탕화면에 [로이창고] 아이콘을 만들었습니다.
+  if not exist "%DEST%\로이창고.ico" echo   ^(전용 아이콘 파일을 받지 못해 크롬 아이콘으로 대신 표시합니다^)
 )
 
 rmdir /s /q "%WORK%" >nul 2>&1
@@ -89,6 +92,8 @@ echo   * 예전 폴더에서 불러와 있던 확장은, 그 항목을 [삭제]�
 echo     위 폴더로 새로 [로드]해야 이번 업데이트가 적용됩니다.
 echo.
 echo   * 다음부터는 바탕화면의 [로이창고] 아이콘을 누르면 바로 열립니다.
+echo.
+echo   * 바탕화면 아이콘이 예전 크롬 모양 그대로면 F5^(새로 고침^)를 한 번 누르세요.
 echo.
 
 if defined CHROME (
