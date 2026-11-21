@@ -6,21 +6,21 @@ title 로이창고 업데이터
 rem ============================================================
 rem  로이창고 원클릭 업데이터 (Git 설치 불필요)
 rem  더블클릭하면 GitHub에서 최신판을 받아
-rem  %USERPROFILE%\Downloads\로이창고 폴더를 갱신하고,
+rem  C:\로이창고 폴더를 갱신하고,
 rem  바탕화면에 '로이창고' 아이콘을 만들고, 앱을 바로 엽니다.
+rem  예전 판은 다운로드\로이창고 에 설치했는데, 다운로드 폴더를 비우면
+rem  지워져서 C:\로이창고 로 옮겼습니다. (그 폴더는 지워지지 않습니다)
 rem ============================================================
 
 set "ZIPURL=https://github.com/lsj1266/roichanggo/archive/refs/heads/main.zip"
 set "WORK=%TEMP%\roichanggo_upd_%RANDOM%"
 set "PS=powershell -NoProfile -ExecutionPolicy Bypass -Command"
 
-rem 다운로드 폴더 실제 위치 확인 (OneDrive로 옮겨 둔 경우 대비), 못 찾으면 기본값
-set "DL=%USERPROFILE%\Downloads"
-set "DLRAW="
-for /f "tokens=2,*" %%A in ('reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders" /v "{374DE290-123F-4565-9164-39C4925E467B}" 2^>nul ^| find "REG_"') do set "DLRAW=%%B"
-if defined DLRAW call set "DLTEST=%DLRAW%"
-if defined DLTEST if exist "%DLTEST%" set "DL=%DLTEST%"
-set "DEST=%DL%\로이창고"
+rem 설치 폴더: C:\로이창고
+rem   미리 ROICHANGGO_HOME 환경변수를 정해 두면 그 폴더에 설치합니다.
+if not defined ROICHANGGO_HOME set "ROICHANGGO_HOME=C:\로이창고"
+set "DEST=%ROICHANGGO_HOME%"
+set "RUNFROM=%~dp0"
 
 rem 구글 크롬을 먼저 찾습니다 - 있으면 크롬으로 열고, 없을 때만 기본 브라우저로 엽니다
 rem 확인 순서: Program Files -> Program Files x86 -> LocalAppData
@@ -35,9 +35,23 @@ echo    로이창고 최신판 자동 업데이트
 echo ============================================================
 echo.
 
+rem ---------- 설치 폴더 준비: 없으면 만들고, 쓸 수 있는지 확인 ----------
+if not exist "%DEST%" mkdir "%DEST%" >nul 2>&1
+call :WRITETEST "%DEST%"
+if not errorlevel 1 goto DESTREADY
+
+echo   * %DEST% 폴더를 만들거나 쓸 수 없습니다.
+echo     사용자 폴더로 대신 설치합니다.
+set "DEST=%USERPROFILE%\로이창고"
+if not exist "%DEST%" mkdir "%DEST%" >nul 2>&1
+call :WRITETEST "%DEST%"
+if errorlevel 1 goto NODEST
+:DESTREADY
+
+if /i not "%RUNFROM:~0,-1%"=="%DEST%" echo   * 예전 폴더에서 실행되어 %DEST% 로 새로 설치합니다.
+
 if exist "%WORK%" rmdir /s /q "%WORK%" >nul 2>&1
 mkdir "%WORK%" >nul 2>&1
-if not exist "%DEST%" mkdir "%DEST%" >nul 2>&1
 
 echo [1/4] 최신판 내려받는 중...
 %PS% "$ProgressPreference='SilentlyContinue'; $ErrorActionPreference='Stop'; try{[Net.ServicePointManager]::SecurityProtocol=[Net.SecurityProtocolType]::Tls12}catch{}; Invoke-WebRequest -Uri '%ZIPURL%' -OutFile '%WORK%\main.zip' -UseBasicParsing"
@@ -53,7 +67,7 @@ for /d %%D in ("%WORK%\x\*") do set "SRC=%%D"
 if not defined SRC goto FAIL
 if not exist "%SRC%\로이창고.html" goto FAIL
 
-echo [3/4] 파일 갱신 중...
+echo [3/4] 파일 갱신 중... %DEST%
 %PS% "$ErrorActionPreference='Stop'; $s='%SRC%'; $d='%DEST%'; Copy-Item -Path (Join-Path $s '로이창고.html') -Destination (Join-Path $d '로이창고.html') -Force; $ext = Join-Path $d '로이창고_수집기'; New-Item -ItemType Directory -Force -Path $ext | Out-Null; Copy-Item -Path (Join-Path $s '로이창고_수집기\*') -Destination $ext -Recurse -Force; if (Test-Path (Join-Path $s 'README.md')) { Copy-Item -Path (Join-Path $s 'README.md') -Destination $d -Force }; if (Test-Path (Join-Path $s '로이창고_업데이트.bat')) { Copy-Item -Path (Join-Path $s '로이창고_업데이트.bat') -Destination $d -Force }; try { if (Test-Path (Join-Path $s '로이창고.ico')) { Copy-Item -Path (Join-Path $s '로이창고.ico') -Destination (Join-Path $d '로이창고.ico') -Force } } catch {}"
 if errorlevel 1 goto FAIL
 if not exist "%DEST%\로이창고.html" goto FAIL
@@ -81,19 +95,26 @@ echo.
 echo   저장 위치: %DEST%
 echo.
 echo   크롬 확장프로그램(chrome://extensions)에서
-echo   새로고침 한 번만 누르세요.
+echo   아래 폴더의 '로이창고_수집기' 를 한 번만 다시 불러오세요.
+echo     %DEST%\로이창고_수집기
 echo.
 echo   * 처음 설치라면 한 번만 더:
 echo     chrome://extensions  우측 상단 [개발자 모드] 켜기
 echo     -^> [압축해제된 확장 프로그램을 로드합니다]
 echo     -^> 위 폴더 안의 '로이창고_수집기' 폴더 선택
 echo.
-echo   * 예전 폴더에서 불러와 있던 확장은, 그 항목을 [삭제]하고
+echo   * 예전 폴더(다운로드\로이창고)에서 불러와 있던 확장은, 그 항목을 [삭제]하고
 echo     위 폴더로 새로 [로드]해야 이번 업데이트가 적용됩니다.
+echo.
+echo   * 예전 폴더(다운로드\로이창고)는 확장을 새 폴더로 다시 불러온 뒤 지우셔도 됩니다.
+echo     예전 폴더는 이제 쓰지 않습니다.
+echo.
+echo   * 앱 설정(Gemini API 키 등)이 안 보이면 [설정]에서 다시 넣으시면 됩니다.
+echo     입력해 둔 내용은 크롬 안에 저장되므로 폴더를 옮겨도 대개 그대로 남습니다.
 echo.
 echo   * 다음부터는 바탕화면의 [로이창고] 아이콘을 누르면 바로 열립니다.
 echo.
-echo   * 바탕화면 아이콘이 예전 크롬 모양 그대로면 F5^(새로 고침^)를 한 번 누르세요.
+echo   * 바탕화면 아이콘이 예전 폴더를 가리키고 있으면 F5^(새로 고침^)를 한 번 누르세요.
 echo.
 
 if defined CHROME (
@@ -105,8 +126,21 @@ if defined CHROME (
 )
 
 echo   창을 닫으셔도 됩니다.
-timeout /t 6 >nul
+timeout /t 8 >nul
 exit /b 0
+
+:NODEST
+echo.
+echo ============================================================
+echo    설치 폴더를 만들지 못했습니다
+echo ============================================================
+echo.
+echo   - C:\로이창고 와 %USERPROFILE%\로이창고 폴더 모두 쓸 수 없습니다.
+echo   - 윈도우 보안 프로그램이 폴더 만들기를 막고 있는지 확인해 주세요.
+echo   - 계속 안 되면 로이에게 이 화면을 보여 주세요.
+echo.
+pause
+exit /b 1
 
 :FAIL
 echo.
@@ -121,3 +155,8 @@ echo.
 if exist "%WORK%" rmdir /s /q "%WORK%" >nul 2>&1
 pause
 exit /b 1
+
+:WRITETEST
+rem %1 폴더에 작은 파일을 하나 써 보고 지웁니다. 쓸 수 있으면 errorlevel 0.
+%PS% "$d='%~1'; try{ $t=Join-Path $d ('wo'+[string](Get-Random)+'.tmp'); Set-Content -LiteralPath $t -Value 'x' -ErrorAction Stop; Remove-Item -LiteralPath $t -Force -ErrorAction Stop; exit 0 } catch { exit 1 }"
+exit /b %errorlevel%
